@@ -1,0 +1,379 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Profi-Modus · Arbeitshaltung (Online)</title>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap');
+  :root{
+    --brand:#5246c4;--brand-dk:#392e9e;--amber:#f6a609;--star:#f5b301;--ok:#22a06b;
+    --bg:#f4f3fb;--surface:#fff;--ink:#241f40;--muted:#7b769a;--line:#e9e7f4;
+    --shadow:0 1px 2px rgba(40,30,90,.05),0 10px 26px rgba(40,30,90,.08);
+    --display:'Fredoka','Baloo 2',system-ui,sans-serif;
+    --body:'Nunito',system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);-webkit-font-smoothing:antialiased;line-height:1.45}
+  .wrap{max-width:1060px;margin:0 auto;padding:22px 18px 60px}
+  header.app{display:flex;flex-wrap:wrap;align-items:center;gap:14px;
+    background:radial-gradient(120% 140% at 80% -20%,#7a6bf0 0%,var(--brand) 45%,var(--brand-dk) 100%);
+    color:#fff;border-radius:22px;padding:22px 24px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+  header.app .stars-bg{position:absolute;inset:0;pointer-events:none;font-size:22px;opacity:.18}
+  header.app .stars-bg span{position:absolute}
+  h1{font-family:var(--display);font-weight:700;margin:0;font-size:31px;line-height:1}
+  .sub{opacity:.9;font-size:13px;margin-top:5px;font-weight:600}
+  .grow{flex:1}
+  .pills{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+  .pill{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);padding:5px 12px;border-radius:999px;font-weight:800;font-size:12.5px;white-space:nowrap}
+  .hbtns{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+  button{font-family:var(--body);cursor:pointer;border:none;border-radius:12px;font-weight:800;font-size:14px;padding:10px 15px;transition:transform .06s,filter .15s}
+  button:active{transform:translateY(1px)}
+  button:focus-visible{outline:3px solid var(--star);outline-offset:2px}
+  .btn-ghost{background:rgba(255,255,255,.16);color:#fff;border:1px solid rgba(255,255,255,.32)}
+  .btn-ghost:hover{filter:brightness(1.12)}
+  .btn-amber{background:var(--amber);color:#3f2a00}
+  .btn-amber:hover{filter:brightness(1.05)}
+
+  .legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  .legend .li{display:flex;align-items:center;gap:7px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:12.5px;font-weight:700;color:#4a4570;box-shadow:var(--shadow)}
+  .legend .li b{color:var(--brand);font-family:var(--display)}
+
+  section{margin-top:26px}
+  .sec-head{display:flex;align-items:baseline;gap:10px;margin:0 4px 12px}
+  .eyebrow{font-family:var(--display);font-weight:700;text-transform:uppercase;letter-spacing:.6px;font-size:13px;color:var(--brand)}
+  h2{font-size:20px;margin:0;font-weight:800}
+  .sec-note{color:var(--muted);font-size:12.5px;margin-left:auto;font-weight:600}
+
+  .bonusgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+  .bcard{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:13px 15px;box-shadow:var(--shadow);border-left:6px solid var(--line)}
+  .bcard.early{border-left-color:var(--ok)}
+  .bcard.stay{border-left-color:#c9c4e0}
+  .bhead{display:flex;align-items:center;gap:10px}
+  .av{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;font-weight:800;color:#231f1f;font-size:14px;flex:0 0 auto}
+  .bname{font-weight:800;font-size:15px}
+  .stufe{margin-left:auto;font-family:var(--display);font-size:15px;color:var(--brand-dk);background:#efeafc;border-radius:9px;padding:2px 9px}
+  .btag{margin-top:9px;font-size:12.5px;font-weight:800;padding:4px 10px;border-radius:999px;display:inline-block}
+  .btag.early{background:#dff3e8;color:#136c43}
+  .btag.stay{background:#eeecf6;color:#6b6690}
+  .bmeta{font-size:11.5px;color:var(--muted);font-weight:700;margin-top:7px}
+
+  .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:15px 16px;box-shadow:var(--shadow)}
+  .crow{display:flex;align-items:center;gap:11px;margin-bottom:11px}
+  .nm{font-weight:800;font-size:16px}
+  .lvlchip{font-size:11px;font-weight:800;color:var(--brand-dk);background:#efeafc;border:1px solid #ddd5f6;padding:1px 8px;border-radius:999px;display:inline-block;margin-top:2px}
+  .todaystars{margin-left:auto;text-align:right;font-family:var(--display);font-size:15px;color:var(--star);white-space:nowrap}
+  .todaystars small{display:block;font-family:var(--body);font-size:10.5px;color:var(--muted);font-weight:700}
+  .rub{display:flex;align-items:center;gap:9px;padding:8px 11px;border-radius:12px;border:1.5px solid var(--line);background:#faf9ff;font-size:13px;font-weight:700;color:#4a4570;margin-top:7px;user-select:none;transition:all .12s}
+  .rub.click{cursor:pointer}
+  .rub.click:hover{border-color:#cfc8ef}
+  .rub .ic{font-size:15px;width:18px;text-align:center}
+  .rub .stk{margin-left:auto;font-size:17px;color:#d6d2ea;transition:transform .12s}
+  .rub.met{background:#fff6e1;border-color:var(--amber);color:#7a5300}
+  .rub.met .stk{color:var(--star);transform:scale(1.12)}
+
+  .grid2{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+  .scard{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:13px 15px;box-shadow:var(--shadow)}
+  .bigstars{margin-left:auto;font-family:var(--display);font-size:22px;color:var(--ink)}
+  .bigstars small{font-family:var(--body);font-size:10.5px;color:var(--muted);font-weight:700;display:block;text-align:right}
+  .prog{height:8px;border-radius:99px;background:#eeebf9;overflow:hidden;margin:9px 0 5px}
+  .prog>i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--brand),#8a7bf2);transition:width .5s}
+  .ptxt{font-size:11.5px;color:var(--muted);font-weight:700}
+
+  #toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:var(--brand-dk);color:#fff;padding:13px 20px;border-radius:14px;font-weight:800;box-shadow:0 10px 30px rgba(0,0,0,.25);opacity:0;pointer-events:none;transition:all .35s;z-index:50;font-size:15px;max-width:90vw}
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .editbar{display:none;background:#f3f0ff;border:1px solid #ddd5f6;border-radius:14px;padding:13px 15px;margin-top:14px;font-size:13px;color:#4a4570;font-weight:600}
+  .editbar.show{display:block}
+  .editbar .danger{background:#f7d3da;color:#8a2233}
+  .editbar .btn-save{background:#e7e1fb;color:var(--brand-dk);margin:0 4px;padding:6px 12px;font-size:13px}
+  .setup{background:#fff6e1;border:1px solid #f3d79a;border-radius:12px;padding:10px 14px;margin-top:14px;font-size:12.5px;color:#7a5300;font-weight:700}
+  .foot{color:var(--muted);font-size:12px;text-align:center;margin-top:26px;font-weight:600}
+  @media (prefers-reduced-motion: reduce){*{transition:none!important}}
+  @media (max-width:560px){h1{font-size:25px}.cards{grid-template-columns:1fr}}
+</style>
+
+<div class="wrap">
+  <header class="app">
+    <div class="stars-bg" id="starsBg"></div>
+    <div style="position:relative">
+      <h1>Profi-Modus</h1>
+      <div class="sub">Arbeitshaltung &ndash; Tag f&uuml;r Tag &middot; 2-Wochen-Zyklus</div>
+    </div>
+    <div class="grow"></div>
+    <div class="pills">
+      <span class="pill" id="cyclePill">Zyklus 1 &middot; Tag 1</span>
+      <span class="pill" id="statusPill">&#9211; Lokal</span>
+    </div>
+    <div class="hbtns" id="controls"></div>
+  </header>
+
+  <div class="legend" id="legend"></div>
+  <div class="setup" id="setup" style="display:none"></div>
+
+  <div class="editbar" id="editbar">
+    <b>Bearbeiten:</b> Namen anklicken zum Umbenennen.
+    <button class="danger" id="resetBtn" style="float:right">Alles zur&uuml;cksetzen</button>
+    <div style="clear:both"></div>
+    <div style="margin-top:10px;border-top:1px solid #ddd5f6;padding-top:10px">
+      Backup (zus&auml;tzlich zur Cloud):
+      <button class="btn-save" id="backupBtn">Sichern (.json)</button>
+      <button class="btn-save" id="loadBtn">Laden</button>
+      <input type="file" id="fileInput" accept=".json,application/json" style="display:none">
+    </div>
+  </div>
+
+  <section>
+    <div class="sec-head"><span class="eyebrow">Freitags-Bonus</span><h2>Stufe im aktuellen Zyklus</h2>
+      <span class="sec-note">Stufe 3&ndash;4 d&uuml;rfen fr&uuml;her gehen &middot; Stufe 1&ndash;2 bleiben</span></div>
+    <div class="bonusgrid" id="bonus"></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="eyebrow">Heute</span><h2>Arbeitshaltung bewerten</h2>
+      <span class="sec-note" id="cardsNote">tippe an, was heute erf&uuml;llt ist</span></div>
+    <div class="cards" id="cards"></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="eyebrow">Langzeit</span><h2>Sterne-Sammlung &amp; Level</h2>
+      <span class="sec-note">Gesamt-Sterne &uuml;ber alle Zyklen</span></div>
+    <div class="grid2" id="overview"></div>
+  </section>
+
+  <div class="foot">Profi-Modus &middot; Online-Version</div>
+</div>
+<div id="toast"></div>
+
+<script>
+/* ==================== EINSTELLUNGEN ====================
+   1) Firebase-Werte hier eintragen (aus der Firebase-Konsole).
+   2) Lehrer-PIN setzen. 3) Stufen-Grenzen bei Bedarf anpassen.
+   Solange die Werte leer sind, läuft die App lokal auf diesem Gerät.       */
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyCL9lwcC0fmgoWGkUkaRI1B6B6G8SC9hNI",
+  authDomain: "klassentracker-kk9.firebaseapp.com",
+  databaseURL: "https://klassentracker-kk9-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "klassentracker-kk9"
+};
+const TEACHER_PIN = "1918";     // PIN für den Lehrer-Modus -> ÄNDERN
+const CYCLE_WEEKS = 2;          // Reset-Zyklus in Wochen
+// Stufen-Grenzen: ab wie vielen Zyklus-Sternen welche Stufe (früher gehen ab Stufe 3)
+const STUFEN = [
+  {stufe:4, min:35},
+  {stufe:3, min:24},
+  {stufe:2, min:12},
+  {stufe:1, min:6},
+];
+const EARLY_FROM = 3;           // ab dieser Stufe: darf früher gehen
+/* ====================================================== */
+
+const COLORS=["FFD54A","F08C3C","EC6A8E","9B7FD4","5B9BD5","7CC576","F0B429","3FC1B0"];
+const NAMES=["Analyn","Leandro","Joline","Matya","Mehmet","Nayara","Pirro","Nerea"];
+const RUBRICS=[
+  {ic:"\u{1F4D2}", short:"Hausaufgaben gemacht"},
+  {ic:"\u270F\uFE0F", short:"Material dabei (inkl. Schreibzeug)"},
+  {ic:"\u23F1\uFE0F", short:"Start innert 2 Minuten"},
+  {ic:"\u{1F92B}", short:"20 Min. ruhig & konzentriert"},
+  {ic:"\u270B", short:"Zuh\u00f6ren & aktiv mitmachen"},
+];
+const THRESH=[0,8,20,36,58,86,122,168,226,300];
+const TITLES=["Anf\u00e4nger","Rookie","Aufsteiger","K\u00f6nner","Profi","Crack","Meister","Champion","Legende","Boss"];
+
+const params=new URLSearchParams(location.search);
+const forceView = params.get('view')==='1';
+const CLOUD = FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.apiKey!=="HIER_EINFUEGEN";
+let state=null, teacher=false, dbRef=null, cloudOk=false;
+
+function defaults(){
+  return {cycle:1, day:1, students:NAMES.map((n,i)=>({
+    id:i,name:n,color:COLORS[i],today:[false,false,false,false,false],
+    cycleStars:0, stars:0, days:0, streak:0
+  }))};
+}
+const todayStars=s=>s.today.filter(Boolean).length;
+const liveCycle=s=>s.cycleStars+todayStars(s);
+const liveCareer=s=>s.stars+todayStars(s);
+
+function levelOf(t){let lv=1;for(let i=0;i<THRESH.length;i++){if(t>=THRESH[i])lv=i+1;}return Math.min(lv,10);}
+function levelInfo(t){const lv=levelOf(t);
+  if(lv>=10) return {lv:10,title:"Boss",pct:100,toNext:0,max:true};
+  const cur=THRESH[lv-1],next=THRESH[lv];
+  return {lv,title:TITLES[lv-1],max:false,pct:Math.max(0,Math.min(100,Math.round((t-cur)/(next-cur)*100))),toNext:next-t};}
+function stufeOf(x){for(const s of STUFEN){if(x>=s.min)return s.stufe;}return 1;}
+function nextStufeInfo(x){
+  const cur=stufeOf(x); const higher=STUFEN.filter(s=>s.stufe>cur).sort((a,b)=>a.min-b.min)[0];
+  return higher?{need:higher.min-x, to:higher.stufe}:null;
+}
+
+/* ---------- storage: local + cloud ---------- */
+const KEY='profimodus_online_v1';
+function save(){
+  try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}
+  if(dbRef && teacher){ dbRef.set(state).catch(()=>{}); }
+}
+function loadLocal(){
+  try{const d=localStorage.getItem(KEY);if(d){state=JSON.parse(d);return;}}catch(e){}
+  state=defaults();
+}
+function initCloud(){
+  try{
+    firebase.initializeApp(FIREBASE_CONFIG);
+    dbRef=firebase.database().ref('profimodus');
+    dbRef.on('value',snap=>{
+      const v=snap.val();
+      if(v && Array.isArray(v.students)){ state=v; cloudOk=true; render(); }
+      else { cloudOk=true; dbRef.set(state).catch(()=>{}); }
+      setStatus();
+    },err=>{ cloudOk=false; setStatus(); });
+    return true;
+  }catch(e){ cloudOk=false; return false; }
+}
+
+/* ---------- render ---------- */
+function setStatus(){
+  const el=document.getElementById('statusPill');
+  el.innerHTML = CLOUD ? (cloudOk?'\u{1F7E2} Live':'\u{1F7E0} verbinde\u2026') : '\u26AA Lokal';
+}
+function render(){
+  document.getElementById('cyclePill').textContent=`Zyklus ${state.cycle} \u00b7 Tag ${state.day}`;
+  setStatus(); renderControls(); renderLegend(); renderBonus(); renderCards(); renderOverview();
+  document.getElementById('setup').style.display = (!CLOUD && teacher) ? 'block' : 'none';
+  if(!CLOUD && teacher) document.getElementById('setup').innerHTML=
+    'Aktuell <b>lokal</b> (nur dieses Ger\u00e4t). F\u00fcr gemeinsamen Zugriff: Firebase-Werte oben im Code eintragen \u2013 Anleitung hast du erhalten.';
+  document.getElementById('cardsNote').textContent = teacher ? 'tippe an, was heute erf\u00fcllt ist' : 'Ansicht \u2013 nur die Lehrperson kann bewerten';
+}
+function renderControls(){
+  const el=document.getElementById('controls'); let h='';
+  if(!forceView){ h += teacher
+    ? `<button class="btn-ghost" data-act="leave">Ansicht</button>`
+    : `<button class="btn-ghost" data-act="login">Lehrer-Modus</button>`; }
+  if(teacher){
+    h += `<button class="btn-ghost" data-act="day">Tag abschliessen</button>`;
+    h += `<button class="btn-amber" data-act="cycle">Zyklus abschliessen</button>`;
+    h += `<button class="btn-ghost" data-act="edit">Bearbeiten</button>`;
+  }
+  el.innerHTML=h;
+}
+function renderLegend(){
+  document.getElementById('legend').innerHTML=RUBRICS.map((r,i)=>
+    `<span class="li"><b>${i+1}</b> ${r.ic} ${r.short}</span>`).join('');
+}
+function renderBonus(){
+  const el=document.getElementById('bonus');
+  const sorted=[...state.students].sort((a,b)=>liveCycle(b)-liveCycle(a));
+  el.innerHTML=sorted.map(s=>{
+    const cyc=liveCycle(s), st=stufeOf(cyc), early=st>=EARLY_FROM;
+    const nx=nextStufeInfo(cyc);
+    return `<div class="bcard ${early?'early':'stay'}">
+      <div class="bhead">
+        <div class="av" style="background:#${s.color}">${s.name[0]}</div>
+        <div class="bname">${s.name}</div>
+        <span class="stufe">Stufe ${st}</span>
+      </div>
+      <span class="btag ${early?'early':'stay'}">${early?'\u{1F7E2} darf Freitag fr\u00fcher gehen':'\u26AA bleibt volle Zeit'}</span>
+      <div class="bmeta">${cyc} Sterne im Zyklus${nx?` &middot; noch ${nx.need} bis Stufe ${nx.to}`:''}</div>
+    </div>`;
+  }).join('');
+}
+function stars(n){return "\u2605".repeat(n)+"\u2606".repeat(5-n);}
+function renderCards(){
+  const el=document.getElementById('cards'); el.innerHTML='';
+  state.students.forEach(s=>{
+    const li=levelInfo(liveCareer(s)), ts=todayStars(s);
+    const c=document.createElement('div'); c.className='card';
+    c.innerHTML=`
+      <div class="crow">
+        <div class="av" style="background:#${s.color}">${s.name[0]}</div>
+        <div><div class="nm" data-edit="${s.id}">${s.name}</div>
+          <span class="lvlchip">Lvl ${li.lv} &middot; ${li.title}</span></div>
+        <div class="todaystars">${stars(ts)}<small>HEUTE ${ts}/5</small></div>
+      </div>
+      ${RUBRICS.map((r,i)=>`
+        <div class="rub ${s.today[i]?'met':''} ${teacher?'click':''}" ${teacher?`data-tog="${s.id}" data-i="${i}"`:''}>
+          <span class="ic">${r.ic}</span><span>${r.short}</span>
+          <span class="stk">${s.today[i]?'\u2605':'\u2606'}</span>
+        </div>`).join('')}`;
+    el.appendChild(c);
+  });
+}
+function renderOverview(){
+  const el=document.getElementById('overview');
+  const sorted=[...state.students].sort((a,b)=>liveCareer(b)-liveCareer(a));
+  el.innerHTML=sorted.map(s=>{const li=levelInfo(liveCareer(s));
+    return `<div class="scard">
+      <div class="crow">
+        <div class="av" style="background:#${s.color}">${s.name[0]}</div>
+        <div><div class="nm">${s.name}</div><span class="lvlchip">Lvl ${li.lv} &middot; ${li.title}</span></div>
+        <div class="bigstars">${liveCareer(s)}<small>STERNE</small></div>
+      </div>
+      <div class="prog"><i style="width:${li.pct}%"></i></div>
+      <div class="ptxt">${li.max?'\u{1F451} Max-Level Boss':'noch '+li.toNext+' bis Level '+(li.lv+1)}</div>
+    </div>`;}).join('');
+}
+
+/* ---------- actions (teacher only) ---------- */
+function toggle(id,i){
+  if(!teacher) return;
+  const s=state.students.find(x=>x.id===id);
+  const before=levelOf(liveCareer(s));
+  s.today[i]=!s.today[i];
+  if(levelOf(liveCareer(s))>before){const t=levelInfo(liveCareer(s));
+    toast(t.lv>=10?`${s.name} ist jetzt BOSS! \u{1F451}`:`${s.name} \u2192 Level ${t.lv}: ${t.title}!`);}
+  render(); save();
+}
+function finishDay(){
+  if(!confirm('Tag abschliessen? Die heutigen Sterne werden gutgeschrieben und morgen startet frisch.')) return;
+  state.students.forEach(s=>{const ts=todayStars(s);
+    s.cycleStars+=ts; s.stars+=ts; s.days++;
+    if(ts===5)s.streak=(s.streak||0)+1; else s.streak=0;
+    s.today=[false,false,false,false,false];});
+  state.day++; render(); save(); toast('Tag gespeichert.');
+}
+function finishCycle(){
+  if(!confirm('Zyklus abschliessen (Freitag)? Der Freitags-Bonus wird festgehalten und die Zyklus-Sterne auf 0 gesetzt. Die Level bleiben erhalten.')) return;
+  state.students.forEach(s=>{const ts=todayStars(s);s.cycleStars+=ts;s.stars+=ts;s.today=[false,false,false,false,false];});
+  const early=state.students.filter(s=>stufeOf(s.cycleStars)>=EARLY_FROM).map(s=>s.name);
+  state.students.forEach(s=>{s.cycleStars=0;});
+  state.cycle++; state.day=1; render(); save();
+  toast(early.length?`Fr\u00fcher gehen: ${early.join(', ')}`:'Zyklus abgeschlossen.');
+}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;
+  t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),3200);}
+function rename(id){const s=state.students.find(x=>x.id===id);
+  const v=prompt('Name \u00e4ndern:',s.name);if(v&&v.trim()){s.name=v.trim();render();save();}}
+function backup(){try{const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='profi-modus_'+new Date().toISOString().slice(0,10)+'.json';
+  document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(a.href);}catch(e){alert('Sichern fehlgeschlagen.');}}
+function restore(file){const r=new FileReader();r.onload=()=>{try{const o=JSON.parse(r.result);
+  if(o&&Array.isArray(o.students)){state=o;render();save();toast('Daten geladen \u2713');}
+  else alert('Diese Datei passt nicht.');}catch(e){alert('Konnte die Datei nicht lesen.');}};r.readAsText(file);}
+
+/* ---------- events ---------- */
+document.addEventListener('click',e=>{
+  const tg=e.target.closest('[data-tog]'); if(tg){ toggle(+tg.dataset.tog,+tg.dataset.i); return; }
+  const ed=e.target.closest('[data-edit]'); if(ed && teacher && document.getElementById('editbar').classList.contains('show')){ rename(+ed.dataset.edit); return; }
+  const act=e.target.closest('[data-act]'); if(!act) return;
+  const a=act.dataset.act;
+  if(a==='login'){ const p=prompt('Lehrer-PIN:'); if(p===TEACHER_PIN){teacher=true;render();toast('Lehrer-Modus aktiv');} else if(p!=null) alert('Falscher PIN.'); }
+  else if(a==='leave'){ teacher=false; document.getElementById('editbar').classList.remove('show'); render(); }
+  else if(a==='day') finishDay();
+  else if(a==='cycle') finishCycle();
+  else if(a==='edit'){ const b=document.getElementById('editbar'); b.classList.toggle('show');
+    document.querySelectorAll('[data-edit]').forEach(n=>n.style.cursor=b.classList.contains('show')?'pointer':'default'); }
+});
+document.getElementById('resetBtn').onclick=()=>{ if(confirm('Wirklich alles zur\u00fccksetzen?')){state=defaults();render();save();} };
+document.getElementById('backupBtn').onclick=backup;
+document.getElementById('loadBtn').onclick=()=>document.getElementById('fileInput').click();
+document.getElementById('fileInput').onchange=e=>{if(e.target.files[0])restore(e.target.files[0]);e.target.value='';};
+
+document.getElementById('starsBg').innerHTML=
+  [[8,18],[20,60],[35,30],[55,70],[70,25],[85,55],[92,15],[45,12],[63,45]]
+  .map(([l,t])=>`<span style="left:${l}%;top:${t}%">\u2605</span>`).join('');
+
+/* ---------- boot ---------- */
+loadLocal();
+render();
+if(CLOUD && window.firebase){ initCloud(); }
+
+</script>
