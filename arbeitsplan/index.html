@@ -1,0 +1,1708 @@
+<!DOCTYPE html>
+<html lang="de-CH">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#1F3864">
+<title>Arbeitsplan Deutsch KK9</title>
+<style>
+:root{
+  --bg:#eef1f6; --karte:#ffffff; --text:#1b2430; --gedaempft:#5b6779; --rand:#d9dfe7;
+  --akzent:#1F3864; --akzent-hell:#2e5aa8; --akzent-weich:#e6edf8;
+  --offen:#F4CCCC; --offen-r:#d99393; --offen-t:#7d2626;
+  --arbeit:#FFF2CC; --arbeit-r:#e2c25f; --arbeit-t:#6b5000;
+  --fertig:#D9EAD3; --fertig-r:#93c47d; --fertig-t:#2a5e22;
+  --kontrolliert:#A9D08E; --kontrolliert-r:#5f9e42; --kontrolliert-t:#173f0c;
+  --radius:14px; --tap:48px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
+     background:var(--bg);color:var(--text);font-size:17px;line-height:1.45}
+button{font:inherit;color:inherit;min-height:var(--tap);padding:10px 16px;border-radius:10px;
+       border:1px solid var(--rand);background:var(--karte);cursor:pointer}
+button:active{transform:translateY(1px)}
+button[disabled]{opacity:.4;cursor:default;transform:none}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--akzent-hell);outline-offset:2px}
+.primaer{background:var(--akzent);border-color:var(--akzent);color:#fff;font-weight:650}
+.gefahr{color:#9b1c1c;border-color:#e6b8b8;background:#fff6f6}
+.klein{min-height:40px;padding:6px 12px;font-size:.92rem}
+.gedaempft{color:var(--gedaempft);font-size:.92rem}
+.verborgen{display:none!important}
+input[type=text],input[type=email],input[type=password],select,textarea{font:inherit;min-height:44px;
+  padding:8px 10px;border:1px solid var(--rand);border-radius:10px;width:100%;background:#fff;color:var(--text)}
+textarea{min-height:84px;resize:vertical;line-height:1.4}
+input[type=color]{width:48px;height:44px;padding:2px;border:1px solid var(--rand);border-radius:10px;background:#fff}
+input[type=checkbox]{width:22px;height:22px;accent-color:var(--akzent)}
+
+/* Kopf */
+.kopf{background:var(--akzent);color:#fff;padding:12px 16px 0;position:sticky;top:0;z-index:20;
+      box-shadow:0 2px 12px rgba(15,30,60,.2)}
+.kopf-zeile{max-width:1240px;margin:0 auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.marke{flex:1;min-width:200px}
+.titel{font-weight:750;font-size:1.22rem;letter-spacing:.01em}
+.untertitel{opacity:.8;font-size:.88rem}
+.kopf-rechts{display:flex;gap:8px;flex-wrap:wrap}
+.pill{display:inline-flex;align-items:center;gap:7px;font-size:.84rem;font-weight:650;padding:5px 11px;
+      border-radius:999px;background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.28);white-space:nowrap}
+.pill .punkt{width:9px;height:9px;border-radius:50%;background:#c8d2e0}
+.pill.live .punkt{background:#5ee08a;box-shadow:0 0 0 3px rgba(94,224,138,.25)}
+.pill.verbinde .punkt{background:#ffc94d}
+.pill.offline .punkt,.pill.fehler .punkt{background:#ff7b6b}
+.tabs{max-width:1240px;margin:10px auto 0;display:flex;gap:2px;overflow-x:auto;scrollbar-width:none}
+.tab{background:transparent;border:none;color:#d3ddef;border-radius:11px 11px 0 0;padding:10px 16px;
+     font-weight:650;white-space:nowrap;min-height:46px}
+.tab.aktiv{background:var(--bg);color:var(--akzent)}
+
+/* Rahmen */
+.huelle{max-width:1240px;margin:0 auto;padding:14px 16px 80px}
+.schmal{max-width:860px;margin-left:auto;margin-right:auto}
+.karte{background:var(--karte);border:1px solid var(--rand);border-radius:var(--radius);padding:16px 18px;margin-bottom:14px}
+h2{font-size:1.25rem;margin:.1em 0 .35em}
+h3{font-size:1.05rem;margin:.1em 0 .6em}
+.zeile{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.hinweis{background:#fff8e1;border:1px solid #efd78a;color:#5e4600;border-radius:12px;padding:10px 14px;margin-bottom:14px;font-size:.95rem}
+.hinweis.rot{background:#fdeeee;border-color:#efb4b4;color:#7d2626}
+.hinweis.blau{background:#eaf1fb;border-color:#bcd0ee;color:#1f3864}
+
+/* DL-Leiste */
+.dl-leiste{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 10px;margin-bottom:4px;scrollbar-width:thin}
+.dl-chip{display:flex;flex-direction:column;align-items:flex-start;min-width:92px;padding:7px 12px;line-height:1.2;
+         border-radius:12px;background:#fff;flex:0 0 auto}
+.dl-chip b{font-size:.98rem}
+.dl-chip span{font-size:.78rem;color:var(--gedaempft)}
+.dl-chip i{font-style:normal;font-size:.68rem;font-weight:750;color:#1d6b38;background:#ddf3e4;border-radius:6px;padding:0 6px;margin-top:3px}
+.dl-chip.aktiv{background:var(--akzent);border-color:var(--akzent);color:#fff}
+.dl-chip.aktiv span{color:#cfdaf0}
+.dl-chip.neu{justify-content:center;align-items:center;border-style:dashed;color:var(--akzent);font-weight:650}
+
+/* DL-Kopf */
+.dl-kopf{display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap;margin:6px 0 12px}
+.dl-nr{font-size:.82rem;font-weight:750;color:var(--akzent-hell);text-transform:uppercase;letter-spacing:.06em}
+.dl-kopf h2{margin:0;font-size:1.4rem}
+.dl-kopf .aktionen{margin-left:auto}
+
+/* Legende */
+.legende{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:0 0 12px}
+.leg{font-size:.8rem;font-weight:700;padding:3px 10px;border-radius:999px;border:1px solid}
+.legende .gedaempft{font-size:.84rem;margin-left:6px}
+
+/* Statusfarben (wie im Excel) */
+.st-offen{background:var(--offen);border-color:var(--offen-r);color:var(--offen-t)}
+.st-arbeit{background:var(--arbeit);border-color:var(--arbeit-r);color:var(--arbeit-t)}
+.st-fertig{background:var(--fertig);border-color:var(--fertig-r);color:var(--fertig-t)}
+.st-kontrolliert{background:var(--kontrolliert);border-color:var(--kontrolliert-r);color:var(--kontrolliert-t)}
+.st-leer{background:#f7f8fa;border-color:#dde1e7;color:#97a0ad}
+
+/* Mein Plan */
+.ich-kopf{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.punkt-gross{width:46px;height:46px;border-radius:13px;display:grid;place-items:center;font-weight:800;
+             font-size:1.15rem;color:#1b2430;flex:0 0 auto;box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)}
+.kennzahl{text-align:right}
+.kennzahl b{display:block;font-size:1.35rem;line-height:1.1}
+.fortschritt{height:12px;background:#e7ebf1;border-radius:99px;overflow:hidden;margin:6px 0 2px}
+.fortschritt>i{display:block;height:100%;background:linear-gradient(90deg,#5f9e42,#93c47d);border-radius:99px;transition:width .4s}
+.auftrag{display:grid;grid-template-columns:38px 1fr auto;gap:12px;align-items:center;background:#fff;
+         border:1px solid var(--rand);border-left:7px solid #dde1e7;border-radius:12px;padding:10px 12px;margin-bottom:8px}
+.auftrag.st-offen{border-left-color:var(--offen-r);background:#fff;color:inherit}
+.auftrag.st-arbeit{border-left-color:var(--arbeit-r);background:#fffdf4;color:inherit}
+.auftrag.st-fertig{border-left-color:var(--fertig-r);background:#f9fcf8;color:inherit}
+.auftrag.st-kontrolliert{border-left-color:var(--kontrolliert-r);background:#f2f9ee;color:inherit}
+.auftrag.st-leer{background:#fbfbfc;color:inherit;border-color:var(--rand);border-left-color:#e3e6eb}
+.nr{width:34px;height:34px;border-radius:50%;background:var(--akzent-weich);color:var(--akzent);font-weight:800;
+    display:grid;place-items:center;font-size:.95rem;flex:0 0 auto}
+.auftrag .text{font-weight:600}
+.wo{font-size:.86rem;color:var(--gedaempft);margin-top:2px}
+.art{display:inline-block;font-size:.7rem;font-weight:800;padding:1px 7px;border-radius:6px;margin-right:6px;vertical-align:2px;white-space:nowrap}
+.art.z{background:#fff0c2;color:#704c00}
+.art.puffer{background:#e1eafb;color:#244a8a}
+.segment{display:flex;gap:6px;flex-wrap:wrap}
+.seg{min-width:96px;padding:8px 10px;font-weight:650;background:#fff;color:var(--gedaempft)}
+.seg.aktiv{font-weight:800;border-width:2px}
+.kontrolliert-marke{font-weight:800;color:var(--kontrolliert-t);background:var(--kontrolliert);border-radius:10px;padding:10px 14px;white-space:nowrap}
+.nehmen{border-style:dashed;color:var(--akzent);font-weight:650;background:#fff}
+.ziel-text{font-size:1.05rem;font-weight:600;margin:.2em 0 .8em}
+.flk-zeile{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:8px 0;border-top:1px solid #eef0f4}
+.flk-zeile:first-of-type{border-top:none}
+.ha-liste{list-style:none;margin:0;padding:0}
+.ha-liste li{display:flex;gap:10px;align-items:baseline;padding:8px 0;border-top:1px solid #eef0f4}
+.ha-liste li:first-child{border-top:none}
+.ha-liste .bis{margin-left:auto;white-space:nowrap;font-weight:650;color:var(--akzent)}
+.ich-raster{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px;margin-top:12px}
+.ich-wahl{display:flex;align-items:center;gap:12px;text-align:left;font-weight:700;font-size:1.05rem;padding:10px 12px;min-height:66px}
+@media (max-width:680px){
+  .auftrag{grid-template-columns:34px 1fr}
+  .auftrag .steuerung{grid-column:1/-1}
+  .segment{width:100%}
+  .seg{flex:1;min-width:0;padding:8px 4px}
+}
+
+/* Raster */
+.scroll-x{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:var(--radius);background:#fff;border:1px solid var(--rand)}
+table.raster{border-collapse:separate;border-spacing:0;width:100%}
+.raster th,.raster td{padding:4px;border-bottom:1px solid #eef0f4;text-align:center;vertical-align:middle}
+.raster thead th{background:#fff;padding:8px 4px}
+.raster td,.raster thead th:not(.sp-auftrag){min-width:96px}
+.raster .sp-auftrag{text-align:left;min-width:230px;max-width:390px;position:sticky;left:0;background:#fff;z-index:1;
+                    padding:8px 10px;font-weight:500;box-shadow:1px 0 0 #eef0f4}
+.auftrag-kopf{display:flex;gap:10px;align-items:flex-start;width:100%;text-align:left;min-height:0;padding:2px;border:none;background:transparent;font-weight:500}
+.auftrag-kopf .nr{width:28px;height:28px;font-size:.85rem}
+.kopf-name{display:flex;align-items:center;justify-content:center;width:100%;min-height:44px;border-radius:10px;
+           font-weight:750;padding:6px 6px;border:none;color:#1b2430;font-size:.95rem;line-height:1.15}
+.zelle{display:flex;align-items:center;justify-content:center;width:100%;min-height:44px;border-radius:9px;border:1px solid;
+       font-size:.84rem;font-weight:700;padding:4px;line-height:1.1;text-align:center}
+button.zelle{cursor:pointer}
+.zelle.st-leer{border-style:dashed}
+.raster .ich-spalte{background:#f2f6fd}
+.raster tfoot th,.raster tfoot td{background:#fafbfc}
+.raster tfoot .sp-auftrag{background:#fafbfc;font-weight:650}
+.raster tfoot tr:first-child>*{border-top:2px solid #e3e7ee}
+.mini{height:7px;background:#e7ebf1;border-radius:99px;overflow:hidden;margin:4px 6px 0}
+.mini>i{display:block;height:100%;background:#5f9e42;border-radius:99px}
+.zahl{font-weight:750;font-size:.95rem}
+.ha-zelle{border-style:solid;border-color:#e6e9ee;background:#fff;color:#1b2430;font-size:1rem}
+.ha-zelle.an{border-color:rgba(0,0,0,.08)}
+@media (max-width:900px){
+  .raster td,.raster thead th:not(.sp-auftrag){min-width:76px}
+  .raster .sp-auftrag{min-width:190px}
+  .zelle{font-size:.78rem}
+}
+
+/* Übersicht */
+.ue-zelle{position:relative;border-radius:8px;padding:9px 4px;overflow:hidden;background:#f1f3f6;font-weight:700;font-size:.9rem}
+.ue-zelle>i{position:absolute;left:0;top:0;bottom:0;background:#cfe6c4}
+.ue-zelle.voll>i{background:#a9d08e}
+.ue-zelle>span{position:relative}
+.klassenziel{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.klassenziel .fortschritt{flex:1;min-width:200px;height:16px}
+
+/* Bearbeiten */
+.feld{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
+.feld label{font-size:.84rem;font-weight:650;color:var(--gedaempft)}
+.raster2{display:grid;grid-template-columns:180px 1fr;gap:0 14px}
+@media (max-width:700px){.raster2{grid-template-columns:1fr}}
+.edit-zeile{display:grid;grid-template-columns:34px minmax(180px,1fr) minmax(120px,210px) 130px auto;gap:8px;align-items:center;padding:8px 0;border-top:1px solid #eef0f4}
+.edit-zeile.lern{grid-template-columns:54px minmax(120px,1fr) minmax(120px,1fr) auto}
+.edit-zeile.ha{grid-template-columns:minmax(180px,1fr) 130px minmax(160px,1.2fr) auto}
+@media (max-width:820px){
+  .edit-zeile,.edit-zeile.lern,.edit-zeile.ha{grid-template-columns:34px 1fr}
+  .edit-zeile>*:not(:first-child){grid-column:2}
+  .edit-zeile.ha>*{grid-column:1/-1!important}
+}
+.knopf-gruppe{display:flex;gap:4px;flex-wrap:wrap}
+.icon{min-width:44px;padding:6px 8px}
+.chip-wahl{display:flex;gap:4px;flex-wrap:wrap}
+.chip{min-height:36px;min-width:36px;padding:4px 8px;font-size:.8rem;font-weight:750;border-radius:9px;opacity:.35}
+.chip.an{opacity:1;box-shadow:inset 0 0 0 2px rgba(0,0,0,.25)}
+.neu-form{background:#f7f9fc;border:1px dashed #c9d3e2;border-radius:12px;padding:12px;margin-top:10px}
+.link-feld{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.85rem}
+details>summary{cursor:pointer;font-weight:650;min-height:40px;display:flex;align-items:center}
+code{background:#f1f3f6;border-radius:6px;padding:1px 6px;font-size:.88em}
+
+/* Dialog */
+.dialog-hg{position:fixed;inset:0;background:rgba(20,28,38,.45);display:flex;align-items:center;justify-content:center;padding:20px;z-index:50}
+.dialog{background:#fff;border-radius:16px;padding:20px;max-width:460px;width:100%;max-height:90vh;overflow:auto;box-shadow:0 20px 50px rgba(0,0,0,.25)}
+.dialog h3{margin-top:0}
+.wahl-liste{display:grid;gap:8px;margin:12px 0}
+.wahl{width:100%;text-align:left;font-weight:750;border-width:2px}
+.wahl.aktiv{outline:3px solid var(--akzent);outline-offset:1px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:#1b2430;color:#fff;padding:12px 18px;
+       border-radius:12px;font-weight:650;opacity:0;pointer-events:none;transition:all .3s;z-index:60;max-width:90vw;text-align:center}
+.toast.zeigen{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* Beamer */
+body.beamer{font-size:19px}
+body.beamer .huelle{max-width:none;padding:14px 22px 30px}
+body.beamer .dl-kopf h2{font-size:1.8rem}
+body.beamer .raster .zelle{min-height:48px;font-size:.98rem}
+body.beamer .raster .sp-auftrag{font-size:1.02rem;max-width:460px}
+body.beamer .kopf-name{font-size:1.1rem;min-height:48px}
+body.beamer .raster th,body.beamer .raster td{padding:3px 4px}
+.beamer-pill{background:var(--akzent);color:#fff;border-color:var(--akzent)}
+
+@media (hover:hover){button:hover{filter:brightness(.97)}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media print{
+  @page{size:A4 landscape;margin:10mm}
+  body{background:#fff;font-size:10pt}
+  .nicht-drucken,.kopf,.dl-leiste,.toast{display:none!important}
+  .huelle{max-width:none;padding:0}
+  .karte,.scroll-x{border:1px solid #999;break-inside:avoid}
+  .scroll-x{overflow:visible}
+  .raster .sp-auftrag{position:static}
+  .zelle,.kopf-name,.st-offen,.st-arbeit,.st-fertig,.st-kontrolliert,.punkt-gross,.mini>i,.fortschritt>i{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .zelle,.kopf-name{min-height:26px}
+  .raster td,.raster thead th:not(.sp-auftrag){min-width:0}
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* ========================================================================
+   0. VERBINDUNG — einmal eintragen (Firebase-Konsole), dann nie mehr.
+   Solange «datenbank» leer ist, läuft die App im Demo-Modus: alles bleibt
+   auf diesem Gerät, nichts wird übertragen.
+   ======================================================================== */
+const CONFIG = {
+  datenbank: "",            // Realtime Database → URL, z.B. "https://arbeitsplan-kk9-default-rtdb.europe-west1.firebasedatabase.app"
+  apiKey: "",               // Projekteinstellungen → Allgemein → Web-API-Schlüssel (nur fürs Lehrer-Login)
+  lehrerEmail: "",          // optional: im Login vorausgefüllt
+  projekt: "arbeitsplan",   // oberster Pfad in der Datenbank – muss zu den Regeln passen
+  taktMs: 5000,             // Rückfall, falls die Live-Verbindung blockiert ist: Abgleich alle 5 s
+};
+
+/* ========================================================================
+   1. INHALT — Vorlage aus «Arbeitsplan_Textproduktion_KK9» (Blatt
+   Einstellungen). Wird nur beim ersten Einrichten in die Datenbank geladen;
+   danach änderst du Aufträge direkt in der App (Bereich «Bearbeiten»).
+   ======================================================================== */
+const DATEN = {
+  titel: "Arbeitsplan · Deutsch KK9",
+  untertitel: "Textproduktion HS26",
+  speicherPraefix: "arbeitsplan_kk9.",   // Schlüssel im Gerätespeicher (gleiche Adresse wie andere Tools)
+
+  // Spalten: Farbe + Farbname (wie im Excel). Echte Namen stehen NIE hier und nie in der
+  // Datenbank – sie kommen nur lokal auf die Geräte (Klassenlink, Bereich «Lernende»).
+  lernende: [
+    ["#FFD54A", "Gelb"], ["#F08C3C", "Orange"], ["#EC6A8E", "Pink"],  ["#9B7FD4", "Violett"],
+    ["#5B9BD5", "Blau"], ["#7CC576", "Grün"],   ["#F0B429", "Gold"],  ["#3FC1B0", "Türkis"],
+  ],
+  weitereFarben: [["#C8956A", "Braun"], ["#A3AEBB", "Grau"], ["#E8705F", "Rot"], ["#7D93E8", "Indigo"]],
+
+  vorlage: [
+    {
+      dl: "DL01", datum: "21.10.2026", thema: "Bericht I: «Schreib zuerst!»",
+      ziel: "Ich kann einen kurzen Bericht über ein Ereignis schreiben (erster Versuch).",
+      flk: [],
+      auftraege: [   // [Art, Auftrag, Wo]   Art: "P" = Pflicht (allen zugeteilt), "Z" = ★ Zusatz, "Puffer"
+        ["P", "Brücke: Bild anschauen, W-Fragen zu zweit", "DOS 1, 1.1"],
+        ["P", "Wortschatz R1: Wortkartei starten", "AB 3, R1 · Version B: auch S. 13"],
+        ["P", "Thema wählen", "DOS 1, 1.2"],
+        ["P", "W-Fragen-Gerüst ausfüllen", "DOS 1, 1.3"],
+        ["P", "Rohfassung Bericht schreiben (Papier oder FelloFish)", "DOS 1, 1.4"],
+        ["P", "Austausch zu zweit: Worüber schreibst du?", ""],
+        ["P", "Portfolio-Satz schreiben", "DOS 1, 1.5"],
+        ["Z", "Bonus: «9 minus 2» oder zeichnen", "DOS 1, 1.6 / AB 1"],
+        ["Puffer", "Puffer-Box: Schreibanlass-Karte oder Leserätsel", ""],
+      ],
+      hausaufgaben: [   // [Auftrag, auf wann, für alle zugeteilt?]
+        ["freiwillig: Wortkartei üben", "", false],
+      ],
+    },
+    {
+      dl: "DL02", datum: "28.10.2026", thema: "Bericht II: Was braucht ein Bericht?",
+      ziel: "Ich kann in einem Bericht die W-Fragen und die drei Teile markieren.",
+      flk: [],
+      auftraege: [   // [Art, Auftrag, Wo]   Art: "P" = Pflicht (allen zugeteilt), "Z" = ★ Zusatz, "Puffer"
+        ["P", "Brücke: Bericht-Würfel zu zweit (Version A 6 Würfel, Version B 9 Würfel)", "AB 1, Karte 2"],
+        ["P", "Wortschatz R2: Wortfeld «sagen»", "AB 3, R2 · Version B: auch S. 13"],
+        ["P", "Texte A bis D: Bericht oder Erzählung?", "DOS 1, 2.1"],
+        ["P", "Merkmale ankreuzen", "DOS 1, 2.2"],
+        ["P", "Bericht-Gerüst ergänzen", "DOS 1, 2.3"],
+        ["P", "Text A farbig markieren", "DOS 1, 2.4"],
+        ["P", "Eigene Rohfassung prüfen: Was fehlt?", "DOS 1, 2.5"],
+        ["P", "Austausch zu zweit: Markierungen vergleichen", ""],
+        ["P", "Portfolio-Satz schreiben", "Portfolio"],
+        ["Z", "Bonus: Bericht-Würfel schriftlich oder Arbeitsheft Sprachstarken 7, S. 79-81", "DOS 1, 2.6"],
+        ["Z", "App «Bericht-Detektiv»: Bericht oder Erzählung?", "App"],
+        ["Puffer", "Puffer-Box (Stufe 1 bis 3)", ""],
+      ],
+      hausaufgaben: [   // [Auftrag, auf wann, für alle zugeteilt?]
+      ],
+    },
+    {
+      dl: "DL03", datum: "04.11.2026", thema: "Bericht III: Überarbeiten",
+      ziel: "Ich kann Sätze aus einer Erzählung sachlich und im Präteritum umschreiben.",
+      flk: [],
+      auftraege: [   // [Art, Auftrag, Wo]   Art: "P" = Pflicht (allen zugeteilt), "Z" = ★ Zusatz, "Puffer"
+        ["P", "Brücke: Gimkit «Bericht oder Erzählung?»", "Gimkit"],
+        ["P", "Wortschatz R3: Wortschatz-Würfel", "AB 3, R3 · Version B: auch S. 13"],
+        ["P", "Ankreuzen: erzählend oder sachlich?", "DOS 1, 3.1"],
+        ["P", "Sätze sachlich umschreiben", "DOS 1, 3.2"],
+        ["P", "Verben ins Präteritum setzen", "DOS 1, 3.3"],
+        ["P", "Rohfassung überarbeiten (Checkliste, KI-Korrekturmodus)", "DOS 1, 3.4 / AB 4"],
+        ["P", "Zu zweit: 2 Sterne, 1 Wunsch", "DOS 1, 3.5"],
+        ["P", "Endfassung schreiben (Portfolio-Blatt)", "DOS 1, 3.6"],
+        ["P", "Portfolio-Satz schreiben", "Portfolio"],
+        ["Z", "Bonus: «Doppelt schreiben»", "DOS 1, 3.7 / AB 1"],
+        ["Z", "App: Präteritum oder Check-Bot", "App"],
+        ["Puffer", "Puffer-Box: Rechtschreib-Fitnessbahn / Förderdossier", "Puffer-Box"],
+      ],
+      hausaufgaben: [   // [Auftrag, auf wann, für alle zugeteilt?]
+      ],
+    },
+    {
+      dl: "DL04", datum: "11.11.2026", thema: "Bericht IV: Berichte im Beruf",
+      ziel: "Ich kann mit dem Bericht-Gerüst einen kurzen Bericht über ein Ereignis verfassen.",
+      flk: [],
+      auftraege: [   // [Art, Auftrag, Wo]   Art: "P" = Pflicht (allen zugeteilt), "Z" = ★ Zusatz, "Puffer"
+        ["P", "Brücke: Gerüst repetieren", "Wandtafel"],
+        ["P", "Wortschatz R4: Unfall- und Polizeiwörter", "AB 3, R4 · Version B: auch S. 13"],
+        ["P", "Zeugen-Puzzle zu zweit", "DOS 1, 4.1"],
+        ["P", "Unfallbericht schreiben", "DOS 1, 4.2"],
+        ["P", "Berufsbericht lesen (Wahl a, b oder c)", "DOS 1, 4.3"],
+        ["P", "Eigenen Rapport schreiben", "DOS 1, 4.4"],
+        ["P", "Austausch zu zweit: Unfallberichte prüfen", ""],
+        ["P", "Portfolio-Satz schreiben", "DOS 1, 4.5"],
+        ["Z", "Bonus: Story Box «Abenteuer als Bericht»", "DOS 1, 4.6 / AB 2"],
+        ["Z", "App: W-Fragen finden", "App"],
+        ["Puffer", "Puffer-Box (Stufe 1 bis 3)", ""],
+      ],
+      hausaufgaben: [   // [Auftrag, auf wann, für alle zugeteilt?]
+      ],
+    },
+    {
+      dl: "DL05", datum: "18.11.2026", thema: "Anleitung I: Anleitungen verstehen",
+      ziel: "Ich kann eine Bild-Anleitung in nummerierte Arbeitsschritte umformen.",
+      flk: [],
+      auftraege: [   // [Art, Auftrag, Wo]   Art: "P" = Pflicht (allen zugeteilt), "Z" = ★ Zusatz, "Puffer"
+        ["P", "Brücke: Anleitungs-Würfel (mündlich)", "AB 1"],
+        ["P", "Wortschatz R5: Reihenfolgewörter", "AB 3, R5 · Version B: auch S. 14"],
+        ["P", "Bild-Anleitung: Bilder nummerieren", "DOS 2, 5.1"],
+        ["P", "Reihenfolgewörter einsetzen", "DOS 2, 5.2"],
+        ["P", "Sätze in Befehlsform schreiben", "DOS 2, 5.3"],
+        ["P", "Puzzle-Anleitung Papierflieger ordnen", "DOS 2, 5.4"],
+        ["P", "Zu zweit nach Anleitung falten", "DOS 2, 5.5"],
+        ["P", "Portfolio-Satz schreiben", "Portfolio"],
+        ["Z", "Bonus: Anleitungs-Würfel schriftlich oder Bild-Anleitung zeichnen", "DOS 2, 5.6 / AB 1"],
+        ["Z", "App: Anleitung ordnen", "App"],
+        ["Puffer", "Puffer-Box (Stufe 1 bis 3)", ""],
+      ],
+      hausaufgaben: [   // [Auftrag, auf wann, für alle zugeteilt?]
+      ],
+    },
+    {
+      dl: "DL06", datum: "25.11.2026", thema: "Anleitung II: Eigene Anleitung",
+      ziel: "Ich kann eine eigene Anleitung in nummerierten Schritten verfassen.",
+      flk: [],
+      auftraege: [   // [Art, Auftrag, Wo]   Art: "P" = Pflicht (allen zugeteilt), "Z" = ★ Zusatz, "Puffer"
+        ["P", "Brücke: Fehler-Anleitung korrigieren", "Folie"],
+        ["P", "Wortschatz R6: Werkzeug- und Berufswörter", "AB 3, R6 · Version B: auch S. 14"],
+        ["P", "Thema wählen", "DOS 2, 6.1"],
+        ["P", "Material und Schritte planen", "DOS 2, 6.2"],
+        ["P", "Anleitung schreiben", "DOS 2, 6.3"],
+        ["P", "Partner-Test", "DOS 2, 6.4"],
+        ["P", "Anleitung überarbeiten", "DOS 2, 6.5"],
+        ["P", "Erkläre es einfach (ELI5)", "DOS 2, 6.6 / AB 4"],
+        ["P", "LZ-Blatt lesen und besprechen", "LZ-Blatt"],
+        ["P", "Portfolio-Satz schreiben", "Portfolio"],
+        ["Puffer", "Puffer-Box: Anleitungs-Würfel, Leserätsel", "Puffer-Box"],
+      ],
+      hausaufgaben: [   // [Auftrag, auf wann, für alle zugeteilt?]
+        ["LZ-Blatt durchlesen", "02.12.2026", true],
+      ],
+    },
+    {
+      dl: "DL07", datum: "02.12.2026", thema: "Repetition und Probeprüfung",
+      ziel: "",
+      flk: [
+        "LZ1: Ich kann in einem Bericht die W-Fragen und die drei Teile markieren.",
+        "LZ2: Ich kann Sätze aus einer Erzählung sachlich und im Präteritum umschreiben.",
+        "LZ3: Ich kann mit dem Bericht-Gerüst einen kurzen Bericht über ein Ereignis verfassen.",
+        "LZ4: Ich kann eine Bild-Anleitung in nummerierte Arbeitsschritte umformen.",
+      ],
+      auftraege: [   // [Art, Auftrag, Wo]   Art: "P" = Pflicht (allen zugeteilt), "Z" = ★ Zusatz, "Puffer"
+        ["P", "Brücke: App «Bericht-Detektiv» Live-Quiz", "App"],
+        ["P", "Wortschatz R7: Gimkit-Runde", "AB 3, R7 · Version B: auch S. 14"],
+        ["P", "Probeprüfung schreiben (30')", "Probeprüfung"],
+        ["P", "Probeprüfung selbst korrigieren", "Lösungen"],
+        ["P", "FLK zu deinen eingekreisten Aufgaben lösen und kontrollieren", "FLK"],
+        ["Z", "Repetition LZ1, nur bei FLK «noch nicht»: Bericht oder Erzählung / W-Fragen", "DOS 2, 7.1 und 7.2"],
+        ["Z", "Repetition LZ2, nur bei FLK «noch nicht»: Präteritum / sachlich", "DOS 2, 7.3 und 7.4"],
+        ["Z", "Repetition LZ4, nur bei FLK «noch nicht»: Bild-Anleitung", "DOS 2, 7.5"],
+        ["Z", "Repetition LZ3, nur bei FLK «noch nicht»: Kurzbericht", "DOS 2, 7.6"],
+        ["P", "Fragen zur Prüfung klären", ""],
+        ["P", "Portfolio-Satz schreiben", "Portfolio"],
+        ["Puffer", "App: Check-Bot", "App"],
+      ],
+      hausaufgaben: [   // [Auftrag, auf wann, für alle zugeteilt?]
+        ["Probeprüfung fertig lösen und korrigieren", "09.12.2026", true],
+        ["LZ-Blatt repetieren", "09.12.2026", true],
+      ],
+    },
+    {
+      dl: "DL08", datum: "09.12.2026", thema: "Prüfung und Comics lesen",
+      ziel: "Ich kann die Elemente eines Comics beschriften.",
+      flk: [],
+      auftraege: [   // [Art, Auftrag, Wo]   Art: "P" = Pflicht (allen zugeteilt), "Z" = ★ Zusatz, "Puffer"
+        ["P", "Prüfung Bericht und Anleitung (45')", "Prüfung"],
+        ["P", "Wortschatz R8: Geräuschwörter (still)", "AB 3, R8 · Version B: auch S. 15"],
+        ["P", "Comic-Teile beschriften", "DOS 2, 8.1"],
+        ["P", "Sprechblasen füllen", "DOS 2, 8.2"],
+        ["Z", "Endfassung 6.5 (falls offen)", "DOS 2, 6.5"],
+        ["Z", "Comic als Polizeibericht", "DOS 2, 8.3"],
+        ["P", "Portfolio-Satz schreiben", "Portfolio"],
+        ["Puffer", "Puffer-Box: Story Cubes", "Puffer-Box"],
+      ],
+      hausaufgaben: [   // [Auftrag, auf wann, für alle zugeteilt?]
+      ],
+    },
+    {
+      dl: "DL09", datum: "16.12.2026", thema: "Bildergeschichte und Comic",
+      ziel: "Ich kann zu einer Bilderfolge eine Geschichte in sinnvoller Reihenfolge schreiben.",
+      flk: [],
+      auftraege: [   // [Art, Auftrag, Wo]   Art: "P" = Pflicht (allen zugeteilt), "Z" = ★ Zusatz, "Puffer"
+        ["P", "Brücke: Würfel-Staffel zu zweit (mündlich)", "AB 1"],
+        ["P", "Wortschatz R9: Gefühls- und Spannungswörter", "AB 3, R9 · Version B: auch S. 15"],
+        ["P", "Möglichkeit A, B oder C wählen", "DOS 2, 9.1"],
+        ["P", "Schreibplan erstellen", "DOS 2, 9.2"],
+        ["P", "Geschichte schreiben oder Comic gestalten", "DOS 2, 9.3"],
+        ["P", "Austausch zu zweit: vorlesen oder zeigen", ""],
+        ["P", "Prüfung anschauen: 1 Aufgabe wählen, 1 Satz daraus richtig ins Portfolio, unterschreiben lassen", "Prüfung"],
+        ["P", "Portfolio-Satz schreiben", "DOS 2, 9.4"],
+        ["Puffer", "Puffer: Story-Box-Tausch", "AB 2"],
+      ],
+      hausaufgaben: [   // [Auftrag, auf wann, für alle zugeteilt?]
+      ],
+    },
+    {
+      dl: "DL10", datum: "06.01.2027", thema: "Portfolio I: Lernbericht",
+      ziel: "Ich kann in einem Lernbericht beschreiben, was mir gelungen ist und was schwierig war.",
+      flk: [],
+      auftraege: [   // [Art, Auftrag, Wo]   Art: "P" = Pflicht (allen zugeteilt), "Z" = ★ Zusatz, "Puffer"
+        ["P", "Brücke: Portfolio durchblättern", "Portfolio"],
+        ["P", "Wortschatz R10: Wörter für den Lernbericht", "AB 3, R10 · Version B: auch S. 15"],
+        ["P", "Portfolio ordnen, Inhaltsverzeichnis", "DOS 2, 10.1"],
+        ["P", "Besten Text wählen und begründen", "DOS 2, 10.2"],
+        ["P", "Lernbericht schreiben", "DOS 2, 10.3"],
+        ["P", "Austausch zu zweit: besten Text zeigen", ""],
+        ["P", "Portfolio-Satz schreiben", "Portfolio"],
+        ["Puffer", "Puffer: Text aus dem Portfolio überarbeiten", "Portfolio"],
+      ],
+      hausaufgaben: [   // [Auftrag, auf wann, für alle zugeteilt?]
+      ],
+    },
+    {
+      dl: "DL11", datum: "13.01.2027", thema: "Portfolio II und Abschluss",
+      ziel: "Ich kann im Partnergespräch meinen besten Text mit zwei Kriterien beurteilen.",
+      flk: [],
+      auftraege: [   // [Art, Auftrag, Wo]   Art: "P" = Pflicht (allen zugeteilt), "Z" = ★ Zusatz, "Puffer"
+        ["P", "Brücke: Lernbericht zu zweit vorlesen (freiwillig)", "DOS 2, 10.3"],
+        ["P", "Wortschatz R11: Wort-Quiz Rückblick", "AB 3, R11 · Version B: auch S. 15"],
+        ["P", "Portfolio-Gespräch mit Leitfragen", "DOS 2, 10.4"],
+        ["P", "SPA: Eintrag fürs Projektjournal, Das nehme ich mit", "DOS 2, 10.5"],
+        ["P", "Gimkit-Rückblick", "Gimkit"],
+        ["P", "Feedback an die Lehrperson (Mentimeter)", "Mentimeter"],
+        ["Puffer", "Puffer: Story-Cubes-Speedrunde", "AB 1"],
+      ],
+      hausaufgaben: [   // [Auftrag, auf wann, für alle zugeteilt?]
+      ],
+    },
+  ],
+};
+
+/* Sicherheitsregeln der Datenbank (gleich wie regeln.json im Repository).
+   Die App zeigt sie im Bereich «Bearbeiten» mit deiner UID an, zum Kopieren. */
+const REGELN = {
+  "rules": {
+    ".read": false,
+    ".write": false,
+
+    "arbeitsplan": {
+      "oeffentlich": {
+        ".read": true,
+        ".write": "auth != null && auth.uid === 'LEHRER_UID'",
+
+        "stand": {
+          "$dl": {
+            "$auftrag": {
+              "$lernende": {
+                ".write": "newData.isString() && (newData.val() === 'offen' || newData.val() === 'in Arbeit' || newData.val() === 'fertig') && (!data.exists() || data.val() !== 'kontrolliert') && root.child('arbeitsplan/oeffentlich/plan/dls/' + $dl + '/auftraege/' + $auftrag).exists() && root.child('arbeitsplan/oeffentlich/plan/lernende/' + $lernende).exists()",
+                ".validate": "newData.isString() && (newData.val() === 'offen' || newData.val() === 'in Arbeit' || newData.val() === 'fertig' || newData.val() === 'kontrolliert')"
+              }
+            }
+          }
+        },
+
+        "ziel": {
+          "$dl": {
+            "$lernende": {
+              ".write": "newData.isString() && (newData.val() === 'noch nicht' || newData.val() === 'fast' || newData.val() === 'sicher') && root.child('arbeitsplan/oeffentlich/plan/dls/' + $dl).exists() && root.child('arbeitsplan/oeffentlich/plan/lernende/' + $lernende).exists()",
+              ".validate": "newData.isString() && (newData.val() === 'noch nicht' || newData.val() === 'fast' || newData.val() === 'sicher')"
+            }
+          }
+        },
+
+        "flk": {
+          "$dl": {
+            "$lz": {
+              "$lernende": {
+                ".write": "newData.isString() && (newData.val() === 'erreicht' || newData.val() === 'noch nicht') && root.child('arbeitsplan/oeffentlich/plan/dls/' + $dl + '/flk/' + $lz).exists() && root.child('arbeitsplan/oeffentlich/plan/lernende/' + $lernende).exists()",
+                ".validate": "newData.isString() && (newData.val() === 'erreicht' || newData.val() === 'noch nicht')"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+};
+
+const STATUS_SUS = ["offen", "in Arbeit", "fertig"];
+const STATUS_LP = ["offen", "in Arbeit", "fertig", "kontrolliert", ""];
+const ST_KLASSE = { "offen": "st-offen", "in Arbeit": "st-arbeit", "fertig": "st-fertig", "kontrolliert": "st-kontrolliert", "": "st-leer" };
+const ZIEL_WERTE = ["noch nicht", "fast", "sicher"];
+const ZIEL_KLASSE = { "noch nicht": "st-offen", "fast": "st-arbeit", "sicher": "st-fertig", "": "st-leer" };
+const FLK_WERTE = ["erreicht", "noch nicht"];
+const FLK_KLASSE = { "erreicht": "st-fertig", "noch nicht": "st-offen", "": "st-leer" };
+const ART_TEXT = { P: "Pflicht", Z: "★ Zusatz", Puffer: "Puffer" };
+const DEMO = !CONFIG.datenbank;
+
+/* ========================================================================
+   2. SPEICHER — localStorage, wenn vorhanden, sonst Arbeitsspeicher.
+   ======================================================================== */
+const Speicher = (() => {
+  let vorhanden = false; const ersatz = {};
+  const k = s => DATEN.speicherPraefix + s;
+  try { window.localStorage.setItem(k("__test__"), "1"); window.localStorage.removeItem(k("__test__")); vorhanden = true; }
+  catch (e) { vorhanden = false; }
+  return {
+    dauerhaft: vorhanden,
+    lies(schluessel, standard) {
+      try {
+        const roh = vorhanden ? window.localStorage.getItem(k(schluessel)) : ersatz[k(schluessel)];
+        return roh == null ? standard : JSON.parse(roh);
+      } catch (e) { return standard; }
+    },
+    schreib(schluessel, wert) {
+      try { const roh = JSON.stringify(wert); if (vorhanden) window.localStorage.setItem(k(schluessel), roh); else ersatz[k(schluessel)] = roh; }
+      catch (e) { /* Speichern ist nie kritisch */ }
+    },
+    loesche(schluessel) {
+      try { if (vorhanden) window.localStorage.removeItem(k(schluessel)); else delete ersatz[k(schluessel)]; } catch (e) {}
+    },
+  };
+})();
+
+/* ========================================================================
+   2b. SYNCHRONISIERUNG (Firebase Realtime Database über REST, kein SDK)
+   Schreiben mit Offline-Warteschlange, Lehrer-Anmeldung (Stufe 2) mit
+   automatischer Verlängerung, Abgleich im Takt als Rückfall.
+   Die Regeln sind der Schutz, nicht dieser Code.
+   ======================================================================== */
+const Sync = (() => {
+  let idToken = null, refreshToken = null, uid = null, email = null, ablauf = 0;
+  let taktId = null, letzterFehler = null, aktiverTakt = null, beiAbmeldung = null, liefert = false;
+  const WARTESCHLANGE = "warteschlange";
+  const SITZUNG = DATEN.speicherPraefix + "sitzung";
+
+  const basis = () => CONFIG.datenbank.replace(/\/$/, "") + "/" + CONFIG.projekt + "/";
+  function url(pfad, mitAuth = true) {
+    const u = basis() + String(pfad).replace(/^\//, "") + ".json";
+    return (mitAuth && idToken) ? u + "?auth=" + encodeURIComponent(idToken) : u;
+  }
+
+  async function anfrage(pfad, methode, koerper, zweiterVersuch) {
+    if (DEMO) return { ok: false, status: 0 };
+    if (idToken && refreshToken && Date.now() > ablauf - 120000) await erneuern();
+    try {
+      const antwort = await fetch(url(pfad), {
+        method: methode, cache: "no-store",
+        headers: koerper !== undefined ? { "Content-Type": "application/json" } : undefined,
+        body: koerper !== undefined ? JSON.stringify(koerper) : undefined,
+      });
+      if (!antwort.ok) {
+        if (antwort.status === 401 && refreshToken && !zweiterVersuch && await erneuern()) return anfrage(pfad, methode, koerper, true);
+        letzterFehler = "HTTP " + antwort.status;
+        return { ok: false, status: antwort.status };   // 401/403: die Regeln greifen
+      }
+      letzterFehler = null;
+      return { ok: true, daten: await antwort.json() };
+    } catch (e) {
+      letzterFehler = "kein Netz";
+      return { ok: false, status: 0 };
+    }
+  }
+
+  const liste = () => Speicher.lies(WARTESCHLANGE, []);
+  function einreihen(methode, pfad, wert) {
+    const l = liste(); l.push({ methode, pfad, wert, zeit: Date.now() }); Speicher.schreib(WARTESCHLANGE, l);
+  }
+
+  /* Gepufferte Schreibvorgänge in der ursprünglichen Reihenfolge nachliefern. */
+  async function nachliefern() {
+    if (liefert || DEMO) return 0;
+    liefert = true; let geliefert = 0;
+    try {
+      while (true) {
+        const l = liste(); if (!l.length) break;
+        const { methode, pfad, wert } = l[0];
+        const r = await anfrage(pfad, methode || "PUT", wert);
+        if (!r.ok && r.status === 0) break;          // immer noch kein Netz
+        const rest = liste(); rest.shift(); Speicher.schreib(WARTESCHLANGE, rest);   // von den Regeln abgelehnt: nicht endlos wiederholen
+        if (r.ok) geliefert++;
+      }
+    } finally { liefert = false; }
+    return geliefert;
+  }
+
+  async function sicher(methode, pfad, wert) {
+    if (liste().length) { einreihen(methode, pfad, wert); nachliefern(); return { ok: false, gepuffert: true }; }
+    const r = await anfrage(pfad, methode, wert);
+    if (r.ok || r.status !== 0) return r;
+    einreihen(methode, pfad, wert);
+    return { ok: false, gepuffert: true };
+  }
+
+  function setzeSitzung(d) {
+    idToken = d.idToken; refreshToken = d.refreshToken; uid = d.localId || uid; email = d.email || email;
+    ablauf = Date.now() + (Number(d.expiresIn) || 3600) * 1000;
+    try { window.sessionStorage.setItem(SITZUNG, JSON.stringify({ refreshToken, uid, email })); } catch (e) {}
+  }
+  function abmeldenIntern(grund) {
+    idToken = null; refreshToken = null; uid = null;
+    try { window.sessionStorage.removeItem(SITZUNG); } catch (e) {}
+    if (grund && typeof beiAbmeldung === "function") beiAbmeldung(grund);
+  }
+  /* Token läuft nach einer Stunde ab – still verlängern statt mitten in der Lektion Rechte verlieren. */
+  async function erneuern() {
+    if (!refreshToken || !CONFIG.apiKey) return false;
+    try {
+      const a = await fetch("https://securetoken.googleapis.com/v1/token?key=" + encodeURIComponent(CONFIG.apiKey), {
+        method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: "grant_type=refresh_token&refresh_token=" + encodeURIComponent(refreshToken) });
+      if (!a.ok) { if (a.status === 400) abmeldenIntern("Anmeldung abgelaufen – bitte neu anmelden"); return false; }
+      const d = await a.json();
+      setzeSitzung({ idToken: d.id_token, refreshToken: d.refresh_token, localId: d.user_id, expiresIn: d.expires_in });
+      return true;
+    } catch (e) { return false; }
+  }
+
+  function takt() {
+    if (!aktiverTakt) return;
+    const holen = async () => {
+      if (!aktiverTakt) return;
+      await nachliefern();
+      const r = await anfrage(aktiverTakt.pfad, "GET");
+      if (aktiverTakt && aktiverTakt.status) aktiverTakt.status(r.ok ? "live" : (r.status === 0 ? "offline" : "fehler"));
+      if (r.ok && aktiverTakt) aktiverTakt.rueckruf(r.daten);
+    };
+    holen();
+    taktId = setInterval(holen, CONFIG.taktMs);
+  }
+  function pausieren() { if (taktId) { clearInterval(taktId); taktId = null; } }
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) pausieren(); else if (aktiverTakt && !taktId) takt();
+  });
+  window.addEventListener("online", () => { nachliefern(); });
+
+  return {
+    url,
+    get fehler() { return letzterFehler; },
+    get angemeldet() { return idToken !== null; },
+    get uid() { return uid; },
+    get email() { return email; },
+    get wartend() { return liste().length; },
+    liste,
+    lies: (pfad) => anfrage(pfad, "GET"),
+    schreib: (pfad, wert) => anfrage(pfad, "PUT", wert),
+    schreibSicher: (pfad, wert) => sicher("PUT", pfad, wert),
+    ergaenzeSicher: (pfad, wert) => sicher("PATCH", pfad, wert),
+    nachliefern,
+    get beiAbmeldung() { return beiAbmeldung; },
+    set beiAbmeldung(f) { beiAbmeldung = f; },
+
+    /* Stufe 2: Anmeldung der Lehrperson. Das Passwort wird nie gespeichert. */
+    async anmelden(mail, passwort) {
+      if (!CONFIG.apiKey) return { ok: false, grund: "Oben im Code fehlt der apiKey." };
+      try {
+        const a = await fetch("https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=" + encodeURIComponent(CONFIG.apiKey), {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: mail, password: passwort, returnSecureToken: true }) });
+        const d = await a.json().catch(() => ({}));
+        if (!a.ok) {
+          const m = (d.error && d.error.message) || "";
+          const grund = /INVALID_LOGIN|INVALID_PASSWORD|EMAIL_NOT_FOUND|INVALID_EMAIL/.test(m) ? "E-Mail oder Passwort stimmt nicht."
+            : /TOO_MANY/.test(m) ? "Zu viele Versuche. Bitte kurz warten."
+            : /OPERATION_NOT_ALLOWED|PASSWORD_LOGIN_DISABLED/.test(m) ? "In Firebase ist «E-Mail/Passwort» noch nicht eingeschaltet."
+            : /API key|API_KEY/.test(m) ? "Der apiKey oben im Code stimmt nicht." : "Anmeldung fehlgeschlagen (" + (m || a.status) + ").";
+          return { ok: false, grund };
+        }
+        email = d.email || mail;
+        setzeSitzung(d);
+        return { ok: true, uid: d.localId };
+      } catch (e) { return { ok: false, grund: "Kein Netz – Anmeldung nicht möglich." }; }
+    },
+    async sitzungFortsetzen() {
+      let s = null;
+      try { s = JSON.parse(window.sessionStorage.getItem(SITZUNG) || "null"); } catch (e) {}
+      if (!s || !s.refreshToken) return false;
+      refreshToken = s.refreshToken; uid = s.uid; email = s.email;
+      return erneuern();
+    },
+    abmelden() { abmeldenIntern(null); },
+
+    /* Rückfall-Takt: rueckruf(daten) bei jeder Antwort; pausiert im Hintergrund. */
+    starteTakt(pfad, rueckruf, status) { pausieren(); aktiverTakt = { pfad, rueckruf, status }; if (!document.hidden) takt(); },
+    stoppeTakt() { pausieren(); aktiverTakt = null; },
+  };
+})();
+
+/* Live-Verbindung: Firebase schickt Änderungen sofort (Server-Sent Events).
+   Klappt das im Schulnetz nicht innert 12 s, wechselt die App auf den Takt. */
+const Strom = (() => {
+  let es = null, pfad = "", rueckruf = null, status = () => {}, nurTakt = false, wachhund = null, wiederTimer = null;
+  function stopp() {
+    if (es) { es.close(); es = null; }
+    clearTimeout(wachhund); clearTimeout(wiederTimer); Sync.stoppeTakt();
+  }
+  function verbinden() {
+    stopp();
+    if (nurTakt || typeof EventSource === "undefined") {
+      Sync.starteTakt(pfad, d => rueckruf({ art: "voll", daten: d }), status);
+      return;
+    }
+    status("verbinde");
+    let bekommen = false;
+    es = new EventSource(Sync.url(pfad, false));
+    wachhund = setTimeout(() => { if (!bekommen) { nurTakt = true; verbinden(); } }, 12000);
+    const verarbeite = art => e => {
+      bekommen = true; clearTimeout(wachhund); status("live");
+      let m = null; try { m = JSON.parse(e.data); } catch (x) { return; }
+      if (m && typeof m.path === "string") rueckruf({ art, pfad: m.path, daten: m.data });
+    };
+    es.addEventListener("put", verarbeite("put"));
+    es.addEventListener("patch", verarbeite("patch"));
+    es.addEventListener("cancel", () => { nurTakt = true; verbinden(); });
+    es.onerror = () => {
+      status(navigator.onLine === false ? "offline" : "verbinde");
+      if (es && es.readyState === 2) wiederTimer = setTimeout(verbinden, 4000);
+    };
+  }
+  document.addEventListener("visibilitychange", () => {
+    if (!pfad || nurTakt) return;
+    if (document.hidden) { if (es) { es.close(); es = null; } }
+    else if (!es) verbinden();
+  });
+  return { start(p, cb, st) { pfad = p; rueckruf = cb; status = st || status; verbinden(); }, neu: () => verbinden() };
+})();
+
+/* ========================================================================
+   3. HILFSMITTEL
+   ======================================================================== */
+const $ = (sel, wurzel = document) => wurzel.querySelector(sel);
+
+function el(tag, attribute = {}, ...kinder) {
+  const k = document.createElement(tag);
+  for (const [n, w] of Object.entries(attribute || {})) {
+    if (w === null || w === undefined || w === false) continue;
+    if (n === "class") k.className = w;
+    else if (n.startsWith("on") && typeof w === "function") k.addEventListener(n.slice(2).toLowerCase(), w);
+    else k.setAttribute(n, w === true ? "" : w);
+  }
+  for (const kind of kinder.flat(Infinity)) {
+    if (kind == null || kind === false) continue;
+    k.append(kind instanceof Node ? kind : document.createTextNode(String(kind)));
+  }
+  return k;
+}
+
+function dialogOeffnen(inhalt) {
+  Zustand.dialog = true;
+  const hg = el("div", { class: "dialog-hg nicht-drucken" });
+  const schliessen = () => { hg.remove(); Zustand.dialog = false; document.removeEventListener("keydown", esc); planeZeichnen(); };
+  const esc = e => { if (e.key === "Escape") schliessen(); };
+  hg.addEventListener("click", e => { if (e.target === hg) schliessen(); });
+  document.addEventListener("keydown", esc);
+  hg.append(el("div", { class: "dialog", role: "dialog", "aria-modal": "true" }, inhalt));
+  document.body.append(hg);
+  const erst = hg.querySelector("button.aktiv, button");
+  if (erst) setTimeout(() => erst.focus(), 0);
+  return schliessen;
+}
+
+/* Ersatz für confirm(): eingebettete Ansichten blockieren die Browserdialoge. */
+function frage(text, beiJa, jaText = "Ja", neinText = "Abbrechen") {
+  let zu = null;
+  zu = dialogOeffnen([
+    el("p", {}, text),
+    el("div", { class: "zeile" },
+      el("button", { class: "primaer", onclick: () => { zu(); beiJa(); } }, jaText),
+      el("button", { onclick: () => zu() }, neinText))]);
+}
+
+function auswahl(titel, untertitel, optionen) {
+  let zu = null;
+  zu = dialogOeffnen([
+    el("h3", {}, titel),
+    untertitel ? el("p", { class: "gedaempft", style: "margin-top:-6px" }, untertitel) : null,
+    el("div", { class: "wahl-liste" }, optionen.map(o =>
+      el("button", { class: "wahl " + (o.klasse || "") + (o.aktiv ? " aktiv" : ""), "aria-pressed": o.aktiv ? "true" : null,
+                     onclick: () => { zu(); o.aktion(); } }, o.text))),
+    el("button", { onclick: () => zu(), style: "width:100%" }, "Abbrechen")]);
+}
+
+let toastTimer = null;
+function toast(text) {
+  const t = $("#toast"); t.textContent = text; t.classList.add("zeigen");
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove("zeigen"), 3000);
+}
+
+function csvHerunterladen(dateiname, zeilen) {
+  const inhalt = "﻿" + zeilen.map(z => z.map(f => `"${String(f == null ? "" : f).replace(/"/g, '""')}"`).join(";")).join("\r\n");
+  dateiHerunterladen(dateiname, inhalt, "text/csv;charset=utf-8");
+}
+function dateiHerunterladen(dateiname, inhalt, typ) {
+  const url = URL.createObjectURL(new Blob([inhalt], { type: typ }));
+  const a = el("a", { href: url, download: dateiname });
+  document.body.append(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1500);
+}
+
+async function kopieren(text, erfolg) {
+  try { await navigator.clipboard.writeText(text); toast(erfolg || "Kopiert"); }
+  catch (e) {
+    const feld = el("textarea", { class: "link-feld", readonly: true, style: "min-height:160px" }, text);
+    dialogOeffnen([el("h3", {}, "Zum Kopieren markieren"), feld, el("p", { class: "gedaempft" }, "Text markieren und kopieren.")]);
+    setTimeout(() => { feld.focus(); feld.select(); }, 50);
+  }
+}
+
+const TAGE = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"];
+function datum(s) {
+  const m = /^(\d{1,2})\.(\d{1,2})\.(\d{4})$/.exec(String(s || "").trim());
+  return m ? new Date(+m[3], +m[2] - 1, +m[1]) : null;
+}
+function langdatum(s) { const d = datum(s); return d ? `${TAGE[d.getDay()]} ${s}` : (s || "ohne Datum"); }
+function kurzdatum(s) { const d = datum(s); return d ? `${TAGE[d.getDay()]} ${String(d.getDate()).padStart(2, "0")}.${String(d.getMonth() + 1).padStart(2, "0")}.` : (s || ""); }
+function heuteIso() { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; }
+const neueId = p => p + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+
+/* ========================================================================
+   4. ZUSTAND
+   ======================================================================== */
+const Zustand = {
+  ansicht: "klasse",       // plan | klasse | uebersicht | lehrer
+  dl: null,                // gewählte Doppellektion
+  beamer: false,
+  dialog: false,
+  ausstehend: false,
+  geladen: false,
+  verbindung: DEMO ? "demo" : "verbinde",
+  demoLehrer: false,
+  schreibrechtFehlt: false,
+  chipsGescrollt: false,
+};
+let Daten = {};                           // Spiegel von /{projekt}/oeffentlich
+let Namen = Speicher.lies("namen", {});   // echte Namen – nur auf diesem Gerät
+
+/* ========================================================================
+   5. DATEN: lesen, schreiben, Vorlage
+   ======================================================================== */
+const plan = () => Daten.plan || null;
+function sortiert(obj) {
+  return Object.entries(obj || {}).filter(([, v]) => v && typeof v === "object")
+    .map(([id, v]) => Object.assign({ id }, v))
+    .sort((a, b) => ((a.ord ?? 9999) - (b.ord ?? 9999)) || a.id.localeCompare(b.id, "de", { numeric: true }));
+}
+const dls = () => sortiert(plan() && plan().dls);
+const dlVon = id => (plan() && plan().dls && plan().dls[id]) || null;
+const lernendeListe = () => sortiert(plan() && plan().lernende);
+const auftraegeVon = dl => sortiert(dlVon(dl) && dlVon(dl).auftraege);
+const hausaufgabenVon = dl => sortiert(dlVon(dl) && dlVon(dl).hausaufgaben);
+const flkVon = dl => Object.entries((dlVon(dl) && dlVon(dl).flk) || {})
+  .sort(([a], [b]) => a.localeCompare(b, "de", { numeric: true })).map(([id, text]) => ({ id, text }));
+const tief = (o, ...k) => k.reduce((x, s) => (x && typeof x === "object") ? x[s] : undefined, o);
+const statusVon = (dl, aid, sid) => tief(Daten, "stand", dl, aid, sid) || "";
+const zielVon = (dl, sid) => tief(Daten, "ziel", dl, sid) || "";
+const flkWert = (dl, lz, sid) => tief(Daten, "flk", dl, lz, sid) || "";
+const istLehrer = () => DEMO ? Zustand.demoLehrer : Sync.angemeldet;
+const ichBin = () => { const s = Speicher.lies("ichBin", null); return s && plan() && plan().lernende && plan().lernende[s] ? s : null; };
+function nameVon(sid) { return Namen[sid] || tief(plan(), "lernende", sid, "label") || sid; }
+function farbeVon(sid) { return tief(plan(), "lernende", sid, "farbe") || "#ccd3dd"; }
+const initiale = sid => (nameVon(sid) || "?").trim().charAt(0).toUpperCase();
+const erledigt = s => s === "fertig" || s === "kontrolliert";
+
+function fortschritt(dl, sid) {
+  let zu = 0, erl = 0;
+  for (const a of auftraegeVon(dl)) { const s = statusVon(dl, a.id, sid); if (s) { zu++; if (erledigt(s)) erl++; } }
+  return { zu, erl, anteil: zu ? erl / zu : 0 };
+}
+function xp(sid) {
+  let summe = 0;
+  for (const d of dls()) for (const a of auftraegeVon(d.id)) {
+    const s = statusVon(d.id, a.id, sid); if (s === "fertig") summe += 1; else if (s === "kontrolliert") summe += 2;
+  }
+  return summe;
+}
+function aktuelleDl() {
+  const heute = new Date(); heute.setHours(0, 0, 0, 0);
+  let wahl = null;
+  for (const d of dls()) { const t = datum(d.datum); if (t && t <= heute) wahl = d.id; }
+  return wahl || (dls()[0] && dls()[0].id) || null;
+}
+
+/* Lokalen Spiegel nachführen (Pfad relativ zu /oeffentlich). null löscht. */
+function setzePfad(pfad, wert) {
+  const teile = String(pfad).split("/").filter(Boolean);
+  if (!teile.length) { Daten = (wert && typeof wert === "object") ? wert : {}; return; }
+  let knoten = Daten; const kette = [];
+  for (let i = 0; i < teile.length - 1; i++) {
+    const t = teile[i];
+    if (!knoten[t] || typeof knoten[t] !== "object") { if (wert === null || wert === undefined) return; knoten[t] = {}; }
+    kette.push([knoten, t]); knoten = knoten[t];
+  }
+  const letzter = teile[teile.length - 1];
+  if (wert === null || wert === undefined) {
+    delete knoten[letzter];
+    for (let i = kette.length - 1; i >= 0; i--) { const [e, t] = kette[i]; if (Object.keys(e[t]).length === 0) delete e[t]; else break; }
+  } else knoten[letzter] = (typeof wert === "object") ? JSON.parse(JSON.stringify(wert)) : wert;
+}
+
+/* Noch nicht gesendete Eingaben über den Serverstand legen (sonst springen sie kurz zurück). */
+function warteschlangeAnwenden() {
+  if (DEMO) return;
+  for (const e of Sync.liste()) {
+    const rel = String(e.pfad).replace(/^oeffentlich\/?/, "");
+    if (e.methode === "PATCH") for (const [k, w] of Object.entries(e.wert || {})) setzePfad(rel ? rel + "/" + k : k, w);
+    else setzePfad(rel, e.wert);
+  }
+}
+
+function ereignis(e) {
+  if (e.art === "voll") { Daten = (e.daten && typeof e.daten === "object") ? e.daten : {}; warteschlangeAnwenden(); }
+  else if (e.art === "put") { setzePfad(e.pfad, e.daten); if (e.pfad === "/") warteschlangeAnwenden(); }
+  else if (e.art === "patch") { for (const [k, w] of Object.entries(e.daten || {})) setzePfad(e.pfad.replace(/\/$/, "") + "/" + k, w); }
+  Zustand.geladen = true;
+  planeZeichnen();
+}
+
+function demoSichern() { Speicher.schreib("demoDaten", Daten); }
+window.addEventListener("storage", e => {
+  if (DEMO && e.key === DATEN.speicherPraefix + "demoDaten") {
+    try { Daten = JSON.parse(e.newValue) || {}; } catch (x) {}
+    planeZeichnen();
+  }
+});
+
+async function schreibe(pfad, wert) { return schreibeMehrere({ [pfad]: wert }); }
+async function schreibeMehrere(aenderungen) {
+  for (const [p, w] of Object.entries(aenderungen)) setzePfad(p, w === undefined ? null : w);
+  planeZeichnen();
+  if (DEMO) { demoSichern(); return true; }
+  const e = Object.entries(aenderungen);
+  const r = e.length === 1 ? await Sync.schreibSicher("oeffentlich/" + e[0][0], e[0][1] === undefined ? null : e[0][1])
+                           : await Sync.ergaenzeSicher("oeffentlich", aenderungen);
+  if (r.ok) return true;
+  if (r.gepuffert) { toast("Offline – deine Eingabe wird nachgeliefert."); planeZeichnen(); return true; }
+  toast(r.status === 401 || r.status === 403 ? "Nicht gespeichert: dafür fehlt die Berechtigung." : "Nicht gespeichert (Fehler " + r.status + ").");
+  const neu = await Sync.lies("oeffentlich");          // Stand vom Server zurückholen
+  if (neu.ok) ereignis({ art: "voll", daten: neu.daten });
+  return false;
+}
+
+function ausVorlage() {
+  const lernende = {};
+  DATEN.lernende.forEach(([farbe, label], i) => { lernende["s" + (i + 1)] = { ord: i + 1, farbe, label }; });
+  const p = { lernende, dls: {}, einstellungen: { uebersichtKlasse: false } };
+  const stand = {};
+  DATEN.vorlage.forEach((d, i) => {
+    const dl = { ord: i + 1, datum: d.datum || "", thema: d.thema || "", ziel: d.ziel || "", auftraege: {}, hausaufgaben: {} };
+    if (d.flk && d.flk.length) { dl.flk = {}; d.flk.forEach((t, j) => { dl.flk["lz" + (j + 1)] = t; }); }
+    d.auftraege.forEach(([art, text, wo], j) => {
+      const aid = "a" + String(j + 1).padStart(2, "0");
+      dl.auftraege[aid] = { ord: j + 1, art, text, wo: wo || "" };
+      if (art === "P") { stand[d.dl] = stand[d.dl] || {}; stand[d.dl][aid] = {}; Object.keys(lernende).forEach(s => { stand[d.dl][aid][s] = "offen"; }); }
+    });
+    d.hausaufgaben.forEach(([text, bis, alle], j) => {
+      const h = { ord: j + 1, text, bis: bis || "" };
+      if (alle) { h.fuer = {}; Object.keys(lernende).forEach(s => { h.fuer[s] = true; }); }
+      dl.hausaufgaben["h" + String(j + 1).padStart(2, "0")] = h;
+    });
+    p.dls[d.dl] = dl;
+  });
+  return { plan: p, stand };
+}
+
+/* Anfangsstand: Pflichtaufträge für alle «offen», alles andere leer. */
+function anfangsstand() {
+  const stand = {};
+  for (const d of dls()) for (const a of auftraegeVon(d.id)) if (a.art === "P") {
+    stand[d.id] = stand[d.id] || {}; stand[d.id][a.id] = {};
+    lernendeListe().forEach(l => { stand[d.id][a.id][l.id] = "offen"; });
+  }
+  return stand;
+}
+
+/* Echte Namen kommen nur über den Link-Teil nach # aufs Gerät (wird nie an einen Server gesendet). */
+function namenAusLink() {
+  const m = /(?:^#|&)namen=([^&]*)/.exec(location.hash || "");
+  if (!m) return;
+  let roh = m[1]; try { roh = decodeURIComponent(roh); } catch (e) {}
+  const neu = {};
+  roh.split(",").forEach(teil => { const i = teil.indexOf(":"); if (i > 0) { const id = teil.slice(0, i).trim(), n = teil.slice(i + 1).trim(); if (/^s\d+$/.test(id) && n) neu[id] = n.slice(0, 40); } });
+  if (Object.keys(neu).length) { Namen = neu; Speicher.schreib("namen", Namen); }
+  try { history.replaceState(null, "", location.pathname + location.search); } catch (e) {}
+}
+function klassenlink() {
+  const teile = lernendeListe().filter(l => Namen[l.id]).map(l => l.id + ":" + Namen[l.id]);
+  return location.origin + location.pathname + (teile.length ? "#namen=" + encodeURIComponent(teile.join(",")) : "");
+}
+
+function regelnText() {
+  let t = JSON.stringify(REGELN, null, 2).replace(/LEHRER_UID/g, Sync.uid || "LEHRER_UID");
+  if (CONFIG.projekt !== "arbeitsplan") t = t.replace(/arbeitsplan/g, CONFIG.projekt);
+  return t;
+}
+
+async function pruefeSchreibrecht() {
+  if (DEMO) return;
+  const r = await Sync.schreib("oeffentlich/meta/lehrerAktiv", Date.now());
+  Zustand.schreibrechtFehlt = !r.ok && (r.status === 401 || r.status === 403);
+}
+
+/* ========================================================================
+   6. AKTIONEN
+   ======================================================================== */
+async function setzeStatus(dlId, aid, sid, wert) {
+  const ok = await schreibe(`stand/${dlId}/${aid}/${sid}`, wert || null);
+  if (ok && !istLehrer() && erledigt(wert)) {
+    const pflicht = auftraegeVon(dlId).filter(a => a.art === "P" && statusVon(dlId, a.id, sid));
+    if (pflicht.length && pflicht.every(a => erledigt(statusVon(dlId, a.id, sid))))
+      toast("Alle Pflichtaufträge erledigt! Weiter mit ★ Zusatz oder Puffer-Box.");
+  }
+}
+
+function statusWaehlen(dlId, a, sid) {
+  const s = statusVon(dlId, a.id, sid);
+  const werte = istLehrer() ? STATUS_LP : STATUS_SUS;
+  const nr = auftraegeVon(dlId).findIndex(x => x.id === a.id) + 1;
+  auswahl(`${nameVon(sid)} · Auftrag ${nr}`, a.text, werte.map(w => ({
+    text: w === "kontrolliert" ? "✓ kontrolliert" : (w || "– nicht zugeteilt"),
+    klasse: ST_KLASSE[w], aktiv: s === w, aktion: () => setzeStatus(dlId, a.id, sid, w) })));
+}
+
+function zielWaehlen(dlId, sid) {
+  const s = zielVon(dlId, sid), lp = istLehrer();
+  auswahl(`${nameVon(sid)} · Das kann ich heute`, dlVon(dlId).ziel,
+    (lp ? ZIEL_WERTE.concat([""]) : ZIEL_WERTE).map(w => ({ text: w || "– leer", klasse: ZIEL_KLASSE[w], aktiv: s === w,
+      aktion: () => schreibe(`ziel/${dlId}/${sid}`, w || null) })));
+}
+function flkWaehlen(dlId, lz, sid) {
+  const s = flkWert(dlId, lz.id, sid), lp = istLehrer();
+  auswahl(`${nameVon(sid)} · FLK`, lz.text,
+    (lp ? FLK_WERTE.concat([""]) : FLK_WERTE).map(w => ({ text: w || "– leer", klasse: FLK_KLASSE[w], aktiv: s === w,
+      aktion: () => schreibe(`flk/${dlId}/${lz.id}/${sid}`, w || null) })));
+}
+
+function fertigKontrollieren(dlId, nurSid, nurAid) {
+  const upd = {};
+  for (const a of auftraegeVon(dlId)) {
+    if (nurAid && a.id !== nurAid) continue;
+    for (const l of lernendeListe()) {
+      if (nurSid && l.id !== nurSid) continue;
+      if (statusVon(dlId, a.id, l.id) === "fertig") upd[`stand/${dlId}/${a.id}/${l.id}`] = "kontrolliert";
+    }
+  }
+  const n = Object.keys(upd).length;
+  if (!n) { toast("Nichts auf «fertig» – nichts zu kontrollieren."); return; }
+  schreibeMehrere(upd); toast(`${n} × auf «kontrolliert» gesetzt`);
+}
+function zuteilen(dlId, aid, an) {
+  const upd = {};
+  for (const l of lernendeListe()) {
+    const s = statusVon(dlId, aid, l.id);
+    if (an && !s) upd[`stand/${dlId}/${aid}/${l.id}`] = "offen";
+    if (!an && s === "offen") upd[`stand/${dlId}/${aid}/${l.id}`] = null;
+  }
+  if (Object.keys(upd).length) schreibeMehrere(upd);
+  toast(an ? "Allen zugeteilt" : "Zuteilung entfernt (wo noch «offen»)");
+}
+
+function spalteMenue(dlId, l) {
+  const f = fortschritt(dlId, l.id);
+  auswahl(nameVon(l.id), `${dlId}: ${f.erl} von ${f.zu} erledigt · ${xp(l.id)} XP gesamt`, [
+    { text: "✓ Alle «fertig» kontrollieren", klasse: "st-kontrolliert", aktion: () => fertigKontrollieren(dlId, l.id) },
+  ]);
+}
+function zeileMenue(dlId, a) {
+  auswahl("Auftrag " + (auftraegeVon(dlId).findIndex(x => x.id === a.id) + 1), a.text, [
+    { text: "Allen zuteilen («offen»)", klasse: "st-offen", aktion: () => zuteilen(dlId, a.id, true) },
+    { text: "Zuteilung entfernen (wo noch «offen»)", aktion: () => zuteilen(dlId, a.id, false) },
+    { text: "✓ Alle «fertig» kontrollieren", klasse: "st-kontrolliert", aktion: () => fertigKontrollieren(dlId, null, a.id) },
+    { text: "✏️ Auftrag bearbeiten", aktion: () => { Zustand.dl = dlId; wechsleAnsicht("lehrer"); } },
+  ]);
+}
+
+function auftragHinzufuegen(dlId, text, wo, art, alle) {
+  const aufs = auftraegeVon(dlId), aid = neueId("a");
+  const ord = (aufs.length ? Math.max(...aufs.map(a => a.ord || 0)) : 0) + 1;
+  const upd = { [`plan/dls/${dlId}/auftraege/${aid}`]: { ord, text, wo, art } };
+  if (alle) { const st = {}; lernendeListe().forEach(l => { st[l.id] = "offen"; }); upd[`stand/${dlId}/${aid}`] = st; }
+  schreibeMehrere(upd); toast("Auftrag hinzugefügt");
+}
+function verschieben(dlId, aufs, i, richtung) {
+  const j = i + richtung; if (j < 0 || j >= aufs.length) return;
+  const neu = aufs.slice(); [neu[i], neu[j]] = [neu[j], neu[i]];
+  const upd = {}; neu.forEach((a, k) => { if (a.ord !== k + 1) upd[`plan/dls/${dlId}/auftraege/${a.id}/ord`] = k + 1; });
+  schreibeMehrere(upd);
+}
+function auftragLoeschen(dlId, a) {
+  frage(`Auftrag «${a.text}» löschen? Der Stand aller Lernenden zu diesem Auftrag wird ebenfalls gelöscht.`, () =>
+    schreibeMehrere({ [`plan/dls/${dlId}/auftraege/${a.id}`]: null, [`stand/${dlId}/${a.id}`]: null }), "Löschen");
+}
+function neueDl() {
+  let max = 0, ordMax = 0;
+  dls().forEach(d => { const m = /^DL(\d+)$/.exec(d.id); if (m) max = Math.max(max, +m[1]); ordMax = Math.max(ordMax, d.ord || 0); });
+  const id = "DL" + String(max + 1).padStart(2, "0");
+  schreibe(`plan/dls/${id}`, { ord: ordMax + 1, datum: "", thema: "Neue Doppellektion", ziel: "" });
+  Zustand.dl = id; toast(id + " angelegt");
+}
+function dlLoeschen(dlId) {
+  frage(`${dlId} mit allen Aufträgen und dem ganzen Stand der Klasse löschen?`, () => {
+    schreibeMehrere({ [`plan/dls/${dlId}`]: null, [`stand/${dlId}`]: null, [`ziel/${dlId}`]: null, [`flk/${dlId}`]: null });
+    Zustand.dl = null;
+  }, "Löschen");
+}
+function lernendeHinzufuegen() {
+  const ls = lernendeListe();
+  let n = 1; while (plan().lernende && plan().lernende["s" + n]) n++;
+  const sid = "s" + n;
+  const belegt = new Set(ls.map(l => (l.farbe || "").toUpperCase()));
+  const frei = DATEN.lernende.concat(DATEN.weitereFarben).find(([f]) => !belegt.has(f.toUpperCase())) || ["#B8C2CF", "Neu " + n];
+  const upd = { [`plan/lernende/${sid}`]: { ord: (ls.length ? Math.max(...ls.map(l => l.ord || 0)) : 0) + 1, farbe: frei[0], label: frei[1] } };
+  for (const d of dls()) for (const a of auftraegeVon(d.id)) if (a.art === "P") upd[`stand/${d.id}/${a.id}/${sid}`] = "offen";
+  schreibeMehrere(upd); toast(`${frei[1]} hinzugefügt – Pflichtaufträge sind zugeteilt`);
+}
+
+function csvExport() {
+  const ls = lernendeListe();
+  const zeilen = [["DL", "Datum", "Thema", "Nr", "Auftrag", "Wo", "Art"].concat(ls.map(l => nameVon(l.id)))];
+  for (const d of dls()) {
+    auftraegeVon(d.id).forEach((a, i) => zeilen.push([d.id, d.datum, d.thema, i + 1, a.text, a.wo || "", ART_TEXT[a.art] || a.art].concat(ls.map(l => statusVon(d.id, a.id, l.id)))));
+    if (d.ziel) zeilen.push([d.id, d.datum, d.thema, "", "Das kann ich heute: " + d.ziel, "", "Ziel"].concat(ls.map(l => zielVon(d.id, l.id))));
+    flkVon(d.id).forEach(f => zeilen.push([d.id, d.datum, d.thema, "", "FLK " + f.text, "", "FLK"].concat(ls.map(l => flkWert(d.id, f.id, l.id)))));
+  }
+  zeilen.push([]);
+  zeilen.push(["XP", "", "", "", "fertig = 1 Punkt, kontrolliert = 2 Punkte", "", ""].concat(ls.map(l => xp(l.id))));
+  csvHerunterladen(`arbeitsplan_kk9_${heuteIso()}.csv`, zeilen);
+}
+function sicherungHerunterladen() {
+  const kopie = JSON.parse(JSON.stringify(Daten)); delete kopie.meta;
+  dateiHerunterladen(`arbeitsplan_kk9_sicherung_${heuteIso()}.json`,
+    JSON.stringify({ app: "arbeitsplan-kk9", version: 1, exportiert: new Date().toISOString(), daten: kopie }, null, 1), "application/json");
+}
+function sicherungLaden(datei) {
+  const r = new FileReader();
+  r.onload = () => {
+    let o = null; try { o = JSON.parse(r.result); } catch (e) {}
+    const d = o && o.daten;
+    if (!d || !d.plan || !d.plan.dls) { toast("Diese Datei ist keine Sicherung des Arbeitsplans."); return; }
+    frage("Sicherung laden? Plan und Stand der ganzen Klasse werden ersetzt.", () =>
+      schreibeMehrere({ plan: d.plan, stand: d.stand || null, ziel: d.ziel || null, flk: d.flk || null }), "Laden");
+  };
+  r.readAsText(datei);
+}
+
+function wechsleAnsicht(id) {
+  Zustand.ansicht = id; Speicher.schreib("ansicht", id);
+  zeichnen(); window.scrollTo(0, 0);
+}
+function beamerUmschalten() {
+  Zustand.beamer = !Zustand.beamer;
+  if (Zustand.beamer) {
+    Zustand.ansicht = "klasse";
+    try { if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(() => {}); } catch (e) {}
+  } else {
+    try { if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(() => {}); } catch (e) {}
+  }
+  zeichnen();
+}
+function dlSchritt(r) {
+  const l = dls(), i = l.findIndex(d => d.id === Zustand.dl);
+  if (l[i + r]) { Zustand.dl = l[i + r].id; zeichnen(); }
+}
+document.addEventListener("keydown", e => {
+  if (Zustand.dialog || !darfNeuZeichnen()) return;
+  if (Zustand.beamer && e.key === "Escape") beamerUmschalten();
+  if (Zustand.ansicht === "klasse" && (e.key === "ArrowLeft" || e.key === "ArrowRight")) dlSchritt(e.key === "ArrowLeft" ? -1 : 1);
+});
+
+/* ========================================================================
+   7. ZEICHNEN — nicht neu zeichnen, solange jemand tippt, tippt (Finger
+   unten) oder ein Dialog offen ist; sonst gehen Eingaben und Klicks verloren.
+   ======================================================================== */
+let zeichnenGeplant = false, zeigerUnten = false;
+function darfNeuZeichnen() {
+  const a = document.activeElement;
+  return !(a && (a.tagName === "INPUT" || a.tagName === "TEXTAREA" || a.tagName === "SELECT") && a.type !== "checkbox" && a.type !== "file");
+}
+function planeZeichnen() {
+  if (zeichnenGeplant) return;
+  zeichnenGeplant = true;
+  requestAnimationFrame(() => {
+    zeichnenGeplant = false;
+    if (!darfNeuZeichnen() || Zustand.dialog || zeigerUnten) { Zustand.ausstehend = true; return; }
+    zeichnen();
+  });
+}
+document.addEventListener("pointerdown", () => { zeigerUnten = true; }, true);
+const zeigerLos = () => setTimeout(() => { zeigerUnten = false; if (Zustand.ausstehend) planeZeichnen(); }, 60);
+document.addEventListener("pointerup", zeigerLos, true);
+document.addEventListener("pointercancel", zeigerLos, true);
+document.addEventListener("focusout", () => setTimeout(() => { if (Zustand.ausstehend) planeZeichnen(); }, 120));
+
+function zeichnen() {
+  Zustand.ausstehend = false;
+  if (plan() && (!Zustand.dl || !dlVon(Zustand.dl))) Zustand.dl = aktuelleDl();
+  const scroll = {};
+  document.querySelectorAll("[data-scroll]").forEach(n => { scroll[n.dataset.scroll] = n.scrollLeft; });
+  const lehrer = istLehrer();
+  if (Zustand.ansicht === "lehrer" && lehrer) Zustand.ansicht = "lehrer";
+  document.body.classList.toggle("beamer", Zustand.beamer);
+  $("#app").replaceChildren(Zustand.beamer ? "" : kopf(), el("main", { class: "huelle" }, inhalt()));
+  document.querySelectorAll("[data-scroll]").forEach(n => { if (scroll[n.dataset.scroll] != null) n.scrollLeft = scroll[n.dataset.scroll]; });
+  if (!Zustand.chipsGescrollt) {
+    const c = $(".dl-chip.aktiv");
+    if (c && c.parentElement) { c.parentElement.scrollLeft = Math.max(0, c.offsetLeft - 40); Zustand.chipsGescrollt = true; }
+  }
+}
+
+function verbindungsPill() {
+  const v = DEMO ? "demo" : Zustand.verbindung;
+  const text = { demo: "Demo · nur dieses Gerät", live: "Live", verbinde: "verbinde …", offline: "offline", fehler: "Verbindungsfehler" }[v] || v;
+  return el("span", { class: "pill " + v, title: "Verbindung zur Datenbank" }, el("span", { class: "punkt" }), text);
+}
+
+function kopf() {
+  const lehrer = istLehrer();
+  const tabs = [["plan", "Mein Plan"], ["klasse", "Klasse"], ["uebersicht", "Übersicht"], ["lehrer", lehrer ? "Bearbeiten" : "Lehrperson"]];
+  return el("header", { class: "kopf nicht-drucken" },
+    el("div", { class: "kopf-zeile" },
+      el("div", { class: "marke" }, el("div", { class: "titel" }, DATEN.titel), el("div", { class: "untertitel" }, DATEN.untertitel)),
+      el("div", { class: "kopf-rechts" }, verbindungsPill(), lehrer ? el("span", { class: "pill" }, "🔑 Lehrperson") : null)),
+    el("nav", { class: "tabs", role: "tablist", "aria-label": "Ansichten" }, tabs.map(([id, text]) =>
+      el("button", { class: "tab" + (Zustand.ansicht === id ? " aktiv" : ""), role: "tab", "aria-selected": String(Zustand.ansicht === id),
+                     onclick: () => wechsleAnsicht(id) }, text))));
+}
+
+function inhalt() {
+  const out = [];
+  const wartend = DEMO ? 0 : Sync.wartend;
+  if (wartend) out.push(el("div", { class: "hinweis rot nicht-drucken" }, `Offline: ${wartend} Eingabe${wartend > 1 ? "n warten" : " wartet"} auf diesem Gerät und ${wartend > 1 ? "werden" : "wird"} automatisch nachgeliefert.`));
+  if (!DEMO && !Zustand.geladen) { out.push(el("div", { class: "karte schmal" }, el("p", {}, "Verbinde mit dem Arbeitsplan …"))); return out; }
+  if (Zustand.ansicht === "lehrer") return out.concat(ansichtLehrer());
+  if (!plan() || !plan().dls) {
+    out.push(el("div", { class: "karte schmal" }, el("h2", {}, "Der Arbeitsplan ist noch leer"),
+      el("p", {}, "Die Lehrperson lädt ihn im Bereich «Lehrperson»."))); return out;
+  }
+  if (DEMO && Zustand.ansicht !== "klasse") out.push(el("div", { class: "hinweis blau nicht-drucken" }, "Demo-Modus: Alles bleibt auf diesem Gerät. Für den gemeinsamen Stand fehlen noch die Firebase-Werte."));
+  if (Zustand.ansicht === "plan") return out.concat(dlLeiste(), ansichtPlan());
+  if (Zustand.ansicht === "uebersicht") return out.concat(ansichtUebersicht());
+  return out.concat(Zustand.beamer ? [] : dlLeiste(), ansichtKlasse());
+}
+
+function dlLeiste(mitNeu) {
+  const aktuell = aktuelleDl();
+  return el("div", { class: "dl-leiste nicht-drucken", "data-scroll": "dls", role: "tablist", "aria-label": "Doppellektionen" },
+    dls().map(d => el("button", { class: "dl-chip" + (d.id === Zustand.dl ? " aktiv" : ""), "aria-selected": String(d.id === Zustand.dl),
+                                   onclick: () => { Zustand.dl = d.id; zeichnen(); } },
+      el("b", {}, d.id), el("span", {}, kurzdatum(d.datum) || "–"), d.id === aktuell ? el("i", {}, "aktuell") : null)),
+    mitNeu ? el("button", { class: "dl-chip neu", onclick: neueDl }, "＋ Neue DL") : null);
+}
+
+function dlKopf(dlId, aktionen) {
+  const d = dlVon(dlId);
+  return el("div", { class: "dl-kopf" },
+    el("div", {}, el("div", { class: "dl-nr" }, `${dlId} · ${langdatum(d.datum)}`), el("h2", {}, d.thema || "")),
+    aktionen ? el("div", { class: "aktionen zeile nicht-drucken" }, aktionen) : null);
+}
+
+function legende() {
+  return el("div", { class: "legende" },
+    el("span", { class: "leg st-offen" }, "offen"), el("span", { class: "leg st-arbeit" }, "in Arbeit"),
+    el("span", { class: "leg st-fertig" }, "fertig"), el("span", { class: "leg st-kontrolliert" }, "✓ kontrolliert"),
+    el("span", { class: "gedaempft" }, "★ = Zusatz · Puffer = wenn du fertig bist"));
+}
+const freiwilligMarke = h => (!h.fuer && !/^freiwillig/i.test(h.text || "")) ? el("span", { class: "art puffer" }, "freiwillig") : null;
+const artMarke = art => art === "Z" ? el("span", { class: "art z" }, "★ Zusatz") : art === "Puffer" ? el("span", { class: "art puffer" }, "Puffer") : null;
+
+/* ---------- Mein Plan (Lernende) ---------- */
+function wahlIch() {
+  return el("div", { class: "karte schmal" },
+    el("h2", {}, "Wer bist du?"),
+    el("p", { class: "gedaempft" }, "Tippe auf deinen Namen (deine Farbe). Dieses Gerät merkt sich das."),
+    el("div", { class: "ich-raster" }, lernendeListe().map(l =>
+      el("button", { class: "ich-wahl", onclick: () => { Speicher.schreib("ichBin", l.id); zeichnen(); } },
+        el("span", { class: "punkt-gross", style: `background:${l.farbe}` }, initiale(l.id)), el("span", {}, nameVon(l.id))))));
+}
+
+function ansichtPlan() {
+  const ich = ichBin();
+  if (!ich) return [wahlIch()];
+  const dlId = Zustand.dl, d = dlVon(dlId), f = fortschritt(dlId, ich), aufs = auftraegeVon(dlId);
+  const out = [];
+  out.push(el("div", { class: "karte schmal" },
+    el("div", { class: "ich-kopf" },
+      el("div", { class: "punkt-gross", style: `background:${farbeVon(ich)}` }, initiale(ich)),
+      el("div", { style: "flex:1;min-width:140px" }, el("div", { class: "gedaempft" }, "Mein Plan"), el("div", { style: "font-weight:750;font-size:1.15rem" }, nameVon(ich))),
+      el("div", { class: "kennzahl" }, el("b", {}, xp(ich)), el("span", { class: "gedaempft" }, "XP gesamt")),
+      el("button", { class: "klein nicht-drucken", onclick: () => frage("Person wechseln? Das braucht es nur, wenn jemand anderes dieses Gerät benutzt.", () => { Speicher.loesche("ichBin"); zeichnen(); }, "Wechseln") }, "Wechseln"))));
+
+  const liste = aufs.map((a, i) => {
+    const s = statusVon(dlId, a.id, ich);
+    let steuerung;
+    if (s === "kontrolliert") steuerung = el("div", { class: "kontrolliert-marke" }, "✓ kontrolliert");
+    else if (!s) steuerung = a.art !== "P"
+      ? el("button", { class: "nehmen", onclick: () => setzeStatus(dlId, a.id, ich, "in Arbeit") }, "＋ Ich mache das")
+      : el("span", { class: "gedaempft" }, "nicht zugeteilt");
+    else steuerung = el("div", { class: "segment", role: "group", "aria-label": "Status" }, STATUS_SUS.map(w =>
+      el("button", { class: "seg" + (s === w ? " aktiv " + ST_KLASSE[w] : ""), "aria-pressed": String(s === w),
+                     onclick: () => { if (s !== w) setzeStatus(dlId, a.id, ich, w); } }, w)));
+    return el("div", { class: "auftrag " + ST_KLASSE[s] },
+      el("div", { class: "nr" }, i + 1),
+      el("div", {}, el("div", { class: "text" }, artMarke(a.art), a.text), a.wo ? el("div", { class: "wo" }, "📍 " + a.wo) : null),
+      el("div", { class: "steuerung" }, steuerung));
+  });
+  out.push(el("div", { class: "karte schmal" },
+    dlKopf(dlId),
+    el("div", { class: "zeile", style: "justify-content:space-between" }, el("b", {}, `${f.erl} von ${f.zu} erledigt`), el("span", { class: "gedaempft" }, `${Math.round(f.anteil * 100)} %`)),
+    el("div", { class: "fortschritt" }, el("i", { style: `width:${Math.round(f.anteil * 100)}%` })),
+    el("div", { style: "margin-top:14px" }, liste.length ? liste : el("p", { class: "gedaempft" }, "Für diese DL sind noch keine Aufträge eingetragen.")),
+    el("p", { class: "gedaempft" }, "Arbeite von oben nach unten: offen → in Arbeit → fertig. Fertig mit allen Pflichtaufträgen? Dann ★ Zusatz oder Puffer-Box. «Kontrolliert» setzt die Lehrperson.")));
+
+  if (d.ziel) out.push(el("div", { class: "karte schmal" },
+    el("h3", {}, "🎯 Das kann ich heute"),
+    el("p", { class: "ziel-text" }, d.ziel),
+    el("div", { class: "segment" }, ZIEL_WERTE.map(w => el("button", { class: "seg" + (zielVon(dlId, ich) === w ? " aktiv " + ZIEL_KLASSE[w] : ""),
+      "aria-pressed": String(zielVon(dlId, ich) === w), onclick: () => schreibe(`ziel/${dlId}/${ich}`, w) }, w))),
+    el("p", { class: "gedaempft" }, "Am Schluss: Wie sicher bist du? Ehrlich ist am besten. Dafür gibt es keine XP.")));
+
+  const flk = flkVon(dlId);
+  if (flk.length) out.push(el("div", { class: "karte schmal" },
+    el("h3", {}, "✅ Mein FLK-Ergebnis"),
+    flk.map(lz => el("div", { class: "flk-zeile" }, el("div", { style: "flex:1;min-width:200px" }, lz.text),
+      el("div", { class: "segment", style: "width:auto" }, FLK_WERTE.map(w => el("button", { class: "seg" + (flkWert(dlId, lz.id, ich) === w ? " aktiv " + FLK_KLASSE[w] : ""),
+        "aria-pressed": String(flkWert(dlId, lz.id, ich) === w), onclick: () => schreibe(`flk/${dlId}/${lz.id}/${ich}`, w) }, w))))),
+    el("p", { class: "gedaempft" }, "Bei «noch nicht»: Tippe oben bei der passenden Zeile «Repetition LZ…» auf «＋ Ich mache das».")));
+
+  const has = hausaufgabenVon(dlId).filter(h => !h.fuer || h.fuer[ich]);
+  if (has.length) out.push(el("div", { class: "karte schmal" },
+    el("h3", {}, "🏠 Hausaufgaben"),
+    el("ul", { class: "ha-liste" }, has.map(h => el("li", {}, el("span", {}, freiwilligMarke(h), h.text),
+      el("span", { class: "bis" }, h.bis ? "auf " + kurzdatum(h.bis) : ""))))));
+  return out;
+}
+
+/* ---------- Klasse (Raster, Beamer) ---------- */
+function ansichtKlasse() {
+  const dlId = Zustand.dl, d = dlVon(dlId), ls = lernendeListe(), lehrer = istLehrer(), ich = lehrer ? null : ichBin();
+  const aufs = auftraegeVon(dlId);
+  const aktionen = Zustand.beamer
+    ? [verbindungsPill(), el("button", { class: "klein", onclick: () => dlSchritt(-1), "aria-label": "vorherige DL" }, "◀"),
+       el("button", { class: "klein", onclick: () => dlSchritt(1), "aria-label": "nächste DL" }, "▶"),
+       el("button", { class: "klein primaer", onclick: beamerUmschalten }, "Beamer beenden")]
+    : [lehrer ? el("button", { class: "klein", onclick: () => frage(`Alle Aufträge auf «fertig» in ${dlId} auf «kontrolliert» setzen?`, () => fertigKontrollieren(dlId), "Kontrollieren") }, "✓ Alle «fertig» kontrollieren") : null,
+       el("button", { class: "klein", onclick: () => window.print() }, "🖨 Drucken"),
+       el("button", { class: "klein primaer", onclick: beamerUmschalten }, "⛶ Beamer")];
+  const spKlasse = sid => sid === ich ? "ich-spalte" : null;
+
+  const kopfzeile = el("tr", {},
+    el("th", { class: "sp-auftrag", scope: "col" }, ich ? el("span", { class: "gedaempft" }, "Deine Spalte ist blau hinterlegt.") : "Auftrag"),
+    ls.map(l => el("th", { class: spKlasse(l.id), scope: "col" }, lehrer
+      ? el("button", { class: "kopf-name", style: `background:${l.farbe}`, onclick: () => spalteMenue(dlId, l) }, nameVon(l.id))
+      : el("div", { class: "kopf-name", style: `background:${l.farbe}` }, nameVon(l.id)))));
+
+  const zeilen = aufs.map((a, i) => {
+    const kopfInhalt = [el("span", { class: "nr" }, i + 1), el("span", {}, artMarke(a.art), a.text, a.wo ? el("span", { class: "wo", style: "display:block" }, a.wo) : null)];
+    return el("tr", {},
+      el("th", { class: "sp-auftrag", scope: "row" }, lehrer ? el("button", { class: "auftrag-kopf", onclick: () => zeileMenue(dlId, a) }, kopfInhalt) : el("div", { class: "auftrag-kopf" }, kopfInhalt)),
+      ls.map(l => {
+        const s = statusVon(dlId, a.id, l.id);
+        const text = s === "kontrolliert" ? "✓ kontrolliert" : (s || (a.art === "P" ? "–" : ""));
+        const darf = lehrer || (l.id === ich && s !== "kontrolliert");
+        const k = "zelle " + ST_KLASSE[s];
+        return el("td", { class: spKlasse(l.id) }, darf
+          ? el("button", { class: k, "aria-label": `${nameVon(l.id)}, Auftrag ${i + 1}: ${s || "nicht zugeteilt"}`, onclick: () => statusWaehlen(dlId, a, l.id) }, text)
+          : el("div", { class: k, title: s || "nicht zugeteilt" }, text));
+      }));
+  });
+
+  const fuss = [el("tr", {}, el("th", { class: "sp-auftrag", scope: "row" }, "Erledigt (fertig + kontrolliert)"),
+    ls.map(l => { const f = fortschritt(dlId, l.id); return el("td", { class: spKlasse(l.id) }, el("div", { class: "zahl" }, `${f.erl}/${f.zu}`), el("div", { class: "mini" }, el("i", { style: `width:${Math.round(f.anteil * 100)}%` }))); }))];
+  if (d.ziel) fuss.push(el("tr", {}, el("th", { class: "sp-auftrag", scope: "row" }, "🎯 Das kann ich heute: ", el("span", { style: "font-weight:400" }, d.ziel)),
+    ls.map(l => { const w = zielVon(dlId, l.id), darf = lehrer || l.id === ich, k = "zelle " + ZIEL_KLASSE[w];
+      return el("td", { class: spKlasse(l.id) }, darf ? el("button", { class: k, onclick: () => zielWaehlen(dlId, l.id) }, w || "") : el("div", { class: k }, w || "")); })));
+  flkVon(dlId).forEach(lz => fuss.push(el("tr", {}, el("th", { class: "sp-auftrag", scope: "row" }, "FLK ", el("span", { style: "font-weight:400" }, lz.text)),
+    ls.map(l => { const w = flkWert(dlId, lz.id, l.id), darf = lehrer || l.id === ich, k = "zelle " + FLK_KLASSE[w];
+      return el("td", { class: spKlasse(l.id) }, darf ? el("button", { class: k, onclick: () => flkWaehlen(dlId, lz, l.id) }, w || "") : el("div", { class: k }, w || "")); }))));
+
+  const out = [dlKopf(dlId, aktionen), legende(),
+    el("div", { class: "scroll-x", "data-scroll": "raster" },
+      el("table", { class: "raster" }, el("thead", {}, kopfzeile), el("tbody", {}, zeilen), el("tfoot", {}, fuss)))];
+
+  const has = hausaufgabenVon(dlId);
+  if (has.length) out.push(el("div", { style: "margin-top:16px" }, el("h3", {}, "🏠 Hausaufgaben"),
+    el("div", { class: "scroll-x", "data-scroll": "ha" }, el("table", { class: "raster" },
+      el("thead", {}, el("tr", {}, el("th", { class: "sp-auftrag", scope: "col" }, "Auftrag · auf wann"),
+        ls.map(l => el("th", { class: spKlasse(l.id), scope: "col" }, el("div", { class: "kopf-name", style: `background:${l.farbe}` }, nameVon(l.id)))))),
+      el("tbody", {}, has.map(h => el("tr", {},
+        el("th", { class: "sp-auftrag", scope: "row" }, freiwilligMarke(h), h.text,
+          h.bis ? el("span", { class: "wo", style: "display:block" }, "📅 auf " + kurzdatum(h.bis)) : null),
+        ls.map(l => {
+          const an = !!(h.fuer && h.fuer[l.id]);
+          const stil = an ? `background:${l.farbe}` : null;
+          return el("td", { class: spKlasse(l.id) }, lehrer
+            ? el("button", { class: "zelle ha-zelle" + (an ? " an" : ""), style: stil, "aria-label": `${nameVon(l.id)}: ${an ? "zugeteilt" : "nicht zugeteilt"}`,
+                             onclick: () => schreibe(`plan/dls/${dlId}/hausaufgaben/${h.id}/fuer/${l.id}`, an ? null : true) }, an ? "x" : "")
+            : el("div", { class: "zelle ha-zelle" + (an ? " an" : ""), style: stil }, an ? "x" : ""));
+        }))))))));
+  if (!aufs.length) out.push(el("p", { class: "gedaempft" }, "Für diese DL sind noch keine Aufträge eingetragen."));
+  return out;
+}
+
+/* ---------- Übersicht ---------- */
+function ansichtUebersicht() {
+  const ls = lernendeListe(), lehrer = istLehrer(), ich = ichBin();
+  const frei = lehrer || !!tief(plan(), "einstellungen", "uebersichtKlasse");
+  const sichtbar = frei ? ls : ls.filter(l => l.id === ich);
+  let klasse = 0, moeglich = 0;
+  for (const d of dls()) for (const a of auftraegeVon(d.id)) for (const l of ls) {
+    const s = statusVon(d.id, a.id, l.id); if (s) moeglich += 2; if (s === "fertig") klasse += 1; if (s === "kontrolliert") klasse += 2;
+  }
+  const out = [el("div", { class: "karte" },
+    el("h2", {}, "📊 Übersicht · Fortschritt und XP über die ganze Einheit"),
+    el("p", { class: "gedaempft" }, "XP: fertig = 1 Punkt, kontrolliert = 2 Punkte."),
+    el("div", { class: "klassenziel" }, el("b", {}, "Klassen-XP"),
+      el("div", { class: "fortschritt" }, el("i", { style: `width:${moeglich ? Math.round(klasse / moeglich * 100) : 0}%` })),
+      el("b", {}, `${klasse} von ${moeglich}`)))];
+  if (!frei && !ich) { out.push(el("div", { class: "hinweis" }, "Wähle zuerst unter «Mein Plan», wer du bist. Dann siehst du hier deinen Fortschritt.")); return out; }
+  if (!frei) out.push(el("div", { class: "hinweis blau" }, "Du siehst hier deinen eigenen Fortschritt. Die Übersicht der ganzen Klasse schaltet die Lehrperson frei."));
+  out.push(el("div", { class: "scroll-x", "data-scroll": "ue" }, el("table", { class: "raster" },
+    el("thead", {}, el("tr", {}, el("th", { class: "sp-auftrag", scope: "col" }, "DL · Datum · Thema"),
+      sichtbar.map(l => el("th", { scope: "col" }, el("div", { class: "kopf-name", style: `background:${l.farbe}` }, nameVon(l.id)))))),
+    el("tbody", {}, dls().map(d => el("tr", {},
+      el("th", { class: "sp-auftrag", scope: "row" }, el("button", { class: "auftrag-kopf", onclick: () => { Zustand.dl = d.id; wechsleAnsicht("klasse"); } },
+        el("span", {}, el("b", {}, d.id), " · " + (kurzdatum(d.datum) || "–") + " · " + (d.thema || "")))),
+      sichtbar.map(l => { const f = fortschritt(d.id, l.id), p = Math.round(f.anteil * 100);
+        return el("td", {}, f.zu ? el("div", { class: "ue-zelle" + (p === 100 ? " voll" : "") }, el("i", { style: `width:${p}%` }), el("span", {}, p + " %")) : el("span", { class: "gedaempft" }, "–")); })))),
+    el("tfoot", {}, el("tr", {}, el("th", { class: "sp-auftrag", scope: "row" }, "XP total"),
+      sichtbar.map(l => el("td", {}, el("div", { class: "zahl", style: "font-size:1.15rem" }, xp(l.id)))))))));
+  return out;
+}
+
+/* ---------- Lehrperson ---------- */
+function anmeldeKarte() {
+  if (DEMO) return el("div", { class: "karte schmal" }, el("h2", {}, "Lehrperson"),
+    el("p", {}, "Demo-Modus: Es ist noch keine Datenbank eingetragen. Alles bleibt auf diesem Gerät – zum Ausprobieren."),
+    el("button", { class: "primaer", onclick: () => { Zustand.demoLehrer = true; zeichnen(); } }, "Lehrer-Modus öffnen (Demo)"));
+  if (!CONFIG.apiKey) return el("div", { class: "karte schmal" }, el("h2", {}, "Lehrperson"), el("p", {}, "Für das Login fehlt oben im Code der apiKey (CONFIG)."));
+  const mail = el("input", { type: "email", value: CONFIG.lehrerEmail || Speicher.lies("lehrerEmail", ""), autocomplete: "username", placeholder: "E-Mail", id: "lp-mail" });
+  const pw = el("input", { type: "password", autocomplete: "current-password", placeholder: "Passwort", id: "lp-pw" });
+  const meldung = el("p", { class: "gedaempft", role: "status" });
+  let knopf = null;
+  const los = async () => {
+    knopf.disabled = true; meldung.textContent = "Melde an …";
+    const r = await Sync.anmelden(mail.value.trim(), pw.value);
+    knopf.disabled = false;
+    if (!r.ok) { meldung.textContent = r.grund; return; }
+    Speicher.schreib("lehrerEmail", mail.value.trim()); pw.value = "";
+    await pruefeSchreibrecht();
+    toast("Angemeldet"); pw.blur(); mail.blur(); zeichnen();
+  };
+  knopf = el("button", { class: "primaer", onclick: los }, "Anmelden");
+  pw.addEventListener("keydown", e => { if (e.key === "Enter") los(); });
+  return el("div", { class: "karte schmal" },
+    el("h2", {}, "Anmelden als Lehrperson"),
+    el("p", { class: "gedaempft" }, "Nur du kannst «kontrolliert» setzen und Aufträge ändern. Das Passwort wird nicht gespeichert."),
+    el("div", { class: "feld" }, el("label", { for: "lp-mail" }, "E-Mail"), mail),
+    el("div", { class: "feld" }, el("label", { for: "lp-pw" }, "Passwort"), pw),
+    el("div", { class: "zeile" }, knopf), meldung);
+}
+
+function ansichtLehrer() {
+  if (!istLehrer()) return [anmeldeKarte()];
+  const out = [];
+  if (Zustand.schreibrechtFehlt) out.push(regelnKarte(true));
+  if (!plan() || !plan().dls) {
+    out.push(el("div", { class: "karte schmal" }, el("h2", {}, "Arbeitsplan einrichten"),
+      el("p", {}, "Die Datenbank ist noch leer. Lade den Arbeitsplan aus der Excel-Vorlage (DL01–DL11, Textproduktion HS26). Pflichtaufträge sind danach für alle «offen»."),
+      el("button", { class: "primaer", onclick: () => { const v = ausVorlage(); schreibeMehrere({ plan: v.plan, stand: v.stand }); toast("Arbeitsplan geladen"); } }, "Arbeitsplan aus Vorlage laden")));
+    out.push(verbindungKarte());
+    return out;
+  }
+  out.push(dlLeiste(true));
+  if (Zustand.dl && dlVon(Zustand.dl)) out.push(dlBearbeiten(Zustand.dl));
+  out.push(lernendeKarte(), einstellungenKarte(), datenKarte(), verbindungKarte());
+  return out;
+}
+
+function artWahl(wert, beiAenderung) {
+  const s = el("select", { "aria-label": "Art", onchange: beiAenderung ? e => beiAenderung(e.target.value) : null },
+    Object.entries(ART_TEXT).map(([w, t]) => el("option", { value: w, selected: w === wert }, t)));
+  return s;
+}
+
+function dlBearbeiten(dlId) {
+  const d = dlVon(dlId), b = `plan/dls/${dlId}`, aufs = auftraegeVon(dlId), has = hausaufgabenVon(dlId), ls = lernendeListe();
+  const textfeld = (label, wert, pfad, platzhalter, pflicht) => el("div", { class: "feld" }, el("label", {}, label),
+    el("input", { type: "text", value: wert || "", placeholder: platzhalter || "",
+      onchange: e => { const v = e.target.value.trim(); if (pflicht && !v) { e.target.value = wert || ""; return; } schreibe(pfad, v); } }));
+
+  const zeilen = aufs.map((a, i) => el("div", { class: "edit-zeile" },
+    el("div", { class: "nr" }, i + 1),
+    el("input", { type: "text", value: a.text, "aria-label": `Auftrag ${i + 1}`, onchange: e => { const v = e.target.value.trim(); if (v) schreibe(`${b}/auftraege/${a.id}/text`, v); else e.target.value = a.text; } }),
+    el("input", { type: "text", value: a.wo || "", placeholder: "Wo (z.B. DOS 1, 2.3)", "aria-label": `Wo, Auftrag ${i + 1}`, onchange: e => schreibe(`${b}/auftraege/${a.id}/wo`, e.target.value.trim()) }),
+    artWahl(a.art, v => schreibe(`${b}/auftraege/${a.id}/art`, v)),
+    el("div", { class: "knopf-gruppe" },
+      el("button", { class: "icon", title: "nach oben", "aria-label": "nach oben", disabled: i === 0, onclick: () => verschieben(dlId, aufs, i, -1) }, "↑"),
+      el("button", { class: "icon", title: "nach unten", "aria-label": "nach unten", disabled: i === aufs.length - 1, onclick: () => verschieben(dlId, aufs, i, 1) }, "↓"),
+      el("button", { class: "icon gefahr", title: "löschen", "aria-label": "Auftrag löschen", onclick: () => auftragLoeschen(dlId, a) }, "🗑"))));
+
+  const neuText = el("input", { type: "text", placeholder: "Neuer Auftrag …", "aria-label": "Neuer Auftrag" });
+  const neuWo = el("input", { type: "text", placeholder: "Wo (optional)", "aria-label": "Wo" });
+  const neuArt = artWahl("P");
+  const neuAlle = el("input", { type: "checkbox", checked: true, id: "neu-alle" });
+  neuArt.addEventListener("change", () => { neuAlle.checked = neuArt.value === "P"; });
+  const hinzu = () => {
+    const t = neuText.value.trim(); if (!t) { neuText.focus(); return; }
+    neuText.blur(); auftragHinzufuegen(dlId, t, neuWo.value.trim(), neuArt.value, neuAlle.checked);
+  };
+  neuText.addEventListener("keydown", e => { if (e.key === "Enter") hinzu(); });
+
+  const haZeilen = has.map(h => {
+    const alle = ls.length && ls.every(l => h.fuer && h.fuer[l.id]);
+    return el("div", { class: "edit-zeile ha" },
+      el("input", { type: "text", value: h.text, "aria-label": "Hausaufgabe", onchange: e => { const v = e.target.value.trim(); if (v) schreibe(`${b}/hausaufgaben/${h.id}/text`, v); } }),
+      el("input", { type: "text", value: h.bis || "", placeholder: "TT.MM.JJJJ", "aria-label": "auf wann", onchange: e => schreibe(`${b}/hausaufgaben/${h.id}/bis`, e.target.value.trim()) }),
+      el("div", { class: "chip-wahl" },
+        el("button", { class: "chip" + (alle ? " an" : ""), onclick: () => { const f = {}; ls.forEach(l => { f[l.id] = true; }); schreibe(`${b}/hausaufgaben/${h.id}/fuer`, f); } }, "alle"),
+        ls.map(l => { const an = !!(h.fuer && h.fuer[l.id]);
+          return el("button", { class: "chip" + (an ? " an" : ""), style: `background:${l.farbe}`, title: nameVon(l.id), "aria-pressed": String(an),
+            onclick: () => schreibe(`${b}/hausaufgaben/${h.id}/fuer/${l.id}`, an ? null : true) }, initiale(l.id)); })),
+      el("button", { class: "icon gefahr", "aria-label": "Hausaufgabe löschen", onclick: () => frage(`Hausaufgabe «${h.text}» löschen?`, () => schreibe(`${b}/hausaufgaben/${h.id}`, null), "Löschen") }, "🗑"));
+  });
+  const haText = el("input", { type: "text", placeholder: "Neue Hausaufgabe …", "aria-label": "Neue Hausaufgabe" });
+  const haBis = el("input", { type: "text", placeholder: "TT.MM.JJJJ", "aria-label": "auf wann" });
+  const haAlle = el("input", { type: "checkbox", checked: true, id: "ha-alle" });
+  const haHinzu = () => {
+    const t = haText.value.trim(); if (!t) { haText.focus(); return; }
+    const h = { ord: (has.length ? Math.max(...has.map(x => x.ord || 0)) : 0) + 1, text: t, bis: haBis.value.trim() };
+    if (haAlle.checked) { h.fuer = {}; ls.forEach(l => { h.fuer[l.id] = true; }); }
+    haText.blur(); schreibe(`${b}/hausaufgaben/${neueId("h")}`, h); toast("Hausaufgabe hinzugefügt");
+  };
+
+  return el("div", { class: "karte" },
+    el("div", { class: "zeile", style: "justify-content:space-between" }, el("h2", {}, `${dlId} bearbeiten`),
+      el("button", { class: "klein", onclick: () => wechsleAnsicht("klasse") }, "Zur Klassenansicht →")),
+    el("div", { class: "raster2" },
+      textfeld("Datum", d.datum, `${b}/datum`, "TT.MM.JJJJ"),
+      textfeld("Thema der DL", d.thema, `${b}/thema`, "", true)),
+    el("div", { class: "feld" }, el("label", {}, "Das kann ich heute (Ziel der DL, Selbsteinschätzung noch nicht · fast · sicher) – leer lassen, wenn es keines gibt"),
+      el("textarea", { onchange: e => schreibe(`${b}/ziel`, e.target.value.trim()), style: "min-height:60px" }, d.ziel || "")),
+    el("details", { open: flkVon(dlId).length ? true : null },
+      el("summary", {}, "FLK-Lernziele (erreicht · noch nicht), z.B. DL07"),
+      el("div", { class: "feld" }, el("label", {}, "Ein Lernziel pro Zeile. Leer = kein FLK in dieser DL."),
+        el("textarea", { onchange: e => { const z = e.target.value.split("\n").map(s => s.trim()).filter(Boolean); const o = {}; z.forEach((t, i) => { o["lz" + (i + 1)] = t; }); schreibe(`${b}/flk`, z.length ? o : null); } },
+          flkVon(dlId).map(f => f.text).join("\n")))),
+    el("h3", { style: "margin-top:16px" }, "Aufträge"),
+    zeilen.length ? zeilen : el("p", { class: "gedaempft" }, "Noch keine Aufträge."),
+    el("div", { class: "neu-form" },
+      el("div", { class: "edit-zeile", style: "border-top:none" }, el("div", { class: "nr" }, "＋"), neuText, neuWo, neuArt,
+        el("button", { class: "primaer", onclick: hinzu }, "Hinzufügen")),
+      el("label", { class: "zeile gedaempft", for: "neu-alle", style: "gap:8px;margin-left:42px" }, neuAlle, "allen zuteilen («offen») – bei ★ und Puffer meist nicht")),
+    el("h3", { style: "margin-top:18px" }, "🏠 Hausaufgaben"),
+    haZeilen.length ? haZeilen : el("p", { class: "gedaempft" }, "Keine Hausaufgaben."),
+    el("div", { class: "neu-form" },
+      el("div", { class: "edit-zeile ha", style: "border-top:none" }, haText, haBis,
+        el("label", { class: "zeile gedaempft", for: "ha-alle", style: "gap:8px" }, haAlle, "allen zuteilen"),
+        el("button", { class: "primaer", onclick: haHinzu }, "Hinzufügen"))),
+    el("div", { class: "zeile", style: "margin-top:18px;justify-content:flex-end" },
+      el("button", { class: "klein gefahr", onclick: () => dlLoeschen(dlId) }, `${dlId} löschen`)));
+}
+
+function lernendeKarte() {
+  const ls = lernendeListe();
+  const link = klassenlink();
+  return el("div", { class: "karte" },
+    el("h2", {}, "Lernende"),
+    el("p", { class: "gedaempft" }, "Farbname = was online gespeichert wird (kein echter Name!). Echter Name = steht nur auf diesem Gerät."),
+    ls.map(l => el("div", { class: "edit-zeile lern" },
+      el("input", { type: "color", value: l.farbe, "aria-label": "Farbe", onchange: e => schreibe(`plan/lernende/${l.id}/farbe`, e.target.value) }),
+      el("input", { type: "text", value: l.label || "", "aria-label": "Farbname (online)", placeholder: "Farbname / Fantasiename",
+        onchange: e => { const v = e.target.value.trim(); if (v) schreibe(`plan/lernende/${l.id}/label`, v.slice(0, 24)); } }),
+      el("input", { type: "text", value: Namen[l.id] || "", "aria-label": "Echter Name (nur dieses Gerät)", placeholder: "Echter Name – nur auf diesem Gerät",
+        onchange: e => { const v = e.target.value.trim(); if (v) Namen[l.id] = v.slice(0, 40); else delete Namen[l.id]; Speicher.schreib("namen", Namen); planeZeichnen(); } }),
+      el("button", { class: "icon gefahr", "aria-label": "entfernen", onclick: () => frage(`${nameVon(l.id)} aus dem Arbeitsplan entfernen?`, () => schreibe(`plan/lernende/${l.id}`, null), "Entfernen") }, "🗑"))),
+    el("div", { class: "zeile", style: "margin-top:10px" }, el("button", { class: "klein", onclick: lernendeHinzufuegen }, "＋ Lernende/n hinzufügen")),
+    el("h3", { style: "margin-top:18px" }, "Klassenlink mit Namen"),
+    el("p", { class: "gedaempft" }, "Die Namen stehen nur im Teil nach «#». Der wird nie an GitHub oder Firebase gesendet. Link einmal auf jedem Gerät öffnen (z.B. im Teams-Kanal posten) – danach zeigt das Gerät die Namen."),
+    el("input", { type: "text", class: "link-feld", readonly: true, value: link, "aria-label": "Klassenlink", onfocus: e => e.target.select() }),
+    el("div", { class: "zeile", style: "margin-top:8px" }, el("button", { class: "klein primaer", onclick: () => kopieren(link, "Klassenlink kopiert") }, "Link kopieren")));
+}
+
+function einstellungenKarte() {
+  const an = !!tief(plan(), "einstellungen", "uebersichtKlasse");
+  const box = el("input", { type: "checkbox", checked: an, id: "ue-frei", onchange: e => schreibe("plan/einstellungen/uebersichtKlasse", e.target.checked) });
+  return el("div", { class: "karte" }, el("h2", {}, "Einstellungen"),
+    el("label", { class: "zeile", for: "ue-frei", style: "gap:10px;align-items:flex-start" }, box,
+      el("span", {}, el("b", {}, "Übersicht für die Klasse freigeben (Klassen-Liga)"), el("br"),
+        el("span", { class: "gedaempft" }, "Aus: Lernende sehen in «Übersicht» nur sich selbst und die Klassen-XP. Du und der Beamer sehen immer alle."))));
+}
+
+function datenKarte() {
+  const datei = el("input", { type: "file", accept: ".json,application/json", class: "verborgen", onchange: e => { if (e.target.files[0]) sicherungLaden(e.target.files[0]); e.target.value = ""; } });
+  return el("div", { class: "karte" }, el("h2", {}, "Daten"),
+    el("div", { class: "zeile" },
+      el("button", { class: "klein", onclick: csvExport }, "CSV exportieren (Excel)"),
+      el("button", { class: "klein", onclick: sicherungHerunterladen }, "Sicherung herunterladen"),
+      el("button", { class: "klein", onclick: () => datei.click() }, "Sicherung laden"), datei),
+    el("details", { style: "margin-top:12px" }, el("summary", {}, "Zurücksetzen und Ende der Einheit"),
+      el("p", { class: "gedaempft" }, "Die Datenbank ist kein Archiv: Am Ende der Einheit CSV exportieren, dann löschen."),
+      el("div", { class: "zeile" },
+        el("button", { class: "klein gefahr", onclick: () => frage("Stand der ganzen Klasse auf Anfang setzen? Pflichtaufträge werden für alle «offen», alles andere leer. Aufträge bleiben.", () => schreibeMehrere({ stand: anfangsstand(), ziel: null, flk: null }), "Zurücksetzen") }, "Stand auf Anfang setzen"),
+        el("button", { class: "klein gefahr", onclick: () => frage("Alles löschen – Plan und Stand? Vorher CSV exportieren.", () => schreibeMehrere({ plan: null, stand: null, ziel: null, flk: null }), "Alles löschen") }, "Alles löschen (Ende der Einheit)"))));
+}
+
+function regelnKarte(fehlt) {
+  return el("div", { class: "karte " + (fehlt ? "hinweis rot" : "") },
+    el("h3", {}, fehlt ? "Noch ein Schritt: Regeln einspielen" : "Sicherheitsregeln"),
+    el("p", {}, fehlt ? "Du bist angemeldet, aber die Datenbank lässt deine Änderungen noch nicht zu. Kopiere die Regeln (deine UID ist schon eingesetzt) und füge sie in der Firebase-Konsole unter Realtime Database → Regeln ein. Dann «Veröffentlichen» und hier «Erneut prüfen»."
+      : "Diese Regeln gehören in die Firebase-Konsole (Realtime Database → Regeln)."),
+    el("div", { class: "zeile" },
+      el("button", { class: "klein primaer", onclick: () => kopieren(regelnText(), "Regeln kopiert") }, "Regeln kopieren"),
+      fehlt ? el("button", { class: "klein", onclick: async () => { await pruefeSchreibrecht(); toast(Zustand.schreibrechtFehlt ? "Noch nicht freigegeben" : "Alles bereit ✓"); zeichnen(); } }, "Erneut prüfen") : null));
+}
+
+function verbindungKarte() {
+  return el("div", { class: "karte" }, el("h2", {}, "Verbindung"),
+    DEMO ? el("p", {}, "Demo-Modus: Es ist keine Datenbank eingetragen (oben im Code, CONFIG). Alles bleibt auf diesem Gerät.")
+      : el("div", {},
+          el("p", { class: "gedaempft" }, "Datenbank: ", el("code", {}, CONFIG.datenbank)),
+          el("p", { class: "gedaempft" }, "Angemeldet: ", el("code", {}, Sync.email || "–"), "  ·  UID: ", el("code", {}, Sync.uid || "–"))),
+    el("div", { class: "zeile" },
+      DEMO ? null : el("button", { class: "klein", onclick: () => dialogOeffnen([el("h3", {}, "Sicherheitsregeln"), el("textarea", { class: "link-feld", readonly: true, style: "min-height:260px" }, regelnText()),
+        el("div", { class: "zeile", style: "margin-top:10px" }, el("button", { class: "primaer", onclick: () => kopieren(regelnText(), "Regeln kopiert") }, "Kopieren"))]) }, "Regeln anzeigen"),
+      el("button", { class: "klein", onclick: () => { if (DEMO) Zustand.demoLehrer = false; else Sync.abmelden(); Zustand.schreibrechtFehlt = false; toast("Abgemeldet"); wechsleAnsicht("klasse"); } }, "Abmelden")));
+}
+
+/* ========================================================================
+   8. START
+   ======================================================================== */
+(async function start() {
+  namenAusLink();
+  const q = new URLSearchParams(location.search);
+  const gespeichert = Speicher.lies("ansicht", null);
+  Zustand.ansicht = ["plan", "klasse", "uebersicht", "lehrer"].includes(q.get("ansicht")) ? q.get("ansicht")
+    : (gespeichert && gespeichert !== "lehrer" ? gespeichert : (Speicher.lies("ichBin", null) ? "plan" : "klasse"));
+  if (q.get("beamer") === "1") { Zustand.beamer = true; Zustand.ansicht = "klasse"; }
+  if (DEMO) {
+    const d = Speicher.lies("demoDaten", null);
+    Daten = (d && d.plan) ? d : ausVorlage();
+    demoSichern(); Zustand.geladen = true;
+    zeichnen();
+    return;
+  }
+  Sync.beiAbmeldung = grund => { toast(grund); zeichnen(); };
+  zeichnen();
+  Strom.start("oeffentlich", ereignis, st => { if (Zustand.verbindung !== st) { Zustand.verbindung = st; planeZeichnen(); } });
+  if (await Sync.sitzungFortsetzen()) { await pruefeSchreibrecht(); planeZeichnen(); }
+  setInterval(() => { if (Sync.wartend && !document.hidden) Sync.nachliefern().then(() => planeZeichnen()); }, 8000);
+})();
+</script>
+</body>
+</html>

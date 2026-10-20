@@ -1,0 +1,44 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+
+    "arbeitsplan": {
+      "oeffentlich": {
+        ".read": true,
+        ".write": "auth != null && auth.uid === 'LEHRER_UID'",
+
+        "stand": {
+          "$dl": {
+            "$auftrag": {
+              "$lernende": {
+                ".write": "newData.isString() && (newData.val() === 'offen' || newData.val() === 'in Arbeit' || newData.val() === 'fertig') && (!data.exists() || data.val() !== 'kontrolliert') && root.child('arbeitsplan/oeffentlich/plan/dls/' + $dl + '/auftraege/' + $auftrag).exists() && root.child('arbeitsplan/oeffentlich/plan/lernende/' + $lernende).exists()",
+                ".validate": "newData.isString() && (newData.val() === 'offen' || newData.val() === 'in Arbeit' || newData.val() === 'fertig' || newData.val() === 'kontrolliert')"
+              }
+            }
+          }
+        },
+
+        "ziel": {
+          "$dl": {
+            "$lernende": {
+              ".write": "newData.isString() && (newData.val() === 'noch nicht' || newData.val() === 'fast' || newData.val() === 'sicher') && root.child('arbeitsplan/oeffentlich/plan/dls/' + $dl).exists() && root.child('arbeitsplan/oeffentlich/plan/lernende/' + $lernende).exists()",
+              ".validate": "newData.isString() && (newData.val() === 'noch nicht' || newData.val() === 'fast' || newData.val() === 'sicher')"
+            }
+          }
+        },
+
+        "flk": {
+          "$dl": {
+            "$lz": {
+              "$lernende": {
+                ".write": "newData.isString() && (newData.val() === 'erreicht' || newData.val() === 'noch nicht') && root.child('arbeitsplan/oeffentlich/plan/dls/' + $dl + '/flk/' + $lz).exists() && root.child('arbeitsplan/oeffentlich/plan/lernende/' + $lernende).exists()",
+                ".validate": "newData.isString() && (newData.val() === 'erreicht' || newData.val() === 'noch nicht')"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
