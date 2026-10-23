@@ -119,7 +119,6 @@ h3{font-size:1.05rem;margin:.1em 0 .6em}
 .griff{flex:0 0 auto;display:grid;place-items:center;width:30px;min-height:40px;border-radius:8px;color:#8a94a3;font-size:1.15rem;
        cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
 .griff:active{cursor:grabbing;background:#eef2f8}
-body.zieht .huelle{padding-bottom:240px}
 body.zieht,body.zieht *{cursor:grabbing!important;user-select:none!important;-webkit-user-select:none!important}
 .geist{position:fixed;left:0;top:0;z-index:70;pointer-events:none;background:#1F3864;color:#fff;font-weight:650;padding:8px 12px;border-radius:10px;
        max-width:320px;box-shadow:0 10px 26px rgba(0,0,0,.28);font-size:.92rem;opacity:.95}
@@ -184,7 +183,11 @@ tr.ueber-drunter>*,.edit-zeile.ueber-drunter{box-shadow:inset 0 -3px 0 #2e5aa8}
 .scroll-x{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:var(--radius);background:#fff;border:1px solid var(--rand)}
 table.raster{border-collapse:separate;border-spacing:0;width:100%}
 .raster th,.raster td{padding:4px;border-bottom:1px solid #eef0f4;text-align:center;vertical-align:middle}
-.raster thead th{background:#fff;padding:8px 4px}
+.raster thead th{background:#fff;padding:8px 4px;position:sticky;top:var(--kopf-ueber, 0px);z-index:2;box-shadow:0 1px 0 #e3e7ee}
+.raster thead th.sp-auftrag{z-index:4}
+/* Raster mit eingefrorener Namenszeile und Auftragsspalte: scrollt in sich, die Seite bleibt */
+.raster-box{max-height:calc(100vh - var(--kopf-h, 120px) - 16px);max-height:calc(100dvh - var(--kopf-h, 120px) - 16px);overflow:auto;overscroll-behavior:contain}
+body.beamer .raster-box{max-height:calc(100vh - 150px);max-height:calc(100dvh - 150px)}
 .raster td,.raster thead th:not(.sp-auftrag){min-width:96px}
 .raster .sp-auftrag{text-align:left;min-width:230px;max-width:390px;position:sticky;left:0;background:#fff;z-index:1;
                     padding:8px 10px;font-weight:500;box-shadow:1px 0 0 #eef0f4}
@@ -273,7 +276,8 @@ body.beamer .raster th,body.beamer .raster td{padding:3px 4px}
   .huelle{max-width:none;padding:0}
   .karte,.scroll-x{border:1px solid #999;break-inside:avoid}
   .scroll-x{overflow:visible}
-  .raster .sp-auftrag{position:static}
+  .raster .sp-auftrag,.raster thead th{position:static}
+  .raster-box{max-height:none!important;overflow:visible}
   .zelle,.kopf-name,.st-offen,.st-arbeit,.st-fertig,.st-kontrolliert,.st-korrektur,.lampe,.punkt-gross,.mini>i,.fortschritt>i{-webkit-print-color-adjust:exact;print-color-adjust:exact}
   .zelle,.kopf-name{min-height:26px}
   .raster td,.raster thead th:not(.sp-auftrag){min-width:0}
@@ -1291,12 +1295,7 @@ const Zieh = (() => {
     z.geist.style.transform = `translate(${Math.min(e.clientX + 14, innerWidth - 200)}px, ${e.clientY + 14}px)`;
     const unter = document.elementFromPoint(e.clientX, e.clientY);
     markieren(unter && unter.closest("[data-ziel-dl],[data-ziel-archiv],[data-ziel-zeile]"), e.clientY);
-    // Am Rand scrollen – aber erst, wenn der Zeiger bewusst an den Rand gezogen wurde
-    // (startet das Ziehen schon im Randbereich, würde die Seite sonst sofort losscrollen).
-    const kopfH = ($(".kopf") ? $(".kopf").offsetHeight : 0), unten = innerHeight - (z.leiste ? z.leiste.offsetHeight : 0);
-    const oben = e.clientY < kopfH + 40, untenRand = e.clientY > unten - 50 && e.clientY < unten;
-    if (e.clientY >= kopfH + 40 && e.clientY <= unten - 50) z.scrollBereit = true;   // erst im freien Mittelbereich scharf schalten
-    else if (z.scrollBereit) window.scrollBy(0, oben ? -14 : 14);
+    // Bewusst kein automatisches Scrollen: die Seite bleibt beim Ziehen stehen.
   }
   function aufraeumen() {
     document.removeEventListener("pointermove", bewegen, { passive: false });
@@ -1445,18 +1444,41 @@ function zeichnen() {
   Zustand.ausstehend = false;
   if (plan() && (!Zustand.dl || !dlVon(Zustand.dl))) Zustand.dl = aktuelleDl();
   const scroll = {};
-  document.querySelectorAll("[data-scroll]").forEach(n => { scroll[n.dataset.scroll] = n.scrollLeft; });
+  document.querySelectorAll("[data-scroll]").forEach(n => { scroll[n.dataset.scroll] = [n.scrollLeft, n.scrollTop]; });
   const lehrer = istLehrer();
   if (Zustand.ansicht === "lehrer" && lehrer) Zustand.ansicht = "lehrer";
   document.body.classList.toggle("beamer", Zustand.beamer);
   $("#app").replaceChildren(Zustand.beamer ? "" : kopf(), el("main", { class: "huelle" }, inhalt()));
-  document.querySelectorAll("[data-scroll]").forEach(n => { if (scroll[n.dataset.scroll] != null) n.scrollLeft = scroll[n.dataset.scroll]; });
+  document.querySelectorAll("[data-scroll]").forEach(n => { const w = scroll[n.dataset.scroll]; if (w) { n.scrollLeft = w[0]; n.scrollTop = w[1]; } });
+  kopfHoeheMessen();
   if (!Zustand.chipsGescrollt) {
     const c = $(".dl-chip.aktiv");
     if (c && c.parentElement) { c.parentElement.scrollLeft = Math.max(0, c.offsetLeft - 40); Zustand.chipsGescrollt = true; }
   }
   if (Zustand.springeZu) { const z = document.getElementById(Zustand.springeZu); Zustand.springeZu = null; if (z) z.scrollIntoView({ block: "center" }); }
 }
+
+function kopfHoeheMessen() {
+  const k = $(".kopf");
+  document.documentElement.style.setProperty("--kopf-h", (k ? k.offsetHeight : 0) + "px");
+  namenszeileNachfuehren();
+}
+/* Namenszeile immer direkt unter dem blauen Kopf: Ist die Rasterbox teilweise unter den Kopf
+   gescrollt (Seite gescrollt), rückt die eingefrorene Zeile um genau diesen Teil nach unten. */
+function namenszeileNachfuehren() {
+  const k = $(".kopf"), kopfUnten = k ? k.getBoundingClientRect().bottom : 0;
+  document.querySelectorAll(".raster-box").forEach(b => {
+    const r = b.getBoundingClientRect();
+    const ueber = Math.max(0, Math.min(kopfUnten - (r.top + b.clientTop), b.clientHeight - 90));
+    b.style.setProperty("--kopf-ueber", ueber + "px");
+  });
+}
+let nachfuehrenGeplant = false;
+window.addEventListener("scroll", () => {
+  if (nachfuehrenGeplant) return; nachfuehrenGeplant = true;
+  requestAnimationFrame(() => { nachfuehrenGeplant = false; namenszeileNachfuehren(); });
+}, { passive: true });
+window.addEventListener("resize", kopfHoeheMessen);
 
 function verbindungsPill() {
   const v = DEMO ? "demo" : Zustand.verbindung;
@@ -1653,7 +1675,7 @@ function ansichtKlasse() {
       return el("td", { class: spKlasse(l.id) }, darf ? el("button", { class: k, onclick: () => flkWaehlen(dlId, lz, l.id) }, w || "") : el("div", { class: k }, w || "")); }))));
 
   const out = [dlKopf(dlId, aktionen), legende(),
-    el("div", { class: "scroll-x", "data-scroll": "raster" },
+    el("div", { class: "scroll-x raster-box", "data-scroll": "raster" },
       el("table", { class: "raster" }, el("thead", {}, kopfzeile), el("tbody", {}, zeilen), el("tfoot", {}, fuss)))];
   if (imArchiv && !Zustand.beamer) out.push(el("div", { class: "archiv-info nicht-drucken" },
     `📦 ${imArchiv} Auftr${imArchiv > 1 ? "äge" : "ag"} dieser DL im Archiv`,
@@ -1724,7 +1746,7 @@ function ansichtUebersicht() {
       el("b", {}, `${klasse} von ${moeglich}`)))];
   if (!frei && !ich) { out.push(el("div", { class: "hinweis" }, "Wähle zuerst unter «Mein Plan», wer du bist. Dann siehst du hier deinen Fortschritt.")); return out; }
   if (!frei) out.push(el("div", { class: "hinweis blau" }, "Du siehst hier deinen eigenen Fortschritt. Die Übersicht der ganzen Klasse schaltet die Lehrperson frei."));
-  out.push(el("div", { class: "scroll-x", "data-scroll": "ue" }, el("table", { class: "raster" },
+  out.push(el("div", { class: "scroll-x raster-box", "data-scroll": "ue" }, el("table", { class: "raster" },
     el("thead", {}, el("tr", {}, el("th", { class: "sp-auftrag", scope: "col" }, "DL · Datum · Thema"),
       sichtbar.map(l => el("th", { scope: "col" }, el("div", { class: "kopf-name", style: `background:${l.farbe}` }, nameVon(l.id)))))),
     el("tbody", {}, dls().map(d => el("tr", {},
