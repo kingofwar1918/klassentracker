@@ -12,8 +12,8 @@
           "$dl": {
             "$auftrag": {
               "$lernende": {
-                ".write": "newData.isString() && (newData.val() === 'offen' || newData.val() === 'in Arbeit' || newData.val() === 'fertig') && (!data.exists() || data.val() !== 'kontrolliert') && root.child('arbeitsplan/oeffentlich/plan/dls/' + $dl + '/auftraege/' + $auftrag).exists() && root.child('arbeitsplan/oeffentlich/plan/lernende/' + $lernende).exists()",
-                ".validate": "newData.isString() && (newData.val() === 'offen' || newData.val() === 'in Arbeit' || newData.val() === 'fertig' || newData.val() === 'kontrolliert')"
+                ".write": "newData.isString() && (newData.val() === 'offen' || newData.val() === 'in Arbeit' || newData.val() === 'fertig') && (!data.exists() || data.val() !== 'kontrolliert') && root.child('arbeitsplan/oeffentlich/plan/dls/' + $dl + '/auftraege/' + $auftrag).exists() && !root.child('arbeitsplan/oeffentlich/plan/dls/' + $dl + '/auftraege/' + $auftrag + '/archiv').exists() && root.child('arbeitsplan/oeffentlich/plan/lernende/' + $lernende).exists()",
+                ".validate": "newData.isString() && (newData.val() === 'offen' || newData.val() === 'in Arbeit' || newData.val() === 'fertig' || newData.val() === 'korrektur' || newData.val() === 'kontrolliert')"
               }
             }
           }

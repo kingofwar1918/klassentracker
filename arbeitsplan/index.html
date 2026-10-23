@@ -94,6 +94,48 @@ h3{font-size:1.05rem;margin:.1em 0 .6em}
 .st-fertig{background:var(--fertig);border-color:var(--fertig-r);color:var(--fertig-t)}
 .st-kontrolliert{background:var(--kontrolliert);border-color:var(--kontrolliert-r);color:var(--kontrolliert-t)}
 .st-leer{background:#f7f8fa;border-color:#dde1e7;color:#97a0ad}
+.st-korrektur{background:#fff5f4;border-color:#d93025;color:#a50e0e}
+.zelle.st-korrektur{border-width:2.5px;gap:6px}
+/* Warnleuchte */
+.lampe{display:inline-block;width:11px;height:11px;border-radius:50%;background:#e53935;flex:0 0 auto;
+       box-shadow:0 0 0 0 rgba(229,57,53,.55);animation:puls 1.4s ease-out infinite;vertical-align:middle}
+.lampe.gross{width:18px;height:18px}
+.lampe.klein{width:8px;height:8px;animation:none}
+@keyframes puls{0%{box-shadow:0 0 0 0 rgba(229,57,53,.55)}70%{box-shadow:0 0 0 9px rgba(229,57,53,0)}100%{box-shadow:0 0 0 0 rgba(229,57,53,0)}}
+.warnung{display:flex;gap:14px;align-items:flex-start;background:#fff5f4;border:2px solid #d93025;color:#7a1010;border-radius:14px;padding:12px 16px;margin-bottom:14px}
+.warnung .lampe{margin-top:4px}
+.warnung b{font-size:1.05rem}
+.korr-kopf{grid-column:1/-1;display:flex;align-items:center;gap:8px;font-weight:750;color:#a50e0e;font-size:.92rem;margin-bottom:-4px}
+.auftrag.st-korrektur{border:2.5px solid #d93025;border-left-width:7px;background:#fffafa;color:inherit}
+.dl-chip{position:relative}
+.dl-chip .lampe{position:absolute;top:7px;right:8px}
+.tab .lampe{margin-left:7px;vertical-align:1px}
+/* Archiv */
+.bereit{display:inline-block;font-size:.7rem;font-weight:800;padding:1px 7px;border-radius:6px;background:#dff0d6;color:#2a5e22;margin-left:6px;white-space:nowrap}
+.archiv-datum{font-size:.8rem;color:var(--gedaempft)}
+.archiv-info{display:flex;align-items:center;gap:8px;background:#f2f6fd;border:1px solid #d6e2f5;border-radius:10px;padding:8px 12px;margin:10px 0 4px;font-size:.92rem;color:#2c4670}
+/* Ziehen und Ablegen */
+.kopf-zelle{display:flex;align-items:flex-start;gap:4px}
+.griff{flex:0 0 auto;display:grid;place-items:center;width:30px;min-height:40px;border-radius:8px;color:#8a94a3;font-size:1.15rem;
+       cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.griff:active{cursor:grabbing;background:#eef2f8}
+body.zieht .huelle{padding-bottom:240px}
+body.zieht,body.zieht *{cursor:grabbing!important;user-select:none!important;-webkit-user-select:none!important}
+.geist{position:fixed;left:0;top:0;z-index:70;pointer-events:none;background:#1F3864;color:#fff;font-weight:650;padding:8px 12px;border-radius:10px;
+       max-width:320px;box-shadow:0 10px 26px rgba(0,0,0,.28);font-size:.92rem;opacity:.95}
+.ziel-leiste{position:fixed;left:0;right:0;bottom:0;z-index:65;background:#fff;border-top:3px solid #1F3864;box-shadow:0 -8px 24px rgba(0,0,0,.15);padding:10px 14px 14px}
+.ziel-titel{font-size:.85rem;font-weight:650;color:var(--gedaempft);margin-bottom:8px}
+.ziel-chips{display:flex;flex-wrap:wrap;gap:8px}
+.ziel-chip{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:82px;min-height:56px;padding:6px 10px;border:2px dashed #b8c4d6;border-radius:12px;line-height:1.2;background:#f7f9fc}
+.ziel-chip span{font-size:.75rem;color:var(--gedaempft)}
+.ziel-chip.hier{opacity:.4}
+.ziel-chip.archiv{border-color:#93c47d;background:#f2f9ee;font-weight:700}
+.ziel-chip.ueber{border-style:solid;border-color:#1F3864;background:#1F3864;color:#fff;transform:scale(1.06)}
+.ziel-chip.ueber span{color:#cfdaf0}
+.ziel-chip.archiv.ueber{background:#5f9e42;border-color:#5f9e42}
+tr.ueber-drueber>*,.edit-zeile.ueber-drueber{box-shadow:inset 0 3px 0 #2e5aa8}
+tr.ueber-drunter>*,.edit-zeile.ueber-drunter{box-shadow:inset 0 -3px 0 #2e5aa8}
+.wird-gezogen{opacity:.35}
 
 /* Mein Plan */
 .ich-kopf{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
@@ -182,11 +224,11 @@ button.zelle{cursor:pointer}
 .feld label{font-size:.84rem;font-weight:650;color:var(--gedaempft)}
 .raster2{display:grid;grid-template-columns:180px 1fr;gap:0 14px}
 @media (max-width:700px){.raster2{grid-template-columns:1fr}}
-.edit-zeile{display:grid;grid-template-columns:34px minmax(180px,1fr) minmax(120px,210px) 130px auto;gap:8px;align-items:center;padding:8px 0;border-top:1px solid #eef0f4}
+.edit-zeile{display:grid;grid-template-columns:72px minmax(180px,1fr) minmax(120px,210px) 130px auto;gap:8px;align-items:center;padding:8px 0;border-top:1px solid #eef0f4}
 .edit-zeile.lern{grid-template-columns:54px minmax(120px,1fr) minmax(120px,1fr) auto}
 .edit-zeile.ha{grid-template-columns:minmax(180px,1fr) 130px minmax(160px,1.2fr) auto}
 @media (max-width:820px){
-  .edit-zeile,.edit-zeile.lern,.edit-zeile.ha{grid-template-columns:34px 1fr}
+  .edit-zeile,.edit-zeile.lern,.edit-zeile.ha{grid-template-columns:72px 1fr}
   .edit-zeile>*:not(:first-child){grid-column:2}
   .edit-zeile.ha>*{grid-column:1/-1!important}
 }
@@ -222,16 +264,17 @@ body.beamer .raster th,body.beamer .raster td{padding:3px 4px}
 .beamer-pill{background:var(--akzent);color:#fff;border-color:var(--akzent)}
 
 @media (hover:hover){button:hover{filter:brightness(.97)}}
-@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}.lampe{animation:none}}
 @media print{
   @page{size:A4 landscape;margin:10mm}
   body{background:#fff;font-size:10pt}
-  .nicht-drucken,.kopf,.dl-leiste,.toast{display:none!important}
+  .nicht-drucken,.kopf,.dl-leiste,.toast,.griff,.ziel-leiste,.geist{display:none!important}
+  .lampe{animation:none}
   .huelle{max-width:none;padding:0}
   .karte,.scroll-x{border:1px solid #999;break-inside:avoid}
   .scroll-x{overflow:visible}
   .raster .sp-auftrag{position:static}
-  .zelle,.kopf-name,.st-offen,.st-arbeit,.st-fertig,.st-kontrolliert,.punkt-gross,.mini>i,.fortschritt>i{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .zelle,.kopf-name,.st-offen,.st-arbeit,.st-fertig,.st-kontrolliert,.st-korrektur,.lampe,.punkt-gross,.mini>i,.fortschritt>i{-webkit-print-color-adjust:exact;print-color-adjust:exact}
   .zelle,.kopf-name{min-height:26px}
   .raster td,.raster thead th:not(.sp-auftrag){min-width:0}
 }
@@ -511,8 +554,8 @@ const REGELN = {
           "$dl": {
             "$auftrag": {
               "$lernende": {
-                ".write": "newData.isString() && (newData.val() === 'offen' || newData.val() === 'in Arbeit' || newData.val() === 'fertig') && (!data.exists() || data.val() !== 'kontrolliert') && root.child('arbeitsplan/oeffentlich/plan/dls/' + $dl + '/auftraege/' + $auftrag).exists() && root.child('arbeitsplan/oeffentlich/plan/lernende/' + $lernende).exists()",
-                ".validate": "newData.isString() && (newData.val() === 'offen' || newData.val() === 'in Arbeit' || newData.val() === 'fertig' || newData.val() === 'kontrolliert')"
+                ".write": "newData.isString() && (newData.val() === 'offen' || newData.val() === 'in Arbeit' || newData.val() === 'fertig') && (!data.exists() || data.val() !== 'kontrolliert') && root.child('arbeitsplan/oeffentlich/plan/dls/' + $dl + '/auftraege/' + $auftrag).exists() && !root.child('arbeitsplan/oeffentlich/plan/dls/' + $dl + '/auftraege/' + $auftrag + '/archiv').exists() && root.child('arbeitsplan/oeffentlich/plan/lernende/' + $lernende).exists()",
+                ".validate": "newData.isString() && (newData.val() === 'offen' || newData.val() === 'in Arbeit' || newData.val() === 'fertig' || newData.val() === 'korrektur' || newData.val() === 'kontrolliert')"
               }
             }
           }
@@ -543,8 +586,11 @@ const REGELN = {
 };
 
 const STATUS_SUS = ["offen", "in Arbeit", "fertig"];
-const STATUS_LP = ["offen", "in Arbeit", "fertig", "kontrolliert", ""];
-const ST_KLASSE = { "offen": "st-offen", "in Arbeit": "st-arbeit", "fertig": "st-fertig", "kontrolliert": "st-kontrolliert", "": "st-leer" };
+const STATUS_LP = ["offen", "in Arbeit", "fertig", "korrektur", "kontrolliert", ""];
+const ST_KLASSE = { "offen": "st-offen", "in Arbeit": "st-arbeit", "fertig": "st-fertig", "korrektur": "st-korrektur", "kontrolliert": "st-kontrolliert", "": "st-leer" };
+/* «korrektur» = von der Lehrperson zur Korrektur zurückgewiesen (nur sie setzt diesen Status). */
+const STATUS_TEXT = { "korrektur": "zur Korrektur", "kontrolliert": "✓ kontrolliert", "": "– nicht zugeteilt" };
+const statusText = s => STATUS_TEXT[s] || s;
 const ZIEL_WERTE = ["noch nicht", "fast", "sicher"];
 const ZIEL_KLASSE = { "noch nicht": "st-offen", "fast": "st-arbeit", "sicher": "st-fertig", "": "st-leer" };
 const FLK_WERTE = ["erreicht", "noch nicht"];
@@ -885,6 +931,7 @@ const Zustand = {
   verbindung: DEMO ? "demo" : "verbinde",
   demoLehrer: false,
   schreibrechtFehlt: false,
+  regelnVeraltet: false,
   chipsGescrollt: false,
 };
 let Daten = {};                           // Spiegel von /{projekt}/oeffentlich
@@ -902,7 +949,10 @@ function sortiert(obj) {
 const dls = () => sortiert(plan() && plan().dls);
 const dlVon = id => (plan() && plan().dls && plan().dls[id]) || null;
 const lernendeListe = () => sortiert(plan() && plan().lernende);
-const auftraegeVon = dl => sortiert(dlVon(dl) && dlVon(dl).auftraege);
+const alleAuftraegeVon = dl => sortiert(dlVon(dl) && dlVon(dl).auftraege);       // inkl. Archiv
+const auftraegeVon = dl => alleAuftraegeVon(dl).filter(a => !a.archiv);          // aktive
+const archivVon = dl => alleAuftraegeVon(dl).filter(a => a.archiv);
+const nrVon = (dl, aid) => alleAuftraegeVon(dl).findIndex(a => a.id === aid) + 1; // Nummer bleibt beim Archivieren gleich
 const hausaufgabenVon = dl => sortiert(dlVon(dl) && dlVon(dl).hausaufgaben);
 const flkVon = dl => Object.entries((dlVon(dl) && dlVon(dl).flk) || {})
   .sort(([a], [b]) => a.localeCompare(b, "de", { numeric: true })).map(([id, text]) => ({ id, text }));
@@ -919,12 +969,26 @@ const erledigt = s => s === "fertig" || s === "kontrolliert";
 
 function fortschritt(dl, sid) {
   let zu = 0, erl = 0;
-  for (const a of auftraegeVon(dl)) { const s = statusVon(dl, a.id, sid); if (s) { zu++; if (erledigt(s)) erl++; } }
+  for (const a of alleAuftraegeVon(dl)) { const s = statusVon(dl, a.id, sid); if (s) { zu++; if (erledigt(s)) erl++; } }
   return { zu, erl, anteil: zu ? erl / zu : 0 };
+}
+/* Bereit fürs Archiv: alle zugeteilten Einträge sind «kontrolliert». */
+function bereitFuersArchiv(dl, aid) {
+  const w = lernendeListe().map(l => statusVon(dl, aid, l.id)).filter(Boolean);
+  return w.length > 0 && w.every(s => s === "kontrolliert");
+}
+/* Alle aktiven Aufträge, die zur Korrektur zurückgewiesen sind (optional nur für eine Person). */
+function korrekturen(nurSid) {
+  const out = [];
+  for (const d of dls()) for (const a of auftraegeVon(d.id)) for (const l of lernendeListe()) {
+    if (nurSid && l.id !== nurSid) continue;
+    if (statusVon(d.id, a.id, l.id) === "korrektur") out.push({ dl: d.id, a, sid: l.id });
+  }
+  return out;
 }
 function xp(sid) {
   let summe = 0;
-  for (const d of dls()) for (const a of auftraegeVon(d.id)) {
+  for (const d of dls()) for (const a of alleAuftraegeVon(d.id)) {
     const s = statusVon(d.id, a.id, sid); if (s === "fertig") summe += 1; else if (s === "kontrolliert") summe += 2;
   }
   return summe;
@@ -989,7 +1053,9 @@ async function schreibeMehrere(aenderungen) {
                            : await Sync.ergaenzeSicher("oeffentlich", aenderungen);
   if (r.ok) return true;
   if (r.gepuffert) { toast("Offline – deine Eingabe wird nachgeliefert."); planeZeichnen(); return true; }
-  toast(r.status === 401 || r.status === 403 ? "Nicht gespeichert: dafür fehlt die Berechtigung." : "Nicht gespeichert (Fehler " + r.status + ").");
+  toast(r.status === 401 || r.status === 403
+    ? (istLehrer() && Zustand.regelnVeraltet ? "Nicht gespeichert: zuerst die neuen Regeln einspielen (Bearbeiten)." : "Nicht gespeichert: dafür fehlt die Berechtigung.")
+    : "Nicht gespeichert (Fehler " + r.status + ").");
   const neu = await Sync.lies("oeffentlich");          // Stand vom Server zurückholen
   if (neu.ok) ereignis({ art: "voll", daten: neu.daten });
   return false;
@@ -1021,7 +1087,7 @@ function ausVorlage() {
 /* Anfangsstand: Pflichtaufträge für alle «offen», alles andere leer. */
 function anfangsstand() {
   const stand = {};
-  for (const d of dls()) for (const a of auftraegeVon(d.id)) if (a.art === "P") {
+  for (const d of dls()) for (const a of alleAuftraegeVon(d.id)) if (a.art === "P") {
     stand[d.id] = stand[d.id] || {}; stand[d.id][a.id] = {};
     lernendeListe().forEach(l => { stand[d.id][a.id][l.id] = "offen"; });
   }
@@ -1053,6 +1119,12 @@ async function pruefeSchreibrecht() {
   if (DEMO) return;
   const r = await Sync.schreib("oeffentlich/meta/lehrerAktiv", Date.now());
   Zustand.schreibrechtFehlt = !r.ok && (r.status === 401 || r.status === 403);
+  Zustand.regelnVeraltet = false;
+  if (r.ok) {   // Sind die Regeln mit «korrektur» und Archiv schon eingespielt?
+    const t = await Sync.schreib("oeffentlich/stand/_regeltest/_a/_s", "korrektur");
+    if (t.ok) await Sync.schreib("oeffentlich/stand/_regeltest", null);
+    else if (t.status === 401 || t.status === 403) Zustand.regelnVeraltet = true;
+  }
 }
 
 /* ========================================================================
@@ -1070,9 +1142,8 @@ async function setzeStatus(dlId, aid, sid, wert) {
 function statusWaehlen(dlId, a, sid) {
   const s = statusVon(dlId, a.id, sid);
   const werte = istLehrer() ? STATUS_LP : STATUS_SUS;
-  const nr = auftraegeVon(dlId).findIndex(x => x.id === a.id) + 1;
-  auswahl(`${nameVon(sid)} · Auftrag ${nr}`, a.text, werte.map(w => ({
-    text: w === "kontrolliert" ? "✓ kontrolliert" : (w || "– nicht zugeteilt"),
+  auswahl(`${nameVon(sid)} · Auftrag ${nrVon(dlId, a.id)}`, a.text, werte.map(w => ({
+    text: w === "korrektur" ? "↩ zur Korrektur zurückweisen" : statusText(w),
     klasse: ST_KLASSE[w], aktiv: s === w, aktion: () => setzeStatus(dlId, a.id, sid, w) })));
 }
 
@@ -1120,13 +1191,138 @@ function spalteMenue(dlId, l) {
   ]);
 }
 function zeileMenue(dlId, a) {
-  auswahl("Auftrag " + (auftraegeVon(dlId).findIndex(x => x.id === a.id) + 1), a.text, [
+  auswahl("Auftrag " + nrVon(dlId, a.id), a.text, [
     { text: "Allen zuteilen («offen»)", klasse: "st-offen", aktion: () => zuteilen(dlId, a.id, true) },
     { text: "Zuteilung entfernen (wo noch «offen»)", aktion: () => zuteilen(dlId, a.id, false) },
     { text: "✓ Alle «fertig» kontrollieren", klasse: "st-kontrolliert", aktion: () => fertigKontrollieren(dlId, null, a.id) },
+    { text: "📦 Ins Archiv verschieben" + (bereitFuersArchiv(dlId, a.id) ? " (alle kontrolliert)" : ""), aktion: () => archivieren(dlId, a.id) },
+    { text: "➜ In eine andere DL verschieben …", aktion: () => verschiebenMenue(dlId, a.id) },
     { text: "✏️ Auftrag bearbeiten", aktion: () => { Zustand.dl = dlId; wechsleAnsicht("lehrer"); } },
   ]);
 }
+
+/* ---------- Archiv ---------- */
+function archivieren(dlId, aid) {
+  const a = tief(plan(), "dls", dlId, "auftraege", aid); if (!a) return;
+  const tun = () => { schreibe(`plan/dls/${dlId}/auftraege/${aid}/archiv`, Date.now()); toast(`Auftrag ${nrVon(dlId, aid)} ist im Archiv`); };
+  if (bereitFuersArchiv(dlId, aid)) tun();
+  else frage(`Bei «${a.text}» sind noch nicht alle Einträge kontrolliert. Trotzdem ins Archiv verschieben? Die Lernenden können ihn dort nicht mehr ändern.`, tun, "Ins Archiv");
+}
+function bereiteArchivieren(dlId) {
+  const bereit = auftraegeVon(dlId).filter(a => bereitFuersArchiv(dlId, a.id));
+  if (!bereit.length) { toast("Noch kein Auftrag ist bei allen kontrolliert."); return; }
+  const jetzt = Date.now(), upd = {};
+  bereit.forEach(a => { upd[`plan/dls/${dlId}/auftraege/${a.id}/archiv`] = jetzt; });
+  schreibeMehrere(upd); toast(`${bereit.length} Auftr${bereit.length > 1 ? "äge" : "ag"} ins Archiv verschoben`);
+}
+function zurueckholen(dlId, aid) {
+  schreibe(`plan/dls/${dlId}/auftraege/${aid}/archiv`, null); toast(`Auftrag ${nrVon(dlId, aid)} ist zurück in ${dlId}`);
+}
+
+/* ---------- Verschieben (Ziehen und Ablegen oder Menü) ---------- */
+function verschiebeNachDl(quelle, aid, ziel) {
+  const roh = tief(plan(), "dls", quelle, "auftraege", aid);
+  if (!roh || quelle === ziel || !dlVon(ziel)) return;
+  const neu = neueId("a"), alle = alleAuftraegeVon(ziel);
+  const obj = JSON.parse(JSON.stringify(roh)); delete obj.archiv;
+  obj.ord = (alle.length ? Math.max(...alle.map(a => a.ord || 0)) : 0) + 1;      // am Schluss einreihen
+  const upd = { [`plan/dls/${ziel}/auftraege/${neu}`]: obj, [`plan/dls/${quelle}/auftraege/${aid}`]: null };
+  const st = tief(Daten, "stand", quelle, aid);
+  if (st) { upd[`stand/${ziel}/${neu}`] = JSON.parse(JSON.stringify(st)); upd[`stand/${quelle}/${aid}`] = null; }
+  schreibeMehrere(upd);
+  toast(`«${roh.text.slice(0, 40)}${roh.text.length > 40 ? "…" : ""}» nach ${ziel} verschoben (am Schluss)`);
+}
+function umsortieren(dlId, aid, zielAid) {
+  const alle = alleAuftraegeVon(dlId);
+  const von = alle.findIndex(a => a.id === aid), nach = alle.findIndex(a => a.id === zielAid);
+  if (von < 0 || nach < 0 || von === nach) return;
+  const [x] = alle.splice(von, 1); alle.splice(nach, 0, x);
+  const upd = {}; alle.forEach((a, k) => { if (a.ord !== k + 1) upd[`plan/dls/${dlId}/auftraege/${a.id}/ord`] = k + 1; });
+  if (Object.keys(upd).length) schreibeMehrere(upd);
+}
+function verschiebenMenue(dlId, aid) {
+  const a = tief(plan(), "dls", dlId, "auftraege", aid); if (!a) return;
+  auswahl(`Auftrag ${nrVon(dlId, aid)} verschieben`, a.text,
+    dls().filter(d => d.id !== dlId).map(d => ({ text: `➜ ${d.id} · ${kurzdatum(d.datum) || "ohne Datum"} · ${d.thema || ""}`, aktion: () => verschiebeNachDl(dlId, aid, d.id) }))
+      .concat([{ text: "📦 Ins Archiv", klasse: "st-kontrolliert", aktion: () => archivieren(dlId, aid) }]));
+}
+
+/* Ziehen am Griff ⠿ (Maus, Finger, Stift). Loslassen über einer DL verschiebt dorthin,
+   über einem anderen Auftrag sortiert um, über «Archiv» archiviert.
+   Nur Tippen ohne Ziehen öffnet dasselbe als Menü (Alternative ohne Ziehen). */
+const Zieh = (() => {
+  let z = null;
+  function start(e, dlId, aid) {
+    if (!istLehrer() || (e.button !== undefined && e.button > 0)) return;
+    e.preventDefault(); e.stopPropagation();
+    z = { dl: dlId, aid, x0: e.clientX, y0: e.clientY, aktiv: false, ziel: null, quelle: e.currentTarget.closest("[data-ziel-zeile]") };
+    document.addEventListener("pointermove", bewegen, { passive: false });
+    document.addEventListener("pointerup", ende);
+    document.addEventListener("pointercancel", abbrechen);
+    document.addEventListener("keydown", taste);
+  }
+  function aktivieren() {
+    const a = tief(plan(), "dls", z.dl, "auftraege", z.aid) || { text: "" };
+    z.aktiv = true; document.body.classList.add("zieht");
+    if (z.quelle) z.quelle.classList.add("wird-gezogen");
+    z.geist = el("div", { class: "geist" }, `⠿ ${nrVon(z.dl, z.aid)}  ${a.text}`);
+    z.leiste = el("div", { class: "ziel-leiste" },
+      el("div", { class: "ziel-titel" }, "Loslassen über einer DL verschiebt den Auftrag dorthin (mit dem Stand der Klasse) · über einem Auftrag: umsortieren"),
+      el("div", { class: "ziel-chips" },
+        dls().map(d => el("div", { class: "ziel-chip" + (d.id === z.dl ? " hier" : ""), "data-ziel-dl": d.id }, el("b", {}, d.id), el("span", {}, kurzdatum(d.datum) || "–"))),
+        el("div", { class: "ziel-chip archiv", "data-ziel-archiv": "1" }, "📦 Archiv")));
+    document.body.append(z.geist, z.leiste);
+  }
+  function markieren(ziel, y) {
+    document.querySelectorAll(".ueber,.ueber-drueber,.ueber-drunter").forEach(n => n.classList.remove("ueber", "ueber-drueber", "ueber-drunter"));
+    z.ziel = null;
+    if (!ziel) return;
+    if (ziel.dataset.zielDl === z.dl || ziel.dataset.zielZeile === z.aid) return;
+    if (ziel.dataset.zielZeile) {
+      const von = nrVon(z.dl, z.aid), nach = nrVon(z.dl, ziel.dataset.zielZeile);
+      ziel.classList.add(von < nach ? "ueber-drunter" : "ueber-drueber");
+    } else ziel.classList.add("ueber");
+    z.ziel = ziel;
+  }
+  function bewegen(e) {
+    if (!z) return;
+    if (!z.aktiv) { if (Math.hypot(e.clientX - z.x0, e.clientY - z.y0) < 8) return; aktivieren(); }
+    e.preventDefault();
+    z.geist.style.transform = `translate(${Math.min(e.clientX + 14, innerWidth - 200)}px, ${e.clientY + 14}px)`;
+    const unter = document.elementFromPoint(e.clientX, e.clientY);
+    markieren(unter && unter.closest("[data-ziel-dl],[data-ziel-archiv],[data-ziel-zeile]"), e.clientY);
+    // Am Rand scrollen – aber erst, wenn der Zeiger bewusst an den Rand gezogen wurde
+    // (startet das Ziehen schon im Randbereich, würde die Seite sonst sofort losscrollen).
+    const kopfH = ($(".kopf") ? $(".kopf").offsetHeight : 0), unten = innerHeight - (z.leiste ? z.leiste.offsetHeight : 0);
+    const oben = e.clientY < kopfH + 40, untenRand = e.clientY > unten - 50 && e.clientY < unten;
+    if (e.clientY >= kopfH + 40 && e.clientY <= unten - 50) z.scrollBereit = true;   // erst im freien Mittelbereich scharf schalten
+    else if (z.scrollBereit) window.scrollBy(0, oben ? -14 : 14);
+  }
+  function aufraeumen() {
+    document.removeEventListener("pointermove", bewegen, { passive: false });
+    document.removeEventListener("pointerup", ende);
+    document.removeEventListener("pointercancel", abbrechen);
+    document.removeEventListener("keydown", taste);
+    if (z) { if (z.geist) z.geist.remove(); if (z.leiste) z.leiste.remove(); if (z.quelle) z.quelle.classList.remove("wird-gezogen"); }
+    document.querySelectorAll(".ueber,.ueber-drueber,.ueber-drunter").forEach(n => n.classList.remove("ueber", "ueber-drueber", "ueber-drunter"));
+    document.body.classList.remove("zieht");
+  }
+  function ende() {
+    if (!z) return;
+    const war = z; aufraeumen(); z = null;
+    if (!war.aktiv) { verschiebenMenue(war.dl, war.aid); return; }
+    const t = war.ziel; if (!t) return;
+    if (t.dataset.zielArchiv) archivieren(war.dl, war.aid);
+    else if (t.dataset.zielDl) verschiebeNachDl(war.dl, war.aid, t.dataset.zielDl);
+    else if (t.dataset.zielZeile) umsortieren(war.dl, war.aid, t.dataset.zielZeile);
+  }
+  function abbrechen() { aufraeumen(); z = null; }
+  function taste(e) { if (e.key === "Escape") abbrechen(); }
+  return { start, get aktiv() { return !!(z && z.aktiv); } };
+})();
+const griff = (dlId, aid) => el("span", { class: "griff nicht-drucken", role: "button", tabindex: "0", title: "Ziehen: in andere DL, ins Archiv oder umsortieren · Tippen: Menü",
+  "aria-label": "Auftrag verschieben", onpointerdown: e => Zieh.start(e, dlId, aid),
+  onkeydown: e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); verschiebenMenue(dlId, aid); } } }, "⠿");
 
 function auftragHinzufuegen(dlId, text, wo, art, alle) {
   const aufs = auftraegeVon(dlId), aid = neueId("a");
@@ -1134,12 +1330,6 @@ function auftragHinzufuegen(dlId, text, wo, art, alle) {
   const upd = { [`plan/dls/${dlId}/auftraege/${aid}`]: { ord, text, wo, art } };
   if (alle) { const st = {}; lernendeListe().forEach(l => { st[l.id] = "offen"; }); upd[`stand/${dlId}/${aid}`] = st; }
   schreibeMehrere(upd); toast("Auftrag hinzugefügt");
-}
-function verschieben(dlId, aufs, i, richtung) {
-  const j = i + richtung; if (j < 0 || j >= aufs.length) return;
-  const neu = aufs.slice(); [neu[i], neu[j]] = [neu[j], neu[i]];
-  const upd = {}; neu.forEach((a, k) => { if (a.ord !== k + 1) upd[`plan/dls/${dlId}/auftraege/${a.id}/ord`] = k + 1; });
-  schreibeMehrere(upd);
 }
 function auftragLoeschen(dlId, a) {
   frage(`Auftrag «${a.text}» löschen? Der Stand aller Lernenden zu diesem Auftrag wird ebenfalls gelöscht.`, () =>
@@ -1169,11 +1359,16 @@ function lernendeHinzufuegen() {
   schreibeMehrere(upd); toast(`${frei[1]} hinzugefügt – Pflichtaufträge sind zugeteilt`);
 }
 
+function standZuruecksetzen() {
+  const upd = { stand: anfangsstand(), ziel: null, flk: null };
+  for (const d of dls()) for (const a of archivVon(d.id)) upd[`plan/dls/${d.id}/auftraege/${a.id}/archiv`] = null;
+  schreibeMehrere(upd);
+}
 function csvExport() {
   const ls = lernendeListe();
   const zeilen = [["DL", "Datum", "Thema", "Nr", "Auftrag", "Wo", "Art"].concat(ls.map(l => nameVon(l.id)))];
   for (const d of dls()) {
-    auftraegeVon(d.id).forEach((a, i) => zeilen.push([d.id, d.datum, d.thema, i + 1, a.text, a.wo || "", ART_TEXT[a.art] || a.art].concat(ls.map(l => statusVon(d.id, a.id, l.id)))));
+    alleAuftraegeVon(d.id).forEach((a, i) => zeilen.push([d.id, d.datum, d.thema, i + 1, a.text, a.wo || "", (ART_TEXT[a.art] || a.art) + (a.archiv ? " (Archiv)" : "")].concat(ls.map(l => statusText(statusVon(d.id, a.id, l.id)).replace("– nicht zugeteilt", "")))));
     if (d.ziel) zeilen.push([d.id, d.datum, d.thema, "", "Das kann ich heute: " + d.ziel, "", "Ziel"].concat(ls.map(l => zielVon(d.id, l.id))));
     flkVon(d.id).forEach(f => zeilen.push([d.id, d.datum, d.thema, "", "FLK " + f.text, "", "FLK"].concat(ls.map(l => flkWert(d.id, f.id, l.id)))));
   }
@@ -1260,6 +1455,7 @@ function zeichnen() {
     const c = $(".dl-chip.aktiv");
     if (c && c.parentElement) { c.parentElement.scrollLeft = Math.max(0, c.offsetLeft - 40); Zustand.chipsGescrollt = true; }
   }
+  if (Zustand.springeZu) { const z = document.getElementById(Zustand.springeZu); Zustand.springeZu = null; if (z) z.scrollIntoView({ block: "center" }); }
 }
 
 function verbindungsPill() {
@@ -1270,14 +1466,16 @@ function verbindungsPill() {
 
 function kopf() {
   const lehrer = istLehrer();
-  const tabs = [["plan", "Mein Plan"], ["klasse", "Klasse"], ["uebersicht", "Übersicht"], ["lehrer", lehrer ? "Bearbeiten" : "Lehrperson"]];
+  const tabs = [["plan", "Mein Plan"], ["klasse", "Klasse"], ["uebersicht", "Übersicht"], ["archiv", "Archiv"], ["lehrer", lehrer ? "Bearbeiten" : "Lehrperson"]];
+  const ich = lehrer ? null : ichBin();
+  const warn = { plan: !!(ich && plan() && korrekturen(ich).length) };
   return el("header", { class: "kopf nicht-drucken" },
     el("div", { class: "kopf-zeile" },
       el("div", { class: "marke" }, el("div", { class: "titel" }, DATEN.titel), el("div", { class: "untertitel" }, DATEN.untertitel)),
       el("div", { class: "kopf-rechts" }, verbindungsPill(), lehrer ? el("span", { class: "pill" }, "🔑 Lehrperson") : null)),
     el("nav", { class: "tabs", role: "tablist", "aria-label": "Ansichten" }, tabs.map(([id, text]) =>
       el("button", { class: "tab" + (Zustand.ansicht === id ? " aktiv" : ""), role: "tab", "aria-selected": String(Zustand.ansicht === id),
-                     onclick: () => wechsleAnsicht(id) }, text))));
+                     onclick: () => wechsleAnsicht(id) }, text, warn[id] ? el("span", { class: "lampe", title: "Auftrag zur Korrektur zurück" }) : null))));
 }
 
 function inhalt() {
@@ -1293,15 +1491,19 @@ function inhalt() {
   if (DEMO && Zustand.ansicht !== "klasse") out.push(el("div", { class: "hinweis blau nicht-drucken" }, "Demo-Modus: Alles bleibt auf diesem Gerät. Für den gemeinsamen Stand fehlen noch die Firebase-Werte."));
   if (Zustand.ansicht === "plan") return out.concat(dlLeiste(), ansichtPlan());
   if (Zustand.ansicht === "uebersicht") return out.concat(ansichtUebersicht());
+  if (Zustand.ansicht === "archiv") return out.concat(ansichtArchiv());
   return out.concat(Zustand.beamer ? [] : dlLeiste(), ansichtKlasse());
 }
 
 function dlLeiste(mitNeu) {
   const aktuell = aktuelleDl();
+  const nur = istLehrer() ? null : ichBin();
+  const mitKorrektur = new Set(korrekturen(nur).map(k => k.dl));
   return el("div", { class: "dl-leiste nicht-drucken", "data-scroll": "dls", role: "tablist", "aria-label": "Doppellektionen" },
     dls().map(d => el("button", { class: "dl-chip" + (d.id === Zustand.dl ? " aktiv" : ""), "aria-selected": String(d.id === Zustand.dl),
                                    onclick: () => { Zustand.dl = d.id; zeichnen(); } },
-      el("b", {}, d.id), el("span", {}, kurzdatum(d.datum) || "–"), d.id === aktuell ? el("i", {}, "aktuell") : null)),
+      el("b", {}, d.id), el("span", {}, kurzdatum(d.datum) || "–"), d.id === aktuell ? el("i", {}, "aktuell") : null,
+      mitKorrektur.has(d.id) ? el("span", { class: "lampe", title: "Auftrag zur Korrektur zurück" }) : null)),
     mitNeu ? el("button", { class: "dl-chip neu", onclick: neueDl }, "＋ Neue DL") : null);
 }
 
@@ -1315,7 +1517,7 @@ function dlKopf(dlId, aktionen) {
 function legende() {
   return el("div", { class: "legende" },
     el("span", { class: "leg st-offen" }, "offen"), el("span", { class: "leg st-arbeit" }, "in Arbeit"),
-    el("span", { class: "leg st-fertig" }, "fertig"), el("span", { class: "leg st-kontrolliert" }, "✓ kontrolliert"),
+    el("span", { class: "leg st-fertig" }, "fertig"), el("span", { class: "leg st-korrektur" }, "zur Korrektur"), el("span", { class: "leg st-kontrolliert" }, "✓ kontrolliert"),
     el("span", { class: "gedaempft" }, "★ = Zusatz · Puffer = wenn du fertig bist"));
 }
 const freiwilligMarke = h => (!h.fuer && !/^freiwillig/i.test(h.text || "")) ? el("span", { class: "art puffer" }, "freiwillig") : null;
@@ -1336,6 +1538,14 @@ function ansichtPlan() {
   if (!ich) return [wahlIch()];
   const dlId = Zustand.dl, d = dlVon(dlId), f = fortschritt(dlId, ich), aufs = auftraegeVon(dlId);
   const out = [];
+  const korr = korrekturen(ich);
+  if (korr.length) out.push(el("div", { class: "warnung schmal", role: "alert" },
+    el("span", { class: "lampe gross" }),
+    el("div", {},
+      el("b", {}, korr.length === 1 ? "1 Auftrag ist zur Korrektur zurück" : `${korr.length} Aufträge sind zur Korrektur zurück`),
+      el("div", {}, korr.length === 1 ? "Überarbeite ihn und setze ihn danach wieder auf «fertig»." : "Überarbeite sie und setze sie danach wieder auf «fertig»."),
+      el("div", { class: "zeile", style: "margin-top:8px;gap:6px" }, korr.map(k => el("button", { class: "klein",
+        onclick: () => { Zustand.dl = k.dl; Zustand.springeZu = `auftrag-${k.dl}-${k.a.id}`; zeichnen(); } }, `${k.dl} · Nr. ${nrVon(k.dl, k.a.id)}`))))));
   out.push(el("div", { class: "karte schmal" },
     el("div", { class: "ich-kopf" },
       el("div", { class: "punkt-gross", style: `background:${farbeVon(ich)}` }, initiale(ich)),
@@ -1343,7 +1553,8 @@ function ansichtPlan() {
       el("div", { class: "kennzahl" }, el("b", {}, xp(ich)), el("span", { class: "gedaempft" }, "XP gesamt")),
       el("button", { class: "klein nicht-drucken", onclick: () => frage("Person wechseln? Das braucht es nur, wenn jemand anderes dieses Gerät benutzt.", () => { Speicher.loesche("ichBin"); zeichnen(); }, "Wechseln") }, "Wechseln"))));
 
-  const liste = aufs.map((a, i) => {
+  const imArchiv = archivVon(dlId).length;
+  const liste = aufs.map(a => {
     const s = statusVon(dlId, a.id, ich);
     let steuerung;
     if (s === "kontrolliert") steuerung = el("div", { class: "kontrolliert-marke" }, "✓ kontrolliert");
@@ -1353,8 +1564,9 @@ function ansichtPlan() {
     else steuerung = el("div", { class: "segment", role: "group", "aria-label": "Status" }, STATUS_SUS.map(w =>
       el("button", { class: "seg" + (s === w ? " aktiv " + ST_KLASSE[w] : ""), "aria-pressed": String(s === w),
                      onclick: () => { if (s !== w) setzeStatus(dlId, a.id, ich, w); } }, w)));
-    return el("div", { class: "auftrag " + ST_KLASSE[s] },
-      el("div", { class: "nr" }, i + 1),
+    return el("div", { class: "auftrag " + ST_KLASSE[s], id: `auftrag-${dlId}-${a.id}` },
+      s === "korrektur" ? el("div", { class: "korr-kopf" }, el("span", { class: "lampe" }), "Zur Korrektur zurück: überarbeite den Auftrag und setze ihn wieder auf «fertig».") : null,
+      el("div", { class: "nr" }, nrVon(dlId, a.id)),
       el("div", {}, el("div", { class: "text" }, artMarke(a.art), a.text), a.wo ? el("div", { class: "wo" }, "📍 " + a.wo) : null),
       el("div", { class: "steuerung" }, steuerung));
   });
@@ -1362,7 +1574,8 @@ function ansichtPlan() {
     dlKopf(dlId),
     el("div", { class: "zeile", style: "justify-content:space-between" }, el("b", {}, `${f.erl} von ${f.zu} erledigt`), el("span", { class: "gedaempft" }, `${Math.round(f.anteil * 100)} %`)),
     el("div", { class: "fortschritt" }, el("i", { style: `width:${Math.round(f.anteil * 100)}%` })),
-    el("div", { style: "margin-top:14px" }, liste.length ? liste : el("p", { class: "gedaempft" }, "Für diese DL sind noch keine Aufträge eingetragen.")),
+    imArchiv ? el("div", { class: "archiv-info" }, `📦 ${imArchiv} Auftr${imArchiv > 1 ? "äge" : "ag"} dieser DL ${imArchiv > 1 ? "sind" : "ist"} kontrolliert und im Archiv.`) : null,
+    el("div", { style: "margin-top:14px" }, liste.length ? liste : el("p", { class: "gedaempft" }, imArchiv ? "Alle Aufträge dieser DL sind erledigt und im Archiv. 🎉" : "Für diese DL sind noch keine Aufträge eingetragen.")),
     el("p", { class: "gedaempft" }, "Arbeite von oben nach unten: offen → in Arbeit → fertig. Fertig mit allen Pflichtaufträgen? Dann ★ Zusatz oder Puffer-Box. «Kontrolliert» setzt die Lehrperson.")));
 
   if (d.ziel) out.push(el("div", { class: "karte schmal" },
@@ -1392,11 +1605,14 @@ function ansichtPlan() {
 function ansichtKlasse() {
   const dlId = Zustand.dl, d = dlVon(dlId), ls = lernendeListe(), lehrer = istLehrer(), ich = lehrer ? null : ichBin();
   const aufs = auftraegeVon(dlId);
+  const bereit = lehrer ? aufs.filter(a => bereitFuersArchiv(dlId, a.id)) : [];
+  const imArchiv = archivVon(dlId).length;
   const aktionen = Zustand.beamer
     ? [verbindungsPill(), el("button", { class: "klein", onclick: () => dlSchritt(-1), "aria-label": "vorherige DL" }, "◀"),
        el("button", { class: "klein", onclick: () => dlSchritt(1), "aria-label": "nächste DL" }, "▶"),
        el("button", { class: "klein primaer", onclick: beamerUmschalten }, "Beamer beenden")]
     : [lehrer ? el("button", { class: "klein", onclick: () => frage(`Alle Aufträge auf «fertig» in ${dlId} auf «kontrolliert» setzen?`, () => fertigKontrollieren(dlId), "Kontrollieren") }, "✓ Alle «fertig» kontrollieren") : null,
+       lehrer && bereit.length ? el("button", { class: "klein", onclick: () => bereiteArchivieren(dlId) }, `📦 ${bereit.length} ins Archiv`) : null,
        el("button", { class: "klein", onclick: () => window.print() }, "🖨 Drucken"),
        el("button", { class: "klein primaer", onclick: beamerUmschalten }, "⛶ Beamer")];
   const spKlasse = sid => sid === ich ? "ich-spalte" : null;
@@ -1407,22 +1623,27 @@ function ansichtKlasse() {
       ? el("button", { class: "kopf-name", style: `background:${l.farbe}`, onclick: () => spalteMenue(dlId, l) }, nameVon(l.id))
       : el("div", { class: "kopf-name", style: `background:${l.farbe}` }, nameVon(l.id)))));
 
-  const zeilen = aufs.map((a, i) => {
-    const kopfInhalt = [el("span", { class: "nr" }, i + 1), el("span", {}, artMarke(a.art), a.text, a.wo ? el("span", { class: "wo", style: "display:block" }, a.wo) : null)];
-    return el("tr", {},
-      el("th", { class: "sp-auftrag", scope: "row" }, lehrer ? el("button", { class: "auftrag-kopf", onclick: () => zeileMenue(dlId, a) }, kopfInhalt) : el("div", { class: "auftrag-kopf" }, kopfInhalt)),
+  const zeilen = aufs.map(a => {
+    const nr = nrVon(dlId, a.id);
+    const kopfInhalt = [el("span", { class: "nr" }, nr), el("span", {}, artMarke(a.art), a.text,
+      lehrer && bereitFuersArchiv(dlId, a.id) ? el("span", { class: "bereit" }, "bereit fürs Archiv") : null,
+      a.wo ? el("span", { class: "wo", style: "display:block" }, a.wo) : null)];
+    return el("tr", { "data-ziel-zeile": lehrer ? a.id : null },
+      el("th", { class: "sp-auftrag", scope: "row" }, lehrer
+        ? el("div", { class: "kopf-zelle" }, griff(dlId, a.id), el("button", { class: "auftrag-kopf", onclick: () => zeileMenue(dlId, a) }, kopfInhalt))
+        : el("div", { class: "auftrag-kopf" }, kopfInhalt)),
       ls.map(l => {
         const s = statusVon(dlId, a.id, l.id);
-        const text = s === "kontrolliert" ? "✓ kontrolliert" : (s || (a.art === "P" ? "–" : ""));
+        const text = s === "korrektur" ? [el("span", { class: "lampe" }), "zur Korrektur"] : s === "kontrolliert" ? "✓ kontrolliert" : (s || (a.art === "P" ? "–" : ""));
         const darf = lehrer || (l.id === ich && s !== "kontrolliert");
         const k = "zelle " + ST_KLASSE[s];
         return el("td", { class: spKlasse(l.id) }, darf
-          ? el("button", { class: k, "aria-label": `${nameVon(l.id)}, Auftrag ${i + 1}: ${s || "nicht zugeteilt"}`, onclick: () => statusWaehlen(dlId, a, l.id) }, text)
-          : el("div", { class: k, title: s || "nicht zugeteilt" }, text));
+          ? el("button", { class: k, "aria-label": `${nameVon(l.id)}, Auftrag ${nr}: ${statusText(s)}`, onclick: () => statusWaehlen(dlId, a, l.id) }, text)
+          : el("div", { class: k, title: statusText(s) }, text));
       }));
   });
 
-  const fuss = [el("tr", {}, el("th", { class: "sp-auftrag", scope: "row" }, "Erledigt (fertig + kontrolliert)"),
+  const fuss = [el("tr", {}, el("th", { class: "sp-auftrag", scope: "row" }, imArchiv ? "Erledigt (inkl. Archiv)" : "Erledigt (fertig + kontrolliert)"),
     ls.map(l => { const f = fortschritt(dlId, l.id); return el("td", { class: spKlasse(l.id) }, el("div", { class: "zahl" }, `${f.erl}/${f.zu}`), el("div", { class: "mini" }, el("i", { style: `width:${Math.round(f.anteil * 100)}%` }))); }))];
   if (d.ziel) fuss.push(el("tr", {}, el("th", { class: "sp-auftrag", scope: "row" }, "🎯 Das kann ich heute: ", el("span", { style: "font-weight:400" }, d.ziel)),
     ls.map(l => { const w = zielVon(dlId, l.id), darf = lehrer || l.id === ich, k = "zelle " + ZIEL_KLASSE[w];
@@ -1434,6 +1655,10 @@ function ansichtKlasse() {
   const out = [dlKopf(dlId, aktionen), legende(),
     el("div", { class: "scroll-x", "data-scroll": "raster" },
       el("table", { class: "raster" }, el("thead", {}, kopfzeile), el("tbody", {}, zeilen), el("tfoot", {}, fuss)))];
+  if (imArchiv && !Zustand.beamer) out.push(el("div", { class: "archiv-info nicht-drucken" },
+    `📦 ${imArchiv} Auftr${imArchiv > 1 ? "äge" : "ag"} dieser DL im Archiv`,
+    el("button", { class: "klein", style: "margin-left:auto", onclick: () => wechsleAnsicht("archiv") }, "Archiv ansehen")));
+  if (lehrer && !Zustand.beamer && aufs.length) out.push(el("p", { class: "gedaempft nicht-drucken" }, "Tipp: Am Griff ⠿ ziehen, um einen Auftrag in eine andere DL, ins Archiv oder an eine andere Stelle zu verschieben. Antippen öffnet dasselbe als Menü."));
 
   const has = hausaufgabenVon(dlId);
   if (has.length) out.push(el("div", { style: "margin-top:16px" }, el("h3", {}, "🏠 Hausaufgaben"),
@@ -1451,7 +1676,34 @@ function ansichtKlasse() {
                              onclick: () => schreibe(`plan/dls/${dlId}/hausaufgaben/${h.id}/fuer/${l.id}`, an ? null : true) }, an ? "x" : "")
             : el("div", { class: "zelle ha-zelle" + (an ? " an" : ""), style: stil }, an ? "x" : ""));
         }))))))));
-  if (!aufs.length) out.push(el("p", { class: "gedaempft" }, "Für diese DL sind noch keine Aufträge eingetragen."));
+  if (!aufs.length) out.push(el("p", { class: "gedaempft" }, imArchiv ? "Alle Aufträge dieser DL sind im Archiv." : "Für diese DL sind noch keine Aufträge eingetragen."));
+  return out;
+}
+
+/* ---------- Archiv ---------- */
+function ansichtArchiv() {
+  const ls = lernendeListe(), lehrer = istLehrer(), ich = lehrer ? null : ichBin();
+  const gruppen = dls().map(d => ({ d, aufs: archivVon(d.id) })).filter(g => g.aufs.length);
+  const out = [el("div", { class: "karte" },
+    el("h2", {}, "📦 Archiv"),
+    el("p", { class: "gedaempft", style: "margin:0" }, "Aufträge, die fertig kontrolliert sind. Die Lehrperson verschiebt sie von Hand hierher, damit der Arbeitsplan übersichtlich bleibt. XP und Fortschritt zählen weiter."))];
+  if (!gruppen.length) { out.push(el("div", { class: "hinweis blau" }, "Noch nichts im Archiv.")); return out; }
+  const sp = sid => sid === ich ? "ich-spalte" : null;
+  for (const { d, aufs } of gruppen) {
+    out.push(el("div", { style: "margin-top:18px" },
+      el("div", { class: "dl-kopf", style: "margin-bottom:8px" }, el("div", {}, el("div", { class: "dl-nr" }, `${d.id} · ${langdatum(d.datum)}`), el("h2", { style: "font-size:1.15rem" }, d.thema || ""))),
+      el("div", { class: "scroll-x", "data-scroll": "archiv-" + d.id }, el("table", { class: "raster" },
+        el("thead", {}, el("tr", {}, el("th", { class: "sp-auftrag", scope: "col" }, "Auftrag"),
+          ls.map(l => el("th", { class: sp(l.id), scope: "col" }, el("div", { class: "kopf-name", style: `background:${l.farbe}` }, nameVon(l.id)))))),
+        el("tbody", {}, aufs.map(a => el("tr", {},
+          el("th", { class: "sp-auftrag", scope: "row" },
+            el("div", { class: "auftrag-kopf" }, el("span", { class: "nr" }, nrVon(d.id, a.id)),
+              el("span", {}, artMarke(a.art), a.text,
+                el("span", { class: "archiv-datum", style: "display:block" }, "archiviert am " + new Date(a.archiv).toLocaleDateString("de-CH")),
+                lehrer ? el("button", { class: "klein nicht-drucken", style: "margin-top:6px", onclick: () => zurueckholen(d.id, a.id) }, "↩ Zurückholen") : null))),
+          ls.map(l => { const s = statusVon(d.id, a.id, l.id);
+            return el("td", { class: sp(l.id) }, el("div", { class: "zelle " + ST_KLASSE[s] }, s === "kontrolliert" ? "✓ kontrolliert" : (s === "korrektur" ? "zur Korrektur" : s))); }))))))));
+  }
   return out;
 }
 
@@ -1517,7 +1769,8 @@ function anmeldeKarte() {
 function ansichtLehrer() {
   if (!istLehrer()) return [anmeldeKarte()];
   const out = [];
-  if (Zustand.schreibrechtFehlt) out.push(regelnKarte(true));
+  if (Zustand.schreibrechtFehlt) out.push(regelnKarte("fehlt"));
+  else if (Zustand.regelnVeraltet) out.push(regelnKarte("veraltet"));
   if (!plan() || !plan().dls) {
     out.push(el("div", { class: "karte schmal" }, el("h2", {}, "Arbeitsplan einrichten"),
       el("p", {}, "Die Datenbank ist noch leer. Lade den Arbeitsplan aus der Excel-Vorlage (DL01–DL11, Textproduktion HS26). Pflichtaufträge sind danach für alle «offen»."),
@@ -1543,15 +1796,17 @@ function dlBearbeiten(dlId) {
     el("input", { type: "text", value: wert || "", placeholder: platzhalter || "",
       onchange: e => { const v = e.target.value.trim(); if (pflicht && !v) { e.target.value = wert || ""; return; } schreibe(pfad, v); } }));
 
-  const zeilen = aufs.map((a, i) => el("div", { class: "edit-zeile" },
-    el("div", { class: "nr" }, i + 1),
-    el("input", { type: "text", value: a.text, "aria-label": `Auftrag ${i + 1}`, onchange: e => { const v = e.target.value.trim(); if (v) schreibe(`${b}/auftraege/${a.id}/text`, v); else e.target.value = a.text; } }),
-    el("input", { type: "text", value: a.wo || "", placeholder: "Wo (z.B. DOS 1, 2.3)", "aria-label": `Wo, Auftrag ${i + 1}`, onchange: e => schreibe(`${b}/auftraege/${a.id}/wo`, e.target.value.trim()) }),
+  const zeilen = aufs.map((a, i) => { const nr = nrVon(dlId, a.id); return el("div", { class: "edit-zeile", "data-ziel-zeile": a.id },
+    el("div", { class: "kopf-zelle", style: "align-items:center" }, griff(dlId, a.id), el("div", { class: "nr" }, nr)),
+    el("input", { type: "text", value: a.text, "aria-label": `Auftrag ${nr}`, onchange: e => { const v = e.target.value.trim(); if (v) schreibe(`${b}/auftraege/${a.id}/text`, v); else e.target.value = a.text; } }),
+    el("input", { type: "text", value: a.wo || "", placeholder: "Wo (z.B. DOS 1, 2.3)", "aria-label": `Wo, Auftrag ${nr}`, onchange: e => schreibe(`${b}/auftraege/${a.id}/wo`, e.target.value.trim()) }),
     artWahl(a.art, v => schreibe(`${b}/auftraege/${a.id}/art`, v)),
     el("div", { class: "knopf-gruppe" },
-      el("button", { class: "icon", title: "nach oben", "aria-label": "nach oben", disabled: i === 0, onclick: () => verschieben(dlId, aufs, i, -1) }, "↑"),
-      el("button", { class: "icon", title: "nach unten", "aria-label": "nach unten", disabled: i === aufs.length - 1, onclick: () => verschieben(dlId, aufs, i, 1) }, "↓"),
-      el("button", { class: "icon gefahr", title: "löschen", "aria-label": "Auftrag löschen", onclick: () => auftragLoeschen(dlId, a) }, "🗑"))));
+      el("button", { class: "icon", title: "nach oben", "aria-label": "nach oben", disabled: i === 0, onclick: () => umsortieren(dlId, a.id, aufs[i - 1].id) }, "↑"),
+      el("button", { class: "icon", title: "nach unten", "aria-label": "nach unten", disabled: i === aufs.length - 1, onclick: () => umsortieren(dlId, a.id, aufs[i + 1].id) }, "↓"),
+      el("button", { class: "icon", title: "ins Archiv", "aria-label": "ins Archiv", onclick: () => archivieren(dlId, a.id) }, "📦"),
+      el("button", { class: "icon gefahr", title: "löschen", "aria-label": "Auftrag löschen", onclick: () => auftragLoeschen(dlId, a) }, "🗑"))); });
+  const imArchiv = archivVon(dlId).length;
 
   const neuText = el("input", { type: "text", placeholder: "Neuer Auftrag …", "aria-label": "Neuer Auftrag" });
   const neuWo = el("input", { type: "text", placeholder: "Wo (optional)", "aria-label": "Wo" });
@@ -1600,7 +1855,10 @@ function dlBearbeiten(dlId) {
         el("textarea", { onchange: e => { const z = e.target.value.split("\n").map(s => s.trim()).filter(Boolean); const o = {}; z.forEach((t, i) => { o["lz" + (i + 1)] = t; }); schreibe(`${b}/flk`, z.length ? o : null); } },
           flkVon(dlId).map(f => f.text).join("\n")))),
     el("h3", { style: "margin-top:16px" }, "Aufträge"),
-    zeilen.length ? zeilen : el("p", { class: "gedaempft" }, "Noch keine Aufträge."),
+    el("p", { class: "gedaempft", style: "margin:0 0 4px" }, "Am Griff ⠿ ziehen: in eine andere DL (oben in der Leiste), ins Archiv oder an eine andere Stelle. Antippen öffnet ein Menü."),
+    zeilen.length ? zeilen : el("p", { class: "gedaempft" }, "Noch keine aktiven Aufträge."),
+    imArchiv ? el("div", { class: "archiv-info" }, `📦 ${imArchiv} Auftr${imArchiv > 1 ? "äge" : "ag"} dieser DL im Archiv`,
+      el("button", { class: "klein", style: "margin-left:auto", onclick: () => wechsleAnsicht("archiv") }, "Archiv ansehen")) : null,
     el("div", { class: "neu-form" },
       el("div", { class: "edit-zeile", style: "border-top:none" }, el("div", { class: "nr" }, "＋"), neuText, neuWo, neuArt,
         el("button", { class: "primaer", onclick: hinzu }, "Hinzufügen")),
@@ -1654,18 +1912,21 @@ function datenKarte() {
     el("details", { style: "margin-top:12px" }, el("summary", {}, "Zurücksetzen und Ende der Einheit"),
       el("p", { class: "gedaempft" }, "Die Datenbank ist kein Archiv: Am Ende der Einheit CSV exportieren, dann löschen."),
       el("div", { class: "zeile" },
-        el("button", { class: "klein gefahr", onclick: () => frage("Stand der ganzen Klasse auf Anfang setzen? Pflichtaufträge werden für alle «offen», alles andere leer. Aufträge bleiben.", () => schreibeMehrere({ stand: anfangsstand(), ziel: null, flk: null }), "Zurücksetzen") }, "Stand auf Anfang setzen"),
+        el("button", { class: "klein gefahr", onclick: () => frage("Stand der ganzen Klasse auf Anfang setzen? Pflichtaufträge werden für alle «offen», alles andere leer, das Archiv wird zurückgeholt. Aufträge bleiben.", standZuruecksetzen, "Zurücksetzen") }, "Stand auf Anfang setzen"),
         el("button", { class: "klein gefahr", onclick: () => frage("Alles löschen – Plan und Stand? Vorher CSV exportieren.", () => schreibeMehrere({ plan: null, stand: null, ziel: null, flk: null }), "Alles löschen") }, "Alles löschen (Ende der Einheit)"))));
 }
 
-function regelnKarte(fehlt) {
-  return el("div", { class: "karte " + (fehlt ? "hinweis rot" : "") },
-    el("h3", {}, fehlt ? "Noch ein Schritt: Regeln einspielen" : "Sicherheitsregeln"),
-    el("p", {}, fehlt ? "Du bist angemeldet, aber die Datenbank lässt deine Änderungen noch nicht zu. Kopiere die Regeln (deine UID ist schon eingesetzt) und füge sie in der Firebase-Konsole unter Realtime Database → Regeln ein. Dann «Veröffentlichen» und hier «Erneut prüfen»."
-      : "Diese Regeln gehören in die Firebase-Konsole (Realtime Database → Regeln)."),
+function regelnKarte(art) {
+  const text = {
+    fehlt: ["Noch ein Schritt: Regeln einspielen", "Du bist angemeldet, aber die Datenbank lässt deine Änderungen noch nicht zu."],
+    veraltet: ["Regeln aktualisieren (1 Minute)", "Für «zur Korrektur» und das Archiv braucht die Datenbank die neuen Regeln. Bis dahin funktioniert alles andere wie bisher."],
+  }[art] || ["Sicherheitsregeln", ""];
+  return el("div", { class: "karte " + (art ? "hinweis rot" : "") },
+    el("h3", {}, text[0]),
+    el("p", {}, text[1], " Kopiere die Regeln (deine UID ist schon eingesetzt), ersetze in der Firebase-Konsole unter Realtime Database → Regeln den ganzen Inhalt, tippe auf «Veröffentlichen» und hier auf «Erneut prüfen»."),
     el("div", { class: "zeile" },
       el("button", { class: "klein primaer", onclick: () => kopieren(regelnText(), "Regeln kopiert") }, "Regeln kopieren"),
-      fehlt ? el("button", { class: "klein", onclick: async () => { await pruefeSchreibrecht(); toast(Zustand.schreibrechtFehlt ? "Noch nicht freigegeben" : "Alles bereit ✓"); zeichnen(); } }, "Erneut prüfen") : null));
+      el("button", { class: "klein", onclick: async () => { await pruefeSchreibrecht(); toast(Zustand.schreibrechtFehlt || Zustand.regelnVeraltet ? "Noch nicht aktiv" : "Alles bereit ✓"); zeichnen(); } }, "Erneut prüfen")));
 }
 
 function verbindungKarte() {
@@ -1687,7 +1948,7 @@ function verbindungKarte() {
   namenAusLink();
   const q = new URLSearchParams(location.search);
   const gespeichert = Speicher.lies("ansicht", null);
-  Zustand.ansicht = ["plan", "klasse", "uebersicht", "lehrer"].includes(q.get("ansicht")) ? q.get("ansicht")
+  Zustand.ansicht = ["plan", "klasse", "uebersicht", "archiv", "lehrer"].includes(q.get("ansicht")) ? q.get("ansicht")
     : (gespeichert && gespeichert !== "lehrer" ? gespeichert : (Speicher.lies("ichBin", null) ? "plan" : "klasse"));
   if (q.get("beamer") === "1") { Zustand.beamer = true; Zustand.ansicht = "klasse"; }
   if (DEMO) {

@@ -9,7 +9,10 @@ Online-Fassung des Excel-Arbeitsplans (DL01–DL11). Lernende tragen ihren Stand
 | Mein Plan | Lernende | eigene Aufträge: offen → in Arbeit → fertig, «Das kann ich heute», FLK, Hausaufgaben |
 | Klasse | alle, Beamer | Raster wie im Excel (Aufträge × Lernende), Fortschritt, Selbsteinschätzung |
 | Übersicht | Lehrperson (Klasse nur, wenn freigegeben) | Fortschritt pro DL und XP (fertig = 1, kontrolliert = 2) |
+| Archiv | alle | Aufträge, die fertig kontrolliert sind (von Hand verschoben); zählen weiter für XP und Fortschritt |
 | Bearbeiten | nur Lehrperson (Login) | Aufträge, Datum/Thema/Ziel, FLK, Hausaufgaben, Lernende, Export |
+
+**Für die Lehrperson im Raster:** Zelle antippen → Status setzen, auch **«zur Korrektur zurückweisen»** (rot umrandet mit Warnleuchte, bei den Lernenden zusätzlich als Warnung oben in «Mein Plan»; sie überarbeiten und setzen wieder «fertig»). Am Griff ⠿ ziehen: Auftrag **in eine andere DL** (mit dem Stand der Klasse), **ins Archiv** oder an eine andere Stelle; Antippen des Griffs öffnet dasselbe als Menü. «📦 n ins Archiv» verschiebt alle Aufträge, die bei allen kontrolliert sind.
 
 Beamer direkt öffnen: `…/arbeitsplan/?beamer=1`
 
@@ -34,9 +37,12 @@ Fehlt Schritt 4, zeigt die App nach dem Login «Regeln kopieren» mit bereits ei
 
 ## Was die Regeln erzwingen
 
-- Lernende dürfen nur `offen`, `in Arbeit`, `fertig` setzen – nie `kontrolliert`, nichts löschen, nichts an Aufträgen ändern.
+- Lernende dürfen nur `offen`, `in Arbeit`, `fertig` setzen – nie `kontrolliert` oder `korrektur`, nichts löschen, nichts an Aufträgen ändern.
+- Archivierte Aufträge können Lernende nicht mehr ändern.
 - Einen kontrollierten Auftrag können Lernende nicht mehr zurücksetzen.
 - Nur bestehende Aufträge, DL, FLK-Lernziele und Lernende sind beschreibbar.
 - Alles andere (Plan, Zuteilung, Löschen) nur mit Lehrer-Login.
 
-Getestet gegen den Firebase-Emulator (27 Regelfälle, 32 Ablaufschritte inkl. Offline-Puffer).
+Getestet gegen den Firebase-Emulator (39 Regelfälle, 66 Ablaufschritte inkl. Offline-Puffer, Ziehen mit Maus und Finger).
+
+Nach einem Update der Regeln (z.B. 23.10.2026: «zur Korrektur», Archiv) zeigt die App nach dem Login eine rote Karte «Regeln aktualisieren» mit Kopierknopf.
