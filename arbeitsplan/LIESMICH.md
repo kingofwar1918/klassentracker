@@ -16,6 +16,8 @@ Online-Fassung des Excel-Arbeitsplans (DL01–DL11). Lernende tragen ihren Stand
 
 Beamer direkt öffnen: `…/arbeitsplan/?beamer=1`
 
+**Links in «Mein Plan»:** Steht bei einem Auftrag unter «Wo» das Wort `App`, erscheint ein Knopf «🔎 Bericht-Detektiv öffnen» (https://kingofwar1918.github.io/bericht-detektiv/). Steht unter «Wo» eine Adresse (`https://…`), wird sie ebenfalls zum Knopf. Weitere Stichwörter in `index.html` bei `CONFIG.links`.
+
 ## Datenschutz
 
 - In der Datenbank und in diesem Repository stehen **keine Namen**, nur Farbnamen (Gelb, Orange …).

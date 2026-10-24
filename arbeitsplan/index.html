@@ -155,6 +155,11 @@ tr.ueber-drunter>*,.edit-zeile.ueber-drunter{box-shadow:inset 0 -3px 0 #2e5aa8}
     display:grid;place-items:center;font-size:.95rem;flex:0 0 auto}
 .auftrag .text{font-weight:600}
 .wo{font-size:.86rem;color:var(--gedaempft);margin-top:2px}
+.wo-link{display:inline-flex;align-items:center;gap:6px;min-height:44px;margin-top:6px;padding:8px 14px;
+         border-radius:10px;border:1px solid var(--akzent);background:var(--akzent-weich);color:var(--akzent);
+         font-weight:650;font-size:.95rem;text-decoration:none}
+.wo-link:active{transform:translateY(1px)}
+.wo-link:focus-visible{outline:3px solid var(--akzent-hell);outline-offset:2px}
 .art{display:inline-block;font-size:.7rem;font-weight:800;padding:1px 7px;border-radius:6px;margin-right:6px;vertical-align:2px;white-space:nowrap}
 .art.z{background:#fff0c2;color:#704c00}
 .art.puffer{background:#e1eafb;color:#244a8a}
@@ -300,6 +305,11 @@ const CONFIG = {
   lehrerEmail: "",          // optional: im Login vorausgefüllt
   projekt: "arbeitsplan",   // oberster Pfad in der Datenbank – muss zu den Regeln passen
   taktMs: 5000,             // Rückfall, falls die Live-Verbindung blockiert ist: Abgleich alle 5 s
+  // Steht bei einem Auftrag unter «Wo» genau dieses Wort, zeigt «Mein Plan» einen Knopf zum Link.
+  // Steht unter «Wo» eine Adresse (https://…), wird sie ebenfalls zum Knopf.
+  links: {
+    "App": { url: "https://kingofwar1918.github.io/bericht-detektiv/", text: "🔎 Bericht-Detektiv öffnen" },
+  },
 };
 
 /* ========================================================================
@@ -835,6 +845,15 @@ const Strom = (() => {
    3. HILFSMITTEL
    ======================================================================== */
 const $ = (sel, wurzel = document) => wurzel.querySelector(sel);
+
+/* «Wo» als Knopf: Stichwort aus CONFIG.links oder eine https-Adresse; sonst null. */
+function woLink(wo) {
+  const w = String(wo || "").trim();
+  const eintrag = (CONFIG.links || {})[w];
+  const url = eintrag ? eintrag.url : (/^https:\/\/\S+$/.test(w) ? w : "");
+  if (!url) return null;
+  return el("a", { class: "wo-link", href: url, target: "_blank", rel: "noopener" }, (eintrag && eintrag.text) || "🔗 Link öffnen", " ↗");
+}
 
 function el(tag, attribute = {}, ...kinder) {
   const k = document.createElement(tag);
@@ -1589,7 +1608,7 @@ function ansichtPlan() {
     return el("div", { class: "auftrag " + ST_KLASSE[s], id: `auftrag-${dlId}-${a.id}` },
       s === "korrektur" ? el("div", { class: "korr-kopf" }, el("span", { class: "lampe" }), "Zur Korrektur zurück: überarbeite den Auftrag und setze ihn wieder auf «fertig».") : null,
       el("div", { class: "nr" }, nrVon(dlId, a.id)),
-      el("div", {}, el("div", { class: "text" }, artMarke(a.art), a.text), a.wo ? el("div", { class: "wo" }, "📍 " + a.wo) : null),
+      el("div", {}, el("div", { class: "text" }, artMarke(a.art), a.text), a.wo ? (woLink(a.wo) || el("div", { class: "wo" }, "📍 " + a.wo)) : null),
       el("div", { class: "steuerung" }, steuerung));
   });
   out.push(el("div", { class: "karte schmal" },
