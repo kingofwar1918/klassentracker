@@ -553,17 +553,16 @@ const DATEN = {
 };
 
 /* Sicherheitsregeln der Datenbank (gleich wie regeln.json im Repository).
+   Gilt für die ganze Datenbank: enthält auch den Baum des RZG-Trackers (/arbeitsplan-rzg).
    Die App zeigt sie im Bereich «Bearbeiten» mit deiner UID an, zum Kopieren. */
 const REGELN = {
   "rules": {
     ".read": false,
     ".write": false,
-
     "arbeitsplan": {
       "oeffentlich": {
         ".read": true,
         ".write": "auth != null && auth.uid === 'LEHRER_UID'",
-
         "stand": {
           "$dl": {
             "$auftrag": {
@@ -574,7 +573,6 @@ const REGELN = {
             }
           }
         },
-
         "ziel": {
           "$dl": {
             "$lernende": {
@@ -583,7 +581,6 @@ const REGELN = {
             }
           }
         },
-
         "flk": {
           "$dl": {
             "$lz": {
@@ -593,6 +590,79 @@ const REGELN = {
               }
             }
           }
+        }
+      }
+    },
+    "arbeitsplan-rzg": {
+      "oeffentlich": {
+        ".read": true,
+        ".write": "auth != null && auth.uid === 'LEHRER_UID'",
+        "stand": {
+          "$dl": {
+            "$auftrag": {
+              "$lernende": {
+                ".write": "newData.isString() && (newData.val() === 'offen' || newData.val() === 'in Arbeit' || newData.val() === 'fertig') && (!data.exists() || data.val() !== 'kontrolliert') && root.child('arbeitsplan-rzg/oeffentlich/plan/dls/' + $dl + '/auftraege/' + $auftrag).exists() && !root.child('arbeitsplan-rzg/oeffentlich/plan/dls/' + $dl + '/auftraege/' + $auftrag + '/archiv').exists() && root.child('arbeitsplan-rzg/oeffentlich/plan/lernende/' + $lernende).exists()",
+                ".validate": "newData.isString() && (newData.val() === 'offen' || newData.val() === 'in Arbeit' || newData.val() === 'fertig' || newData.val() === 'korrektur' || newData.val() === 'kontrolliert')"
+              }
+            }
+          }
+        },
+        "ziel": {
+          "$dl": {
+            "$lernende": {
+              ".write": "newData.isString() && (newData.val() === 'noch nicht' || newData.val() === 'fast' || newData.val() === 'sicher') && root.child('arbeitsplan-rzg/oeffentlich/plan/dls/' + $dl).exists() && root.child('arbeitsplan-rzg/oeffentlich/plan/lernende/' + $lernende).exists()",
+              ".validate": "newData.isString() && (newData.val() === 'noch nicht' || newData.val() === 'fast' || newData.val() === 'sicher')"
+            }
+          }
+        },
+        "flk": {
+          "$dl": {
+            "$lz": {
+              "$lernende": {
+                ".write": "newData.isString() && (newData.val() === 'erreicht' || newData.val() === 'noch nicht') && root.child('arbeitsplan-rzg/oeffentlich/plan/dls/' + $dl + '/flk/' + $lz).exists() && root.child('arbeitsplan-rzg/oeffentlich/plan/lernende/' + $lernende).exists()",
+                ".validate": "newData.isString() && (newData.val() === 'erreicht' || newData.val() === 'noch nicht')"
+              }
+            }
+          }
+        },
+        "interesse": {
+          "$dl": {
+            "$lernende": {
+              ".write": "newData.isString() && root.child('arbeitsplan-rzg/oeffentlich/plan/dls/' + $dl + '/interesse/fragen/' + newData.val()).exists() && root.child('arbeitsplan-rzg/oeffentlich/plan/lernende/' + $lernende).exists()",
+              ".validate": "newData.isString() && newData.val().matches(/^f[1-4]$/)"
+            }
+          }
+        },
+        "biteAngebot": {
+          "$dl": {
+            "$lernende": {
+              ".write": "(!newData.exists() || newData.val() === true) && root.child('arbeitsplan-rzg/oeffentlich/plan/dls/' + $dl).exists() && root.child('arbeitsplan-rzg/oeffentlich/plan/lernende/' + $lernende).exists()",
+              ".validate": "newData.val() === true"
+            }
+          }
+        }
+      },
+      "privat": {
+        ".read": "auth != null && auth.uid === 'LEHRER_UID'",
+        ".write": "auth != null && auth.uid === 'LEHRER_UID'",
+        "fragen": {
+          "$dl": {
+            "$lernende": {
+              ".write": "newData.isString() && newData.val().length > 0 && newData.val().length <= 300 && root.child('arbeitsplan-rzg/oeffentlich/plan/dls/' + $dl).exists() && root.child('arbeitsplan-rzg/oeffentlich/plan/lernende/' + $lernende).exists()",
+              ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 300"
+            }
+          }
+        },
+        "vertiefung": {
+          "$dl": {
+            "$lernende": {
+              ".write": "newData.isString() && newData.val().length > 0 && newData.val().length <= 1200 && root.child('arbeitsplan-rzg/oeffentlich/plan/dls/' + $dl).exists() && root.child('arbeitsplan-rzg/oeffentlich/plan/lernende/' + $lernende).exists()",
+              ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 1200"
+            }
+          }
+        },
+        "$sonst": {
+          ".validate": false
         }
       }
     }
