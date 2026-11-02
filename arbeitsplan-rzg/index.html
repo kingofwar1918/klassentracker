@@ -3413,7 +3413,7 @@ const Sync = (() => {
       if (!aktiverTakt) return;
       await nachliefern();
       const r = await anfrage(aktiverTakt.pfad, "GET");
-      if (aktiverTakt && aktiverTakt.status) aktiverTakt.status(r.ok ? "live" : (r.status === 0 ? "offline" : "fehler"));
+      if (aktiverTakt && aktiverTakt.status) aktiverTakt.status(r.ok ? "live" : (r.status === 0 ? "offline" : (r.status === 401 || r.status === 403 ? "gesperrt" : "fehler")));
       if (r.ok && aktiverTakt) aktiverTakt.rueckruf(r.daten);
     };
     holen();
@@ -3505,7 +3505,10 @@ const Strom = (() => {
     es.addEventListener("cancel", () => { nurTakt = true; verbinden(); });
     es.onerror = () => {
       status(navigator.onLine === false ? "offline" : "verbinde");
-      if (es && es.readyState === 2) wiederTimer = setTimeout(verbinden, 4000);
+      if (es && es.readyState === 2) {
+      Sync.lies(pfad + "/meta").then(r => { if (r && (r.status === 401 || r.status === 403)) { nurTakt = true; verbinden(); } }).catch(() => {});
+      wiederTimer = setTimeout(verbinden, 4000);
+    }
     };
   }
   document.addEventListener("visibilitychange", () => {
@@ -4265,7 +4268,7 @@ window.addEventListener("resize", kopfHoeheMessen);
 
 function verbindungsPill() {
   const v = DEMO ? "demo" : Zustand.verbindung;
-  const text = { demo: "Demo · nur dieses Gerät", live: "Live", verbinde: "verbinde …", offline: "offline", fehler: "Verbindungsfehler" }[v] || v;
+  const text = { demo: "Demo · nur dieses Gerät", live: "Live", verbinde: "verbinde …", offline: "offline", fehler: "Verbindungsfehler", gesperrt: "noch nicht freigeschaltet" }[v] || v;
   return el("span", { class: "pill " + v, title: "Verbindung zur Datenbank" }, el("span", { class: "punkt" }), text);
 }
 
@@ -4288,7 +4291,22 @@ function inhalt() {
   const out = [];
   const wartend = DEMO ? 0 : Sync.wartend;
   if (wartend) out.push(el("div", { class: "hinweis rot nicht-drucken" }, `Offline: ${wartend} Eingabe${wartend > 1 ? "n warten" : " wartet"} auf diesem Gerät und ${wartend > 1 ? "werden" : "wird"} automatisch nachgeliefert.`));
-  if (!DEMO && !Zustand.geladen) { out.push(el("div", { class: "karte schmal" }, el("p", {}, "Verbinde mit dem Arbeitsplan …"))); return out; }
+  if (!DEMO && !Zustand.geladen) {
+    const gesperrt = Zustand.verbindung === "gesperrt";
+    const gesperrtKarte = () => el("div", { class: "karte schmal hinweis rot" },
+      el("h2", {}, "Arbeitsplan RZG noch nicht freigeschaltet"),
+      el("p", {}, "Die Datenbank gibt diesen Bereich noch nicht frei. Lehrperson: Tab «Lehrperson» → anmelden → «Regeln kopieren» → Firebase-Konsole → Realtime Database → Regeln: den ganzen Inhalt ersetzen → «Veröffentlichen». Danach lädt die Seite von selbst."),
+      Zustand.beamer || Zustand.ansicht === "lehrer" ? null : el("button", { class: "primaer", onclick: () => wechsleAnsicht("lehrer") }, "Zum Tab Lehrperson"));
+    if (Zustand.ansicht === "lehrer") {   // Login und Regeln auch ohne geladenen Plan; «Aus Vorlage laden» erst nach dem Laden
+      if (!istLehrer()) return out.concat(gesperrt ? [gesperrtKarte()] : [], [anmeldeKarte()]);
+      if (Zustand.schreibrechtFehlt || gesperrt) out.push(regelnKarte("fehlt"));
+      else if (Zustand.regelnVeraltet) out.push(regelnKarte("veraltet"));
+      out.push(el("div", { class: "karte schmal" }, el("p", {}, gesperrt ? "Nach dem Veröffentlichen der Regeln lädt der Arbeitsplan von selbst (bis 30 Sekunden)." : "Verbinde mit dem Arbeitsplan …")));
+      return out;
+    }
+    out.push(gesperrt ? gesperrtKarte() : el("div", { class: "karte schmal" }, el("p", {}, "Verbinde mit dem Arbeitsplan …")));
+    return out;
+  }
   if (Zustand.ansicht === "lehrer") return out.concat(ansichtLehrer());
   if (Zustand.ansicht === "interessen") return out.concat(ansichtInteressen());
   if (!plan() || !plan().dls) {
