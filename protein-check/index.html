@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="de-CH">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Protein-Check</title>
+<style>
+:root{
+  --bg:#f4f6f9; --karte:#ffffff; --text:#1b2430; --gedaempft:#5b6779;
+  --akzent:#1f4e79; --akzent-hell:#2e6bb0; --rand:#d9dfe7;
+  --richtig:#1e7f4f; --falsch:#b3352c;
+  --radius:14px; --tap:48px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
+     background:var(--bg);color:var(--text);font-size:17px;line-height:1.5}
+.huelle{max-width:820px;margin:0 auto;padding:16px 16px 64px}
+h1{font-size:1.5rem;margin:.2em 0}
+h2{font-size:1.2rem;margin:.6em 0 .3em}
+.karte{background:var(--karte);border:1px solid var(--rand);border-radius:var(--radius);
+       padding:18px;margin-bottom:14px}
+button{font:inherit;min-height:var(--tap);padding:12px 18px;border-radius:10px;
+       border:1px solid var(--rand);background:var(--karte);color:var(--text);cursor:pointer}
+button:active{transform:translateY(1px)}
+button:focus-visible{outline:3px solid var(--akzent-hell);outline-offset:2px}
+.primaer{background:var(--akzent);border-color:var(--akzent);color:#fff;font-weight:600}
+.antworten{display:grid;gap:10px;margin:14px 0}
+.antwort{text-align:left;width:100%}
+.antwort.richtig{background:#e6f4ec;border-color:var(--richtig);color:var(--richtig);font-weight:600}
+.antwort.falsch{background:#fbeceb;border-color:var(--falsch);color:var(--falsch)}
+.antwort[disabled]{cursor:default;opacity:1}
+.leiste{height:8px;background:var(--rand);border-radius:99px;overflow:hidden;margin:10px 0}
+.leiste > i{display:block;height:100%;background:var(--akzent-hell);width:0;transition:width .25s}
+.zeile{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.gedaempft{color:var(--gedaempft);font-size:.92rem}
+.rueckmeldung{margin-top:12px;padding:12px;border-radius:10px;background:#f0f3f7}
+.rueckmeldung.ok{background:#e6f4ec;color:var(--richtig)}
+.rueckmeldung.nein{background:#fbeceb;color:var(--falsch)}
+.verborgen{display:none !important}
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:8px;border-bottom:1px solid var(--rand)}
+input[type=text],input[type=number],input[type=password]{font:inherit;min-height:var(--tap);
+  padding:10px;border:1px solid var(--rand);border-radius:10px;width:100%;background:#fff}
+.marke{display:inline-block;font-size:.8rem;font-weight:600;letter-spacing:.04em;
+       background:#eef2f7;color:var(--akzent);border-radius:99px;padding:4px 12px;margin-bottom:8px}
+.rechenfeld{display:flex;gap:10px;align-items:center;margin:14px 0;flex-wrap:wrap}
+.rechenfeld input{max-width:190px}
+.einheit{font-weight:600}
+.balken{background:var(--rand);border-radius:99px;height:22px;overflow:hidden;margin:4px 0 2px}
+.balken > i{display:block;height:100%;background:var(--akzent-hell)}
+.lzblock{margin:14px 0}
+.dialog-hg{position:fixed;inset:0;background:rgba(20,28,38,.45);display:flex;
+           align-items:center;justify-content:center;padding:20px;z-index:50}
+.dialog{background:#fff;border-radius:var(--radius);padding:20px;max-width:420px;width:100%}
+@media print{
+  body{background:#fff;font-size:12pt}
+  button,.nicht-drucken{display:none !important}
+  .karte{border:1px solid #999;break-inside:avoid;margin-bottom:8px}
+  .huelle{max-width:none;padding:0}
+}
+</style>
+</head>
+<body>
+<div class="huelle">
+  <header class="nicht-drucken">
+    <h1 id="titel">Protein-Check</h1>
+    <p class="gedaempft" id="untertitel"></p>
+  </header>
+  <main id="buehne"></main>
+</div>
+
+<script>
+/* ========================================================================
+   1. INHALT — nur dieser Block wird angepasst, wenn die App ein neues
+   Thema bekommt. Die Logik darunter kennt keine konkreten Fragen.
+
+   Pro Aufgabe:
+     art: "wahl"  -> antworten[] + richtig (Index)
+     art: "zahl"  -> loesung (Zahl) + toleranz (erlaubte Abweichung) + einheit
+     lz:          -> 1, 2 oder 3; steuert die Auswertung am Schluss
+     erklaerung:  -> wird immer gezeigt, auch bei richtiger Antwort
+     hinweis:     -> optionaler Tipp, den man vorher aufklappen kann
+   ======================================================================== */
+const DATEN = {
+  titel: "Protein-Check",
+  untertitel: "Prüfe selbst, wo du stehst. Du kannst so oft wiederholen, wie du willst.",
+  lehrerPin: "4712",
+  lernziele: {
+    1: "Bedarf berechnen",
+    2: "Lebensmittel und Tagesplan",
+    3: "Produkte beurteilen"
+  },
+  aufgaben: [
+    /* ---- LZ 1: Bedarf berechnen ---- */
+    {
+      lz: 1, art: "zahl", einheit: "g pro Tag", toleranz: 0.5,
+      frage: "Jan ist 16, wiegt 60 kg und treibt keinen Sport. Wie viel Protein braucht er pro Tag?",
+      hinweis: "Für Jugendliche von 15 bis 19 Jahren gilt 0,9 g pro kg Körpergewicht (m).",
+      loesung: 54,
+      erklaerung: "60 kg × 0,9 g/kg = 54 g pro Tag."
+    },
+    {
+      lz: 1, art: "wahl",
+      frage: "Welcher Faktor gilt für eine 17-jährige Schülerin, die keinen Sport treibt?",
+      antworten: ["0,8 g pro kg", "0,9 g pro kg", "1,2 g pro kg", "2,0 g pro kg"],
+      richtig: 0,
+      erklaerung: "Für junge Frauen von 15 bis 19 Jahren gilt 0,8 g/kg, für junge Männer 0,9 g/kg."
+    },
+    {
+      lz: 1, art: "zahl", einheit: "g pro Tag", toleranz: 0.5,
+      frage: "Mia wiegt 70 kg und trainiert regelmässig. Berechne die untere Grenze ihrer Sportempfehlung.",
+      hinweis: "Wer regelmässig trainiert: 1,2 bis 2,0 g pro kg Körpergewicht.",
+      loesung: 84,
+      erklaerung: "70 kg × 1,2 g/kg = 84 g pro Tag. Die obere Grenze läge bei 70 × 2,0 = 140 g."
+    },
+    {
+      lz: 1, art: "wahl",
+      frage: "Ab welchem Wert bringt mehr Protein im Mittel keinen zusätzlichen Muskelaufbau mehr?",
+      antworten: ["ab 0,8 g pro kg", "ab 1,62 g pro kg", "ab 2,5 g pro kg", "es gibt keine Grenze"],
+      richtig: 1,
+      erklaerung: "Eine Auswertung von 49 Studien fand ein Plateau bei rund 1,62 g/kg pro Tag "
+                + "(Morton et al., 2018). Darüber wuchs die Muskelmasse im Mittel nicht weiter."
+    },
+    /* ---- LZ 2: Lebensmittel und Tagesplan ---- */
+    {
+      lz: 2, art: "zahl", einheit: "g Protein", toleranz: 0.3,
+      frage: "Wie viel Protein stecken in 175 g Magerquark? Magerquark enthält 10,6 g pro 100 g.",
+      hinweis: "Rechne zuerst pro Gramm, dann mal 175.",
+      loesung: 18.6,
+      erklaerung: "175 g × 10,6 g ÷ 100 g = 18,6 g. Das sind rund 40 % des Tagesbedarfs eines "
+                + "14-jährigen Mädchens mit 52 kg (52 × 0,9 = 46,8 g)."
+    },
+    {
+      lz: 2, art: "wahl",
+      frage: "Welches Lebensmittel liefert pro üblicher Portion am meisten Protein?",
+      antworten: ["175 g Magerquark", "23 g Kürbiskerne", "175 g Joghurt nature", "30 g Hartkäse"],
+      richtig: 0,
+      erklaerung: "Magerquark liefert pro Portion 18,6 g, Kürbiskerne 8,2 g, Hartkäse 8,0 g und "
+                + "Joghurt nature 6,8 g. Pro 100 g stünden die Kürbiskerne weit vorne – aber "
+                + "davon isst man nur eine Handvoll."
+    },
+    {
+      lz: 2, art: "wahl",
+      frage: "In der Schweiz stammen rund zwei Drittel des Proteins aus …",
+      antworten: ["pflanzlichen Quellen", "tierischen Quellen", "Nahrungsergänzungsmitteln",
+                  "Getreide allein"],
+      richtig: 1,
+      erklaerung: "Zwei Drittel stammen aus tierischen, ein Drittel aus pflanzlichen Quellen. "
+                + "Die grössten Lieferanten sind Fleisch (32,4 %), Getreide (21,2 %) und "
+                + "Milchprodukte (20,7 %)."
+    },
+    {
+      lz: 2, art: "zahl", einheit: "g Protein", toleranz: 0.3,
+      frage: "Ein Zmorge mit 60 g Haferflocken: wie viel Protein? Haferflocken enthalten 13,5 g pro 100 g.",
+      loesung: 8.1,
+      erklaerung: "60 g × 13,5 g ÷ 100 g = 8,1 g. Getreide liefert pro 100 g wenig, über den "
+                + "ganzen Tag aber viel – deshalb steht es in der Schweiz auf Platz zwei."
+    },
+    /* ---- LZ 3: Produkte beurteilen ---- */
+    {
+      lz: 3, art: "wahl",
+      frage: "Wann darf «High Protein» auf eine Packung?",
+      antworten: ["wenn mindestens 20 g Protein pro 100 g drin sind",
+                  "wenn mindestens 20 % der Energie aus Protein stammen",
+                  "wenn der Hersteller es für sinnvoll hält",
+                  "wenn es ein Sportprodukt ist"],
+      richtig: 1,
+      erklaerung: "Entscheidend ist der Energieanteil, nicht die Grammzahl: ab 20 % der Energie "
+                + "aus Protein. Ab 12 % ist bereits «Proteinquelle» erlaubt."
+    },
+    {
+      lz: 3, art: "zahl", einheit: "%", toleranz: 2,
+      frage: "Ein Quark hat pro 100 g: 272 kJ Energie und 12 g Protein. Wie viel Prozent der "
+           + "Energie stammen aus Protein?",
+      hinweis: "1 g Protein liefert 17 kJ. Rechne zuerst die Energie aus dem Protein aus.",
+      loesung: 75,
+      erklaerung: "12 g × 17 kJ = 204 kJ.  204 ÷ 272 × 100 = 75 %. Weit über der Schwelle von "
+                + "20 % – dieser ganz normale Quark dürfte also «proteinreich» heissen."
+    },
+    {
+      lz: 3, art: "wahl",
+      frage: "20 g Protein kosten aus dem Shake CHF 1.33, aus Magerquark CHF 0.57. Wie viel Mal "
+           + "teurer ist der Shake?",
+      antworten: ["etwa gleich teuer", "rund 2,3-mal teurer", "rund 5-mal teurer",
+                  "der Shake ist günstiger"],
+      richtig: 1,
+      erklaerung: "1.33 ÷ 0.57 = 2,3. Für dasselbe Protein zahlst du beim Shake rund das "
+                + "2,3-Fache."
+    },
+    {
+      lz: 3, art: "wahl",
+      frage: "Nico trainiert 4-mal pro Woche und kommt mit normalem Essen schon auf 92 g Protein. "
+           + "Sein Bedarf liegt bei 82 bis 136 g. Was folgt daraus?",
+      antworten: ["Er braucht dringend einen Shake, sonst bringt das Training nichts.",
+                  "Er ist bereits im empfohlenen Bereich – ein Shake ist nicht nötig.",
+                  "Er sollte die doppelte Menge essen.",
+                  "Ohne Messung lässt sich dazu nichts sagen."],
+      richtig: 1,
+      erklaerung: "Er liegt mitten im empfohlenen Bereich und sogar unter dem Plateau von "
+                + "110 g. Mit Shake käme er auf 116 g – zusätzlicher Muskelaufbau ist dort "
+                + "nicht zu erwarten. Praktisch sein kann ein Shake trotzdem; nötig ist er nicht."
+    }
+  ]
+};
+
+/* ========================================================================
+   2. SPEICHER — nutzt localStorage, wenn vorhanden, sonst nur Arbeits-
+   speicher. So läuft dieselbe Datei als Vorschau und als echte Datei.
+   ======================================================================== */
+const Speicher = (() => {
+  let vorhanden = false, ersatz = {};
+  try {
+    const p = "__test__";
+    window.localStorage.setItem(p, "1");
+    window.localStorage.removeItem(p);
+    vorhanden = true;
+  } catch (e) { vorhanden = false; }
+  return {
+    dauerhaft: vorhanden,
+    lies(schluessel, standard) {
+      try {
+        const roh = vorhanden ? window.localStorage.getItem(schluessel) : ersatz[schluessel];
+        return roh == null ? standard : JSON.parse(roh);
+      } catch (e) { return standard; }
+    },
+    schreib(schluessel, wert) {
+      try {
+        const roh = JSON.stringify(wert);
+        if (vorhanden) window.localStorage.setItem(schluessel, roh);
+        else ersatz[schluessel] = roh;
+      } catch (e) { /* Speichern ist nie kritisch */ }
+    },
+    loesche(schluessel) {
+      try {
+        if (vorhanden) window.localStorage.removeItem(schluessel);
+        else delete ersatz[schluessel];
+      } catch (e) {}
+    }
+  };
+})();
+
+/* ========================================================================
+   3. HILFSMITTEL
+   ======================================================================== */
+const $ = (sel, wurzel = document) => wurzel.querySelector(sel);
+const buehne = $("#buehne");
+
+function el(tag, attribute = {}, ...kinder) {
+  const k = document.createElement(tag);
+  for (const [n, w] of Object.entries(attribute)) {
+    if (n === "class") k.className = w;
+    else if (n.startsWith("on")) k.addEventListener(n.slice(2).toLowerCase(), w);
+    else if (w !== null && w !== undefined) k.setAttribute(n, w);
+  }
+  for (const kind of kinder.flat()) {
+    if (kind == null) continue;
+    k.append(kind instanceof Node ? kind : document.createTextNode(String(kind)));
+  }
+  return k;
+}
+
+/* Ersatz für confirm(): eingebettete Ansichten blockieren die Browserdialoge. */
+function frage(text, beiJa, jaText = "Ja", neinText = "Abbrechen") {
+  const hg = el("div", { class: "dialog-hg nicht-drucken" });
+  const schliessen = () => hg.remove();
+  hg.append(el("div", { class: "dialog" },
+    el("p", {}, text),
+    el("div", { class: "zeile" },
+      el("button", { class: "primaer", onclick: () => { schliessen(); beiJa(); } }, jaText),
+      el("button", { onclick: schliessen }, neinText))));
+  document.body.append(hg);
+}
+
+function mischen(liste) {
+  const a = liste.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+/* Komma und Punkt sind beide erlaubt – sonst scheitert die Aufgabe am Trennzeichen. */
+function zahlLesen(roh) {
+  const t = String(roh).trim().replace(",", ".").replace(/\s/g, "");
+  if (t === "") return null;
+  const z = Number(t);
+  return Number.isFinite(z) ? z : null;
+}
+
+function zahlZeigen(z) {
+  return String(z).replace(".", ",");
+}
+
+function csvHerunterladen(dateiname, zeilen) {
+  const inhalt = "﻿" + zeilen.map(z =>
+    z.map(f => `"${String(f).replace(/"/g, '""')}"`).join(";")).join("\r\n");
+  const url = URL.createObjectURL(new Blob([inhalt], { type: "text/csv;charset=utf-8" }));
+  const a = el("a", { href: url, download: dateiname });
+  document.body.append(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+/* ========================================================================
+   4. ZUSTAND
+   ======================================================================== */
+const Zustand = {
+  bildschirm: "start",
+  index: 0,
+  richtig: 0,
+  beantwortet: [],      // {frage, lz, gewaehlt, korrekt}
+  reihenfolge: [],
+  /* Kurzdurchgang: 2 Aufgaben pro Lernziel. Standard, wenn die Adresse ?kurz enthält
+     (z.B. über den QR-Code in einer Präsentation). */
+  kurzStandard: (() => { try { return new URLSearchParams(location.search).has("kurz"); }
+                         catch (e) { return false; } })()
+};
+const KURZ_PRO_LZ = 2;
+
+/* ========================================================================
+   5. BILDSCHIRME
+   ======================================================================== */
+function zeichnen() {
+  buehne.replaceChildren();
+  ({ start: startBild, aufgabe: aufgabeBild,
+     ergebnis: ergebnisBild, dashboard: dashboardBild }[Zustand.bildschirm])();
+  window.scrollTo(0, 0);
+}
+
+function startBild() {
+  const letzte = Speicher.lies("letztesErgebnis", null);
+  buehne.append(el("div", { class: "karte" },
+    el("p", {}, `Dieser Check enthält ${DATEN.aufgaben.length} Aufgaben zu Protein: `
+              + `Bedarf berechnen, Lebensmittel einschätzen und Produkte beurteilen. `
+              + `Im kurzen Check sind es ${kurzAnzahl()} – ${KURZ_PRO_LZ} pro Teil.`),
+    el("p", { class: "gedaempft" },
+      "Es gibt keine Note. Nach jeder Aufgabe siehst du, warum eine Antwort stimmt. "
+      + "Am Schluss erfährst du, welcher Teil bei dir schon sitzt."),
+    el("p", { class: "gedaempft" }, "Bei Rechenaufgaben darfst du Komma oder Punkt schreiben."),
+    letzte ? el("p", { class: "gedaempft" },
+      `Zuletzt: ${letzte.richtig} von ${letzte.total} richtig.`) : null,
+    el("div", { class: "zeile" },
+      el("button", { class: "primaer", onclick: () => starten(Zustand.kurzStandard) },
+        Zustand.kurzStandard ? `Los geht's (${kurzAnzahl()} Aufgaben)`
+                             : `Los geht's (alle ${DATEN.aufgaben.length})`),
+      el("button", { onclick: () => starten(!Zustand.kurzStandard) },
+        Zustand.kurzStandard ? `Alle ${DATEN.aufgaben.length} Aufgaben`
+                             : `Kurzer Check (${kurzAnzahl()})`),
+      el("button", { onclick: () => { Zustand.bildschirm = "dashboard"; zeichnen(); } },
+        "Für die Lehrperson"))));
+}
+
+function kurzAnzahl() {
+  return Object.keys(DATEN.lernziele).reduce((s, lz) =>
+    s + Math.min(KURZ_PRO_LZ, DATEN.aufgaben.filter(a => String(a.lz) === lz).length), 0);
+}
+
+function starten(kurz) {
+  Zustand.index = 0;
+  Zustand.richtig = 0;
+  Zustand.beantwortet = [];
+  Zustand.kurz = kurz === true;
+  const alle = DATEN.aufgaben.map((_, i) => i);
+  Zustand.reihenfolge = Zustand.kurz
+    ? mischen(Object.keys(DATEN.lernziele).flatMap(lz =>
+        mischen(alle.filter(i => String(DATEN.aufgaben[i].lz) === lz)).slice(0, KURZ_PRO_LZ)))
+    : mischen(alle);
+  Zustand.bildschirm = "aufgabe";
+  zeichnen();
+}
+
+function aufgabeBild() {
+  const a = DATEN.aufgaben[Zustand.reihenfolge[Zustand.index]];
+  const anzahl = Zustand.reihenfolge.length;
+  const fortschritt = Zustand.index / anzahl * 100;
+
+  const rueckmeldung = el("div", { class: "rueckmeldung verborgen" });
+  const weiter = el("button", { class: "primaer verborgen", onclick: weiterGehen },
+                    Zustand.index + 1 >= anzahl ? "Zur Auswertung" : "Weiter");
+
+  const koerper = [];
+
+  if (a.art === "wahl") {
+    const knoepfe = [];
+    a.antworten.forEach((text, i) => {
+      knoepfe.push(el("button", {
+        class: "antwort",
+        onclick: () => wahlPruefen(i, a, knoepfe, rueckmeldung, weiter)
+      }, text));
+    });
+    koerper.push(el("div", { class: "antworten" }, knoepfe));
+  } else {
+    const feld = el("input", { type: "text", inputmode: "decimal",
+                               autocomplete: "off", placeholder: "Zahl eingeben" });
+    const pruefen = el("button", { class: "primaer" }, "Antwort prüfen");
+    pruefen.addEventListener("click", () => zahlPruefen(feld, pruefen, a, rueckmeldung, weiter));
+    feld.addEventListener("keydown", e => { if (e.key === "Enter") pruefen.click(); });
+    koerper.push(el("div", { class: "rechenfeld" },
+      feld, el("span", { class: "einheit" }, a.einheit || ""), pruefen));
+  }
+
+  buehne.append(
+    el("div", { class: "leiste nicht-drucken" }, el("i", { style: `width:${fortschritt}%` })),
+    el("p", { class: "gedaempft" },
+      `Aufgabe ${Zustand.index + 1} von ${anzahl}`),
+    el("div", { class: "karte" },
+      el("span", { class: "marke" }, DATEN.lernziele[a.lz]),
+      el("h2", {}, a.frage),
+      a.hinweis ? el("details", {}, el("summary", {}, "Tipp anzeigen"), el("p", {}, a.hinweis))
+                : null,
+      koerper, rueckmeldung, weiter));
+}
+
+function melden(korrekt, a, rueckmeldung, weiter, zusatz) {
+  if (korrekt) Zustand.richtig++;
+  rueckmeldung.className = "rueckmeldung " + (korrekt ? "ok" : "nein");
+  rueckmeldung.replaceChildren(
+    el("strong", {}, korrekt ? "Richtig. " : "Noch nicht. "),
+    document.createTextNode((zusatz ? zusatz + " " : "") + (a.erklaerung || "")));
+  weiter.classList.remove("verborgen");
+  weiter.focus();
+}
+
+function wahlPruefen(gewaehlt, a, knoepfe, rueckmeldung, weiter) {
+  const korrekt = gewaehlt === a.richtig;
+  knoepfe.forEach((b, i) => {
+    b.disabled = true;
+    if (i === a.richtig) b.classList.add("richtig");
+    else if (i === gewaehlt) b.classList.add("falsch");
+  });
+  Zustand.beantwortet.push({ frage: a.frage, lz: a.lz,
+                             gewaehlt: a.antworten[gewaehlt], korrekt });
+  melden(korrekt, a, rueckmeldung, weiter, null);
+}
+
+function zahlPruefen(feld, knopf, a, rueckmeldung, weiter) {
+  const z = zahlLesen(feld.value);
+  if (z === null) {
+    rueckmeldung.className = "rueckmeldung";
+    rueckmeldung.replaceChildren(
+      document.createTextNode("Schreibe eine Zahl in das Feld, dann prüfe nochmals."));
+    return;
+  }
+  const korrekt = Math.abs(z - a.loesung) <= (a.toleranz || 0);
+  feld.disabled = true;
+  knopf.disabled = true;
+  Zustand.beantwortet.push({ frage: a.frage, lz: a.lz,
+                             gewaehlt: zahlZeigen(z) + " " + (a.einheit || ""), korrekt });
+  melden(korrekt, a, rueckmeldung, weiter,
+         korrekt ? null : `Richtig wären ${zahlZeigen(a.loesung)} ${a.einheit || ""}.`);
+}
+
+function weiterGehen() {
+  Zustand.index++;
+  if (Zustand.index >= Zustand.reihenfolge.length) {
+    const ergebnis = { richtig: Zustand.richtig, total: Zustand.reihenfolge.length,
+                       zeit: Date.now(), proLz: proLernziel() };
+    Speicher.schreib("letztesErgebnis", ergebnis);
+    const verlauf = Speicher.lies("verlauf", []);
+    verlauf.push(ergebnis);
+    Speicher.schreib("verlauf", verlauf.slice(-50));
+    Zustand.bildschirm = "ergebnis";
+  }
+  zeichnen();
+}
+
+function proLernziel() {
+  const z = {};
+  for (const b of Zustand.beantwortet) {
+    if (!z[b.lz]) z[b.lz] = { richtig: 0, total: 0 };
+    z[b.lz].total++;
+    if (b.korrekt) z[b.lz].richtig++;
+  }
+  return z;
+}
+
+function ergebnisBild() {
+  const anzahl = Zustand.reihenfolge.length;
+  const anteil = Math.round(Zustand.richtig / anzahl * 100);
+  const z = proLernziel();
+
+  const bloecke = Object.keys(DATEN.lernziele).map(lz => {
+    const w = z[lz] || { richtig: 0, total: 0 };
+    const p = w.total ? Math.round(w.richtig / w.total * 100) : 0;
+    const rat = p === 100 ? "Sitzt."
+              : p >= 50 ? "Fast. Schau dir die Erklärungen zu diesem Teil nochmals an."
+                        : "Hier lohnt sich eine Wiederholung.";
+    return el("div", { class: "lzblock" },
+      el("div", { class: "zeile" },
+        el("strong", {}, DATEN.lernziele[lz]),
+        el("span", { class: "gedaempft" }, `${w.richtig} von ${w.total}`)),
+      el("div", { class: "balken" }, el("i", { style: `width:${p}%` })),
+      el("span", { class: "gedaempft" }, rat));
+  });
+
+  buehne.append(
+    el("div", { class: "karte" },
+      el("h2", {}, `${Zustand.richtig} von ${anzahl} richtig (${anteil}%)`),
+      el("p", { class: "gedaempft" },
+        "Das ist keine Note. Die drei Balken zeigen dir, welcher Teil schon sitzt."),
+      bloecke),
+    el("div", { class: "karte" },
+      el("h2", {}, "Deine Antworten"),
+      el("table", {},
+        el("tbody", {}, Zustand.beantwortet.map(b =>
+          el("tr", {},
+            el("td", {}, b.korrekt ? "✓" : "✗"),
+            el("td", {}, b.frage),
+            el("td", { class: "gedaempft" }, b.gewaehlt)))))),
+    el("div", { class: "zeile nicht-drucken" },
+      el("button", { class: "primaer", onclick: () => starten(Zustand.kurz) }, "Nochmals üben"),
+      Zustand.kurz ? el("button", { onclick: () => starten(false) },
+                        `Alle ${DATEN.aufgaben.length} Aufgaben`) : null,
+      el("button", { onclick: () => window.print() }, "Ergebnis drucken"),
+      el("button", { onclick: () => { Zustand.bildschirm = "start"; zeichnen(); } },
+        "Zurück zum Start")));
+}
+
+function dashboardBild() {
+  const feld = el("input", { type: "password", inputmode: "numeric",
+                             placeholder: "PIN", autocomplete: "off" });
+  const bereich = el("div");
+
+  const oeffnen = () => {
+    if (feld.value !== DATEN.lehrerPin) {
+      bereich.replaceChildren(el("p", { class: "rueckmeldung nein" }, "PIN stimmt nicht."));
+      return;
+    }
+    const verlauf = Speicher.lies("verlauf", []);
+    const summe = {};
+    for (const v of verlauf) {
+      for (const [lz, w] of Object.entries(v.proLz || {})) {
+        if (!summe[lz]) summe[lz] = { richtig: 0, total: 0 };
+        summe[lz].richtig += w.richtig;
+        summe[lz].total += w.total;
+      }
+    }
+    const zeilen = Object.keys(DATEN.lernziele).map(lz => {
+      const w = summe[lz] || { richtig: 0, total: 0 };
+      const p = w.total ? Math.round(w.richtig / w.total * 100) : 0;
+      return el("tr", {},
+        el("td", {}, DATEN.lernziele[lz]),
+        el("td", {}, `${p} %`),
+        el("td", { class: "gedaempft" }, `${w.richtig} von ${w.total}`));
+    });
+
+    bereich.replaceChildren(
+      el("p", {}, `${verlauf.length} abgeschlossene Durchgänge auf diesem Gerät.`),
+      el("table", {}, el("thead", {}, el("tr", {},
+          el("th", {}, "Lernziel"), el("th", {}, "Trefferquote"), el("th", {}, "Aufgaben"))),
+        el("tbody", {}, zeilen)),
+      el("p", { class: "gedaempft" }, Speicher.dauerhaft
+        ? "Die Daten bleiben auf diesem Gerät und werden nirgends übertragen."
+        : "Achtung: In dieser Ansicht wird nichts dauerhaft gespeichert."),
+      el("div", { class: "zeile" },
+        el("button", {
+          onclick: () => csvHerunterladen("protein-check.csv",
+            [["Datum", "Richtig", "Total"]].concat(verlauf.map(v =>
+              [new Date(v.zeit).toLocaleString("de-CH"), v.richtig, v.total])))
+        }, "CSV exportieren"),
+        el("button", {
+          onclick: () => frage("Alle gespeicherten Durchgänge auf diesem Gerät löschen?", () => {
+            Speicher.loesche("verlauf"); Speicher.loesche("letztesErgebnis"); oeffnen();
+          }, "Löschen")
+        }, "Daten löschen")));
+  };
+
+  buehne.append(el("div", { class: "karte" },
+    el("h2", {}, "Für die Lehrperson"),
+    el("p", { class: "gedaempft" },
+      "Zeigt die Trefferquote pro Lernziel über alle Durchgänge auf diesem Gerät. "
+      + "Es werden keine Namen erfasst."),
+    feld,
+    el("div", { class: "zeile", style: "margin-top:10px" },
+      el("button", { class: "primaer", onclick: oeffnen }, "Öffnen"),
+      el("button", { onclick: () => { Zustand.bildschirm = "start"; zeichnen(); } }, "Zurück")),
+    bereich));
+}
+
+/* ========================================================================
+   6. START
+   ======================================================================== */
+$("#titel").textContent = DATEN.titel;
+$("#untertitel").textContent = DATEN.untertitel || "";
+document.title = DATEN.titel;
+zeichnen();
+</script>
+</body>
+</html>
