@@ -113,6 +113,24 @@ h3{font-size:1.05rem;margin:.1em 0 .6em}
 /* Archiv */
 .bereit{display:inline-block;font-size:.7rem;font-weight:800;padding:1px 7px;border-radius:6px;background:#dff0d6;color:#2a5e22;margin-left:6px;white-space:nowrap}
 .archiv-datum{font-size:.8rem;color:var(--gedaempft)}
+.dl-chip.archiv-schalter{background:#eef1f6;border-style:dashed;color:#44506a}
+.dl-chip.archiv-schalter.offen{background:#e3e8f1}
+.dl-chip.im-archiv{background:#f4f5f8;border-style:dashed;opacity:.85}
+.dl-chip.im-archiv.aktiv{opacity:1;background:#5b6b86;border-color:#5b6b86;border-style:solid;color:#fff}
+.dl-chip.im-archiv.aktiv span{color:#dde3ee}
+.dl-trenner{flex:0 0 2px;align-self:stretch;background:#c9d1de;border-radius:2px;margin:4px 4px}
+.archiv-banner{display:flex;align-items:center;gap:12px;background:#f1f3f7;border:1px dashed #aab4c4;border-radius:12px;padding:10px 14px;margin:8px 0 12px;color:#33405a}
+.korrektur-marke{display:flex;align-items:center;gap:8px;font-weight:700;color:#a3221a;background:#fdecea;border:2px solid #d9392b;border-radius:10px;padding:8px 12px;white-space:nowrap}
+details.archiv-dl{background:#fff;border:1px solid #d6dce6;border-radius:12px;margin:8px 0;padding:0 14px}
+details.archiv-dl>summary{display:flex;flex-wrap:wrap;gap:4px 14px;justify-content:space-between;padding:10px 0}
+details.archiv-dl>summary::-webkit-details-marker{display:none}
+details.archiv-dl>summary .archiv-dl-titel::before{content:"▸ ";color:var(--gedaempft)}
+details.archiv-dl[open]>summary .archiv-dl-titel::before{content:"▾ "}
+details.archiv-dl[open]>summary{border-bottom:1px solid #e3e7ee;margin-bottom:10px}
+.archiv-dl-info{font-weight:400;color:var(--gedaempft);font-size:.9rem}
+.archiv-dl-inhalt{padding-bottom:12px}
+tr.ue-archiviert th, tr.ue-archiviert td{background:#f6f7fa;opacity:.85}
+tr.ue-archiv-schalter th{background:#eef1f6}
 .archiv-info{display:flex;align-items:center;gap:8px;background:#f2f6fd;border:1px solid #d6e2f5;border-radius:10px;padding:8px 12px;margin:10px 0 4px;font-size:.92rem;color:#2c4670}
 /* Ziehen und Ablegen */
 .kopf-zelle{display:flex;align-items:flex-start;gap:4px}
@@ -567,7 +585,7 @@ const REGELN = {
           "$dl": {
             "$auftrag": {
               "$lernende": {
-                ".write": "newData.isString() && (newData.val() === 'offen' || newData.val() === 'in Arbeit' || newData.val() === 'fertig') && (!data.exists() || data.val() !== 'kontrolliert') && root.child('arbeitsplan/oeffentlich/plan/dls/' + $dl + '/auftraege/' + $auftrag).exists() && !root.child('arbeitsplan/oeffentlich/plan/dls/' + $dl + '/auftraege/' + $auftrag + '/archiv').exists() && root.child('arbeitsplan/oeffentlich/plan/lernende/' + $lernende).exists()",
+                ".write": "newData.isString() && (newData.val() === 'offen' || newData.val() === 'in Arbeit' || newData.val() === 'fertig') && (!data.exists() || (data.val() !== 'kontrolliert' && data.val() !== 'korrektur')) && root.child('arbeitsplan/oeffentlich/plan/dls/' + $dl + '/auftraege/' + $auftrag).exists() && !root.child('arbeitsplan/oeffentlich/plan/dls/' + $dl + '/auftraege/' + $auftrag + '/archiv').exists() && root.child('arbeitsplan/oeffentlich/plan/lernende/' + $lernende).exists() && !root.child('arbeitsplan/oeffentlich/plan/dls/' + $dl + '/archiv').exists()",
                 ".validate": "newData.isString() && (newData.val() === 'offen' || newData.val() === 'in Arbeit' || newData.val() === 'fertig' || newData.val() === 'korrektur' || newData.val() === 'kontrolliert')"
               }
             }
@@ -576,7 +594,7 @@ const REGELN = {
         "ziel": {
           "$dl": {
             "$lernende": {
-              ".write": "newData.isString() && (newData.val() === 'noch nicht' || newData.val() === 'fast' || newData.val() === 'sicher') && root.child('arbeitsplan/oeffentlich/plan/dls/' + $dl).exists() && root.child('arbeitsplan/oeffentlich/plan/lernende/' + $lernende).exists()",
+              ".write": "newData.isString() && (newData.val() === 'noch nicht' || newData.val() === 'fast' || newData.val() === 'sicher') && root.child('arbeitsplan/oeffentlich/plan/dls/' + $dl).exists() && root.child('arbeitsplan/oeffentlich/plan/lernende/' + $lernende).exists() && !root.child('arbeitsplan/oeffentlich/plan/dls/' + $dl + '/archiv').exists()",
               ".validate": "newData.isString() && (newData.val() === 'noch nicht' || newData.val() === 'fast' || newData.val() === 'sicher')"
             }
           }
@@ -585,10 +603,15 @@ const REGELN = {
           "$dl": {
             "$lz": {
               "$lernende": {
-                ".write": "newData.isString() && (newData.val() === 'erreicht' || newData.val() === 'noch nicht') && root.child('arbeitsplan/oeffentlich/plan/dls/' + $dl + '/flk/' + $lz).exists() && root.child('arbeitsplan/oeffentlich/plan/lernende/' + $lernende).exists()",
+                ".write": "newData.isString() && (newData.val() === 'erreicht' || newData.val() === 'noch nicht') && root.child('arbeitsplan/oeffentlich/plan/dls/' + $dl + '/flk/' + $lz).exists() && root.child('arbeitsplan/oeffentlich/plan/lernende/' + $lernende).exists() && !root.child('arbeitsplan/oeffentlich/plan/dls/' + $dl + '/archiv').exists()",
                 ".validate": "newData.isString() && (newData.val() === 'erreicht' || newData.val() === 'noch nicht')"
               }
             }
+          }
+        },
+        "meta": {
+          "_regelnAlt": {
+            ".validate": false
           }
         }
       }
@@ -1039,8 +1062,11 @@ function sortiert(obj) {
     .map(([id, v]) => Object.assign({ id }, v))
     .sort((a, b) => ((a.ord ?? 9999) - (b.ord ?? 9999)) || a.id.localeCompare(b.id, "de", { numeric: true }));
 }
-const dls = () => sortiert(plan() && plan().dls);
+const alleDls = () => sortiert(plan() && plan().dls);                           // inkl. archivierte DL
+const dls = () => alleDls().filter(d => !d.archiv);                               // aktive DL
+const archivDls = () => alleDls().filter(d => d.archiv);
 const dlVon = id => (plan() && plan().dls && plan().dls[id]) || null;
+const dlImArchiv = id => !!(dlVon(id) && dlVon(id).archiv);
 const lernendeListe = () => sortiert(plan() && plan().lernende);
 const alleAuftraegeVon = dl => sortiert(dlVon(dl) && dlVon(dl).auftraege);       // inkl. Archiv
 const auftraegeVon = dl => alleAuftraegeVon(dl).filter(a => !a.archiv);          // aktive
@@ -1081,7 +1107,7 @@ function korrekturen(nurSid) {
 }
 function xp(sid) {
   let summe = 0;
-  for (const d of dls()) for (const a of alleAuftraegeVon(d.id)) {
+  for (const d of alleDls()) for (const a of alleAuftraegeVon(d.id)) {
     const s = statusVon(d.id, a.id, sid); if (s === "fertig") summe += 1; else if (s === "kontrolliert") summe += 2;
   }
   return summe;
@@ -1090,7 +1116,8 @@ function aktuelleDl() {
   const heute = new Date(); heute.setHours(0, 0, 0, 0);
   let wahl = null;
   for (const d of dls()) { const t = datum(d.datum); if (t && t <= heute) wahl = d.id; }
-  return wahl || (dls()[0] && dls()[0].id) || null;
+  const alle = alleDls();
+  return wahl || (dls()[0] && dls()[0].id) || (alle.length ? alle[alle.length - 1].id : null);
 }
 
 /* Lokalen Spiegel nachführen (Pfad relativ zu /oeffentlich). null löscht. */
@@ -1180,7 +1207,7 @@ function ausVorlage() {
 /* Anfangsstand: Pflichtaufträge für alle «offen», alles andere leer. */
 function anfangsstand() {
   const stand = {};
-  for (const d of dls()) for (const a of alleAuftraegeVon(d.id)) if (a.art === "P") {
+  for (const d of alleDls()) for (const a of alleAuftraegeVon(d.id)) if (a.art === "P") {
     stand[d.id] = stand[d.id] || {}; stand[d.id][a.id] = {};
     lernendeListe().forEach(l => { stand[d.id][a.id][l.id] = "offen"; });
   }
@@ -1217,13 +1244,20 @@ async function pruefeSchreibrecht() {
     const t = await Sync.schreib("oeffentlich/stand/_regeltest/_a/_s", "korrektur");
     if (t.ok) await Sync.schreib("oeffentlich/stand/_regeltest", null);
     else if (t.status === 401 || t.status === 403) Zustand.regelnVeraltet = true;
+    // Regeln vom 09.11.2026 («zur Korrektur» gesperrt, DL-Archiv): sie lehnen diesen Testwert ab.
+    const v = await Sync.schreib("oeffentlich/meta/_regelnAlt", 1);
+    if (v.ok) { Zustand.regelnVeraltet = true; await Sync.schreib("oeffentlich/meta/_regelnAlt", null); }
   }
 }
 
 /* ========================================================================
    6. AKTIONEN
    ======================================================================== */
+/* Darf eine Lernende / ein Lernender diesen Eintrag selbst ändern? */
+const sperrGrund = (dlId, s) => dlImArchiv(dlId) ? "Diese DL ist im Archiv." : s === "kontrolliert" ? "Schon kontrolliert." :
+  s === "korrektur" ? "Zur Korrektur zurück: Nur die Lehrperson setzt den Auftrag auf «kontrolliert»." : "";
 async function setzeStatus(dlId, aid, sid, wert) {
+  if (!istLehrer()) { const g = sperrGrund(dlId, statusVon(dlId, aid, sid)); if (g) { toast(g); return; } }
   const ok = await schreibe(`stand/${dlId}/${aid}/${sid}`, wert || null);
   if (ok && !istLehrer() && erledigt(wert)) {
     const pflicht = auftraegeVon(dlId).filter(a => a.art === "P" && statusVon(dlId, a.id, sid));
@@ -1310,6 +1344,37 @@ function bereiteArchivieren(dlId) {
 }
 function zurueckholen(dlId, aid) {
   schreibe(`plan/dls/${dlId}/auftraege/${aid}/archiv`, null); toast(`Auftrag ${nrVon(dlId, aid)} ist zurück in ${dlId}`);
+}
+
+/* ---------- Ganze DL ins Archiv ---------- */
+function dlArchivieren(dlId) {
+  const d = dlVon(dlId); if (!d) return;
+  const z = { fertig: 0, korrektur: 0, offen: 0 };
+  for (const a of auftraegeVon(dlId)) for (const l of lernendeListe()) {
+    const s = statusVon(dlId, a.id, l.id);
+    if (s === "fertig") z.fertig++; else if (s === "korrektur") z.korrektur++; else if (s === "offen" || s === "in Arbeit") z.offen++;
+  }
+  const teile = [z.fertig ? `${z.fertig} × fertig (noch nicht kontrolliert)` : "", z.korrektur ? `${z.korrektur} × zur Korrektur` : "", z.offen ? `${z.offen} × offen oder in Arbeit` : ""].filter(Boolean);
+  const text = `${dlId} «${d.thema || ""}» ins Archiv verschieben?` + (teile.length ? ` Noch nicht abgeschlossen: ${teile.join(", ")}.` : " Alles ist kontrolliert.") +
+    " Die Lernenden sehen die DL dann nur noch unter «📦 Archiv» und können dort nichts mehr ändern. XP zählen weiter. Du kannst sie jederzeit zurückholen.";
+  frage(text, () => {
+    schreibe(`plan/dls/${dlId}/archiv`, Date.now());
+    if (Zustand.dl === dlId) Zustand.dl = null;
+    toast(`${dlId} ist im Archiv`);
+  }, "Ins Archiv");
+}
+function dlZurueckholen(dlId) {
+  schreibe(`plan/dls/${dlId}/archiv`, null); Zustand.dl = dlId; toast(`${dlId} ist zurück im Arbeitsplan`);
+}
+const dlArchivKnopf = dlId => dlImArchiv(dlId)
+  ? el("button", { class: "klein", onclick: () => dlZurueckholen(dlId) }, "↩ DL zurückholen")
+  : el("button", { class: "klein", onclick: () => dlArchivieren(dlId) }, "📦 DL ins Archiv");
+function archivBanner(dlId) {
+  if (!dlImArchiv(dlId)) return null;
+  const am = new Date(dlVon(dlId).archiv).toLocaleDateString("de-CH");
+  return el("div", { class: "archiv-banner" }, el("span", { style: "font-size:1.3rem" }, "📦"),
+    el("div", { style: "flex:1" }, el("b", {}, `${dlId} ist im Archiv`), el("div", {}, istLehrer() ? `Seit ${am}. Für die Lernenden gesperrt.` : "Du kannst hier nur noch nachschauen, nichts mehr ändern.")),
+    istLehrer() ? el("button", { class: "klein", onclick: () => dlZurueckholen(dlId) }, "↩ Zurückholen") : null);
 }
 
 /* ---------- Verschieben (Ziehen und Ablegen oder Menü) ---------- */
@@ -1425,7 +1490,7 @@ function auftragLoeschen(dlId, a) {
 }
 function neueDl() {
   let max = 0, ordMax = 0;
-  dls().forEach(d => { const m = /^DL(\d+)$/.exec(d.id); if (m) max = Math.max(max, +m[1]); ordMax = Math.max(ordMax, d.ord || 0); });
+  alleDls().forEach(d => { const m = /^DL(\d+)$/.exec(d.id); if (m) max = Math.max(max, +m[1]); ordMax = Math.max(ordMax, d.ord || 0); });
   const id = "DL" + String(max + 1).padStart(2, "0");
   schreibe(`plan/dls/${id}`, { ord: ordMax + 1, datum: "", thema: "Neue Doppellektion", ziel: "" });
   Zustand.dl = id; toast(id + " angelegt");
@@ -1449,13 +1514,13 @@ function lernendeHinzufuegen() {
 
 function standZuruecksetzen() {
   const upd = { stand: anfangsstand(), ziel: null, flk: null };
-  for (const d of dls()) for (const a of archivVon(d.id)) upd[`plan/dls/${d.id}/auftraege/${a.id}/archiv`] = null;
+  for (const d of alleDls()) { if (d.archiv) upd[`plan/dls/${d.id}/archiv`] = null; for (const a of archivVon(d.id)) upd[`plan/dls/${d.id}/auftraege/${a.id}/archiv`] = null; }
   schreibeMehrere(upd);
 }
 function csvExport() {
   const ls = lernendeListe();
   const zeilen = [["DL", "Datum", "Thema", "Nr", "Auftrag", "Wo", "Art"].concat(ls.map(l => nameVon(l.id)))];
-  for (const d of dls()) {
+  for (const d of alleDls()) {
     alleAuftraegeVon(d.id).forEach((a, i) => zeilen.push([d.id, d.datum, d.thema, i + 1, a.text, a.wo || "", (ART_TEXT[a.art] || a.art) + (a.archiv ? " (Archiv)" : "")].concat(ls.map(l => statusText(statusVon(d.id, a.id, l.id)).replace("– nicht zugeteilt", "")))));
     if (d.ziel) zeilen.push([d.id, d.datum, d.thema, "", "Das kann ich heute: " + d.ziel, "", "Ziel"].concat(ls.map(l => zielVon(d.id, l.id))));
     flkVon(d.id).forEach(f => zeilen.push([d.id, d.datum, d.thema, "", "FLK " + f.text, "", "FLK"].concat(ls.map(l => flkWert(d.id, f.id, l.id)))));
@@ -1610,11 +1675,20 @@ function dlLeiste(mitNeu) {
   const aktuell = aktuelleDl();
   const nur = istLehrer() ? null : ichBin();
   const mitKorrektur = new Set(korrekturen(nur).map(k => k.dl));
-  return el("div", { class: "dl-leiste nicht-drucken", "data-scroll": "dls", role: "tablist", "aria-label": "Doppellektionen" },
-    dls().map(d => el("button", { class: "dl-chip" + (d.id === Zustand.dl ? " aktiv" : ""), "aria-selected": String(d.id === Zustand.dl),
+  const chip = (d, extra) => el("button", { class: "dl-chip" + (extra || "") + (d.id === Zustand.dl ? " aktiv" : ""), "aria-selected": String(d.id === Zustand.dl),
                                    onclick: () => { Zustand.dl = d.id; zeichnen(); } },
       el("b", {}, d.id), el("span", {}, kurzdatum(d.datum) || "–"), d.id === aktuell ? el("i", {}, "aktuell") : null,
-      mitKorrektur.has(d.id) ? el("span", { class: "lampe", title: "Auftrag zur Korrektur zurück" }) : null)),
+      mitKorrektur.has(d.id) ? el("span", { class: "lampe", title: "Auftrag zur Korrektur zurück" }) : null);
+  const arch = archivDls();
+  const offen = arch.length && (Zustand.dlArchivOffen || dlImArchiv(Zustand.dl));
+  return el("div", { class: "dl-leiste nicht-drucken", "data-scroll": "dls", role: "tablist", "aria-label": "Doppellektionen" },
+    arch.length ? el("button", { class: "dl-chip archiv-schalter" + (offen ? " offen" : ""), "aria-expanded": String(!!offen),
+        title: offen ? "Archiv zuklappen" : "Archivierte DL anzeigen",
+        onclick: () => { Zustand.dlArchivOffen = !offen; if (offen && dlImArchiv(Zustand.dl)) Zustand.dl = null; zeichnen(); } },
+      el("b", {}, (offen ? "▾ " : "▸ ") + "📦 Archiv"), el("span", {}, `${arch.length} DL`)) : null,
+    offen ? arch.map(d => chip(d, " im-archiv")) : null,
+    offen ? el("span", { class: "dl-trenner", "aria-hidden": "true" }) : null,
+    dls().map(d => chip(d)),
     mitNeu ? el("button", { class: "dl-chip neu", onclick: neueDl }, "＋ Neue DL") : null);
 }
 
@@ -1654,7 +1728,7 @@ function ansichtPlan() {
     el("span", { class: "lampe gross" }),
     el("div", {},
       el("b", {}, korr.length === 1 ? "1 Auftrag ist zur Korrektur zurück" : `${korr.length} Aufträge sind zur Korrektur zurück`),
-      el("div", {}, korr.length === 1 ? "Überarbeite ihn und setze ihn danach wieder auf «fertig»." : "Überarbeite sie und setze sie danach wieder auf «fertig»."),
+      el("div", {}, korr.length === 1 ? "Überarbeite ihn und zeig ihn danach der Lehrperson. Nur sie setzt ihn auf «kontrolliert»." : "Überarbeite sie und zeig sie danach der Lehrperson. Nur sie setzt sie auf «kontrolliert»."),
       el("div", { class: "zeile", style: "margin-top:8px;gap:6px" }, korr.map(k => el("button", { class: "klein",
         onclick: () => { Zustand.dl = k.dl; Zustand.springeZu = `auftrag-${k.dl}-${k.a.id}`; zeichnen(); } }, `${k.dl} · Nr. ${nrVon(k.dl, k.a.id)}`))))));
   out.push(el("div", { class: "karte schmal" },
@@ -1668,7 +1742,10 @@ function ansichtPlan() {
   const liste = aufs.map(a => {
     const s = statusVon(dlId, a.id, ich);
     let steuerung;
+    const gesperrt = dlImArchiv(dlId);
     if (s === "kontrolliert") steuerung = el("div", { class: "kontrolliert-marke" }, "✓ kontrolliert");
+    else if (s === "korrektur") steuerung = el("div", { class: "korrektur-marke", title: "Nur die Lehrperson kann das ändern" }, el("span", { class: "lampe" }), "zur Korrektur 🔒");
+    else if (gesperrt) steuerung = el("div", { class: "zelle " + ST_KLASSE[s], style: "min-width:110px" }, s || "–");
     else if (!s) steuerung = a.art !== "P"
       ? el("button", { class: "nehmen", onclick: () => setzeStatus(dlId, a.id, ich, "in Arbeit") }, "＋ Ich mache das")
       : el("span", { class: "gedaempft" }, "nicht zugeteilt");
@@ -1676,24 +1753,24 @@ function ansichtPlan() {
       el("button", { class: "seg" + (s === w ? " aktiv " + ST_KLASSE[w] : ""), "aria-pressed": String(s === w),
                      onclick: () => { if (s !== w) setzeStatus(dlId, a.id, ich, w); } }, w)));
     return el("div", { class: "auftrag " + ST_KLASSE[s], id: `auftrag-${dlId}-${a.id}` },
-      s === "korrektur" ? el("div", { class: "korr-kopf" }, el("span", { class: "lampe" }), "Zur Korrektur zurück: überarbeite den Auftrag und setze ihn wieder auf «fertig».") : null,
+      s === "korrektur" ? el("div", { class: "korr-kopf" }, el("span", { class: "lampe" }), "Zur Korrektur zurück: Überarbeite den Auftrag und zeig ihn der Lehrperson. Nur sie setzt ihn auf «kontrolliert».") : null,
       el("div", { class: "nr" }, nrVon(dlId, a.id)),
       el("div", {}, el("div", { class: "text" }, artMarke(a.art), a.text), a.wo ? (woLink(a.wo) || el("div", { class: "wo" }, "📍 " + a.wo)) : null),
       el("div", { class: "steuerung" }, steuerung));
   });
   out.push(el("div", { class: "karte schmal" },
-    dlKopf(dlId),
+    dlKopf(dlId), archivBanner(dlId),
     el("div", { class: "zeile", style: "justify-content:space-between" }, el("b", {}, `${f.erl} von ${f.zu} erledigt`), el("span", { class: "gedaempft" }, `${Math.round(f.anteil * 100)} %`)),
     el("div", { class: "fortschritt" }, el("i", { style: `width:${Math.round(f.anteil * 100)}%` })),
     imArchiv ? el("div", { class: "archiv-info" }, `📦 ${imArchiv} Auftr${imArchiv > 1 ? "äge" : "ag"} dieser DL ${imArchiv > 1 ? "sind" : "ist"} kontrolliert und im Archiv.`) : null,
     el("div", { style: "margin-top:14px" }, liste.length ? liste : el("p", { class: "gedaempft" }, imArchiv ? "Alle Aufträge dieser DL sind erledigt und im Archiv. 🎉" : "Für diese DL sind noch keine Aufträge eingetragen.")),
-    el("p", { class: "gedaempft" }, "Arbeite von oben nach unten: offen → in Arbeit → fertig. Fertig mit allen Pflichtaufträgen? Dann ★ Zusatz oder Puffer-Box. «Kontrolliert» setzt die Lehrperson.")));
+    el("p", { class: "gedaempft" }, "Arbeite von oben nach unten: offen → in Arbeit → fertig. Fertig mit allen Pflichtaufträgen? Dann ★ Zusatz oder Puffer-Box. «Kontrolliert» setzt die Lehrperson, und nur sie hebt «zur Korrektur» auf.")));
 
   if (d.ziel) out.push(el("div", { class: "karte schmal" },
     el("h3", {}, "🎯 Das kann ich heute"),
     el("p", { class: "ziel-text" }, d.ziel),
     el("div", { class: "segment" }, ZIEL_WERTE.map(w => el("button", { class: "seg" + (zielVon(dlId, ich) === w ? " aktiv " + ZIEL_KLASSE[w] : ""),
-      "aria-pressed": String(zielVon(dlId, ich) === w), onclick: () => schreibe(`ziel/${dlId}/${ich}`, w) }, w))),
+      "aria-pressed": String(zielVon(dlId, ich) === w), disabled: dlImArchiv(dlId), onclick: () => schreibe(`ziel/${dlId}/${ich}`, w) }, w))),
     el("p", { class: "gedaempft" }, "Am Schluss: Wie sicher bist du? Ehrlich ist am besten. Dafür gibt es keine XP.")));
 
   const flk = flkVon(dlId);
@@ -1701,7 +1778,7 @@ function ansichtPlan() {
     el("h3", {}, "✅ Mein FLK-Ergebnis"),
     flk.map(lz => el("div", { class: "flk-zeile" }, el("div", { style: "flex:1;min-width:200px" }, lz.text),
       el("div", { class: "segment", style: "width:auto" }, FLK_WERTE.map(w => el("button", { class: "seg" + (flkWert(dlId, lz.id, ich) === w ? " aktiv " + FLK_KLASSE[w] : ""),
-        "aria-pressed": String(flkWert(dlId, lz.id, ich) === w), onclick: () => schreibe(`flk/${dlId}/${lz.id}/${ich}`, w) }, w))))),
+        "aria-pressed": String(flkWert(dlId, lz.id, ich) === w), disabled: dlImArchiv(dlId), onclick: () => schreibe(`flk/${dlId}/${lz.id}/${ich}`, w) }, w))))),
     el("p", { class: "gedaempft" }, "Bei «noch nicht»: Tippe oben bei der passenden Zeile «Repetition LZ…» auf «＋ Ich mache das».")));
 
   const has = hausaufgabenVon(dlId).filter(h => !h.fuer || h.fuer[ich]);
@@ -1723,7 +1800,8 @@ function ansichtKlasse() {
        el("button", { class: "klein", onclick: () => dlSchritt(1), "aria-label": "nächste DL" }, "▶"),
        el("button", { class: "klein primaer", onclick: beamerUmschalten }, "Beamer beenden")]
     : [lehrer ? el("button", { class: "klein", onclick: () => frage(`Alle Aufträge auf «fertig» in ${dlId} auf «kontrolliert» setzen?`, () => fertigKontrollieren(dlId), "Kontrollieren") }, "✓ Alle «fertig» kontrollieren") : null,
-       lehrer && bereit.length ? el("button", { class: "klein", onclick: () => bereiteArchivieren(dlId) }, `📦 ${bereit.length} ins Archiv`) : null,
+       lehrer && bereit.length && !dlImArchiv(dlId) ? el("button", { class: "klein", onclick: () => bereiteArchivieren(dlId) }, `📦 ${bereit.length} ins Archiv`) : null,
+       lehrer ? dlArchivKnopf(dlId) : null,
        el("button", { class: "klein", onclick: () => window.print() }, "🖨 Drucken"),
        el("button", { class: "klein primaer", onclick: beamerUmschalten }, "⛶ Beamer")];
   const spKlasse = sid => sid === ich ? "ich-spalte" : null;
@@ -1746,7 +1824,7 @@ function ansichtKlasse() {
       ls.map(l => {
         const s = statusVon(dlId, a.id, l.id);
         const text = s === "korrektur" ? [el("span", { class: "lampe" }), "zur Korrektur"] : s === "kontrolliert" ? "✓ kontrolliert" : (s || (a.art === "P" ? "–" : ""));
-        const darf = lehrer || (l.id === ich && s !== "kontrolliert");
+        const darf = lehrer || (l.id === ich && !sperrGrund(dlId, s));
         const k = "zelle " + ST_KLASSE[s];
         return el("td", { class: spKlasse(l.id) }, darf
           ? el("button", { class: k, "aria-label": `${nameVon(l.id)}, Auftrag ${nr}: ${statusText(s)}`, onclick: () => statusWaehlen(dlId, a, l.id) }, text)
@@ -1757,13 +1835,13 @@ function ansichtKlasse() {
   const fuss = [el("tr", {}, el("th", { class: "sp-auftrag", scope: "row" }, imArchiv ? "Erledigt (inkl. Archiv)" : "Erledigt (fertig + kontrolliert)"),
     ls.map(l => { const f = fortschritt(dlId, l.id); return el("td", { class: spKlasse(l.id) }, el("div", { class: "zahl" }, `${f.erl}/${f.zu}`), el("div", { class: "mini" }, el("i", { style: `width:${Math.round(f.anteil * 100)}%` }))); }))];
   if (d.ziel) fuss.push(el("tr", {}, el("th", { class: "sp-auftrag", scope: "row" }, "🎯 Das kann ich heute: ", el("span", { style: "font-weight:400" }, d.ziel)),
-    ls.map(l => { const w = zielVon(dlId, l.id), darf = lehrer || l.id === ich, k = "zelle " + ZIEL_KLASSE[w];
+    ls.map(l => { const w = zielVon(dlId, l.id), darf = lehrer || (l.id === ich && !dlImArchiv(dlId)), k = "zelle " + ZIEL_KLASSE[w];
       return el("td", { class: spKlasse(l.id) }, darf ? el("button", { class: k, onclick: () => zielWaehlen(dlId, l.id) }, w || "") : el("div", { class: k }, w || "")); })));
   flkVon(dlId).forEach(lz => fuss.push(el("tr", {}, el("th", { class: "sp-auftrag", scope: "row" }, "FLK ", el("span", { style: "font-weight:400" }, lz.text)),
-    ls.map(l => { const w = flkWert(dlId, lz.id, l.id), darf = lehrer || l.id === ich, k = "zelle " + FLK_KLASSE[w];
+    ls.map(l => { const w = flkWert(dlId, lz.id, l.id), darf = lehrer || (l.id === ich && !dlImArchiv(dlId)), k = "zelle " + FLK_KLASSE[w];
       return el("td", { class: spKlasse(l.id) }, darf ? el("button", { class: k, onclick: () => flkWaehlen(dlId, lz, l.id) }, w || "") : el("div", { class: k }, w || "")); }))));
 
-  const out = [dlKopf(dlId, aktionen), legende(),
+  const out = [dlKopf(dlId, aktionen), Zustand.beamer ? null : archivBanner(dlId), legende(),
     el("div", { class: "scroll-x raster-box", "data-scroll": "raster" },
       el("table", { class: "raster" }, el("thead", {}, kopfzeile), el("tbody", {}, zeilen), el("tfoot", {}, fuss)))];
   if (imArchiv && !Zustand.beamer) out.push(el("div", { class: "archiv-info nicht-drucken" },
@@ -1792,28 +1870,51 @@ function ansichtKlasse() {
 }
 
 /* ---------- Archiv ---------- */
+function archivRaster(d, aufs, sp) {
+  const ls = lernendeListe(), lehrer = istLehrer();
+  return el("div", { class: "scroll-x", "data-scroll": "archiv-" + d.id }, el("table", { class: "raster" },
+    el("thead", {}, el("tr", {}, el("th", { class: "sp-auftrag", scope: "col" }, "Auftrag"),
+      ls.map(l => el("th", { class: sp(l.id), scope: "col" }, el("div", { class: "kopf-name", style: `background:${l.farbe}` }, nameVon(l.id)))))),
+    el("tbody", {}, aufs.map(a => el("tr", {},
+      el("th", { class: "sp-auftrag", scope: "row" },
+        el("div", { class: "auftrag-kopf" }, el("span", { class: "nr" }, nrVon(d.id, a.id)),
+          el("span", {}, artMarke(a.art), a.text,
+            a.archiv ? el("span", { class: "archiv-datum", style: "display:block" }, "archiviert am " + new Date(a.archiv).toLocaleDateString("de-CH")) : null,
+            lehrer && a.archiv && !d.archiv ? el("button", { class: "klein nicht-drucken", style: "margin-top:6px", onclick: () => zurueckholen(d.id, a.id) }, "↩ Zurückholen") : null))),
+      ls.map(l => { const s = statusVon(d.id, a.id, l.id);
+        return el("td", { class: sp(l.id) }, el("div", { class: "zelle " + ST_KLASSE[s] }, s === "kontrolliert" ? "✓ kontrolliert" : (s === "korrektur" ? "zur Korrektur" : s))); }))))));
+}
 function ansichtArchiv() {
-  const ls = lernendeListe(), lehrer = istLehrer(), ich = lehrer ? null : ichBin();
+  const lehrer = istLehrer(), ich = lehrer ? null : ichBin();
+  const sp = sid => sid === ich ? "ich-spalte" : null;
+  const ganze = archivDls().slice().reverse();                       // neueste zuerst
   const gruppen = dls().map(d => ({ d, aufs: archivVon(d.id) })).filter(g => g.aufs.length);
+  Zustand.archivAuf = Zustand.archivAuf || {};
   const out = [el("div", { class: "karte" },
     el("h2", {}, "📦 Archiv"),
-    el("p", { class: "gedaempft", style: "margin:0" }, "Aufträge, die fertig kontrolliert sind. Die Lehrperson verschiebt sie von Hand hierher, damit der Arbeitsplan übersichtlich bleibt. XP und Fortschritt zählen weiter."))];
-  if (!gruppen.length) { out.push(el("div", { class: "hinweis blau" }, "Noch nichts im Archiv.")); return out; }
-  const sp = sid => sid === ich ? "ich-spalte" : null;
-  for (const { d, aufs } of gruppen) {
-    out.push(el("div", { style: "margin-top:18px" },
+    el("p", { class: "gedaempft", style: "margin:0" }, "Abgeschlossene Doppellektionen und kontrollierte Aufträge. Die Lehrperson verschiebt sie hierher, damit der Arbeitsplan übersichtlich bleibt. Hier kannst du nur nachschauen. XP und Fortschritt zählen weiter."))];
+  if (!ganze.length && !gruppen.length) { out.push(el("div", { class: "hinweis blau" }, "Noch nichts im Archiv.")); return out; }
+  if (ganze.length) {
+    out.push(el("h3", { style: "margin:18px 0 6px" }, "Abgeschlossene Doppellektionen"));
+    for (const d of ganze) {
+      const aufs = alleAuftraegeVon(d.id);
+      const f = ich ? fortschritt(d.id, ich) : null;
+      out.push(el("details", { class: "archiv-dl", open: Zustand.archivAuf[d.id] ? true : null, ontoggle: e => { Zustand.archivAuf[d.id] = e.target.open; } },
+        el("summary", {},
+          el("span", { class: "archiv-dl-titel" }, el("b", {}, d.id), ` · ${kurzdatum(d.datum) || "ohne Datum"} · ${d.thema || ""}`),
+          el("span", { class: "archiv-dl-info" }, f ? `${f.erl} von ${f.zu} erledigt` : `${aufs.length} Auftr${aufs.length === 1 ? "ag" : "äge"}`, " · archiviert am " + new Date(d.archiv).toLocaleDateString("de-CH"))),
+        el("div", { class: "archiv-dl-inhalt" },
+          lehrer ? el("div", { class: "zeile nicht-drucken", style: "justify-content:flex-end;margin-bottom:8px" },
+            el("button", { class: "klein", onclick: () => { Zustand.dl = d.id; wechsleAnsicht("klasse"); } }, "In der Klassenansicht öffnen"),
+            el("button", { class: "klein", onclick: () => dlZurueckholen(d.id) }, "↩ DL zurückholen")) : null,
+          aufs.length ? archivRaster(d, aufs, sp) : el("p", { class: "gedaempft" }, "Keine Aufträge."))));
+    }
+  }
+  if (gruppen.length) {
+    out.push(el("h3", { style: "margin:22px 0 6px" }, "Einzelne Aufträge aus laufenden DL"));
+    for (const { d, aufs } of gruppen) out.push(el("div", { style: "margin-top:12px" },
       el("div", { class: "dl-kopf", style: "margin-bottom:8px" }, el("div", {}, el("div", { class: "dl-nr" }, `${d.id} · ${langdatum(d.datum)}`), el("h2", { style: "font-size:1.15rem" }, d.thema || ""))),
-      el("div", { class: "scroll-x", "data-scroll": "archiv-" + d.id }, el("table", { class: "raster" },
-        el("thead", {}, el("tr", {}, el("th", { class: "sp-auftrag", scope: "col" }, "Auftrag"),
-          ls.map(l => el("th", { class: sp(l.id), scope: "col" }, el("div", { class: "kopf-name", style: `background:${l.farbe}` }, nameVon(l.id)))))),
-        el("tbody", {}, aufs.map(a => el("tr", {},
-          el("th", { class: "sp-auftrag", scope: "row" },
-            el("div", { class: "auftrag-kopf" }, el("span", { class: "nr" }, nrVon(d.id, a.id)),
-              el("span", {}, artMarke(a.art), a.text,
-                el("span", { class: "archiv-datum", style: "display:block" }, "archiviert am " + new Date(a.archiv).toLocaleDateString("de-CH")),
-                lehrer ? el("button", { class: "klein nicht-drucken", style: "margin-top:6px", onclick: () => zurueckholen(d.id, a.id) }, "↩ Zurückholen") : null))),
-          ls.map(l => { const s = statusVon(d.id, a.id, l.id);
-            return el("td", { class: sp(l.id) }, el("div", { class: "zelle " + ST_KLASSE[s] }, s === "kontrolliert" ? "✓ kontrolliert" : (s === "korrektur" ? "zur Korrektur" : s))); }))))))));
+      archivRaster(d, aufs, sp)));
   }
   return out;
 }
@@ -1824,7 +1925,7 @@ function ansichtUebersicht() {
   const frei = lehrer || !!tief(plan(), "einstellungen", "uebersichtKlasse");
   const sichtbar = frei ? ls : ls.filter(l => l.id === ich);
   let klasse = 0, moeglich = 0;
-  for (const d of dls()) for (const a of auftraegeVon(d.id)) for (const l of ls) {
+  for (const d of alleDls()) for (const a of alleAuftraegeVon(d.id)) for (const l of ls) {
     const s = statusVon(d.id, a.id, l.id); if (s) moeglich += 2; if (s === "fertig") klasse += 1; if (s === "kontrolliert") klasse += 2;
   }
   const out = [el("div", { class: "karte" },
@@ -1838,9 +1939,13 @@ function ansichtUebersicht() {
   out.push(el("div", { class: "scroll-x raster-box", "data-scroll": "ue" }, el("table", { class: "raster" },
     el("thead", {}, el("tr", {}, el("th", { class: "sp-auftrag", scope: "col" }, "DL · Datum · Thema"),
       sichtbar.map(l => el("th", { scope: "col" }, el("div", { class: "kopf-name", style: `background:${l.farbe}` }, nameVon(l.id)))))),
-    el("tbody", {}, dls().map(d => el("tr", {},
+    el("tbody", {}, archivDls().length ? el("tr", { class: "ue-archiv-schalter" },
+        el("th", { class: "sp-auftrag", scope: "row", colspan: String(sichtbar.length + 1) },
+          el("button", { class: "auftrag-kopf", "aria-expanded": String(!!Zustand.ueArchivOffen), onclick: () => { Zustand.ueArchivOffen = !Zustand.ueArchivOffen; zeichnen(); } },
+            el("span", {}, (Zustand.ueArchivOffen ? "▾ " : "▸ ") + `📦 Archiv · ${archivDls().length} abgeschlossene DL`)))) : null,
+      (Zustand.ueArchivOffen ? archivDls() : []).concat(dls()).map(d => el("tr", { class: d.archiv ? "ue-archiviert" : null },
       el("th", { class: "sp-auftrag", scope: "row" }, el("button", { class: "auftrag-kopf", onclick: () => { Zustand.dl = d.id; wechsleAnsicht("klasse"); } },
-        el("span", {}, el("b", {}, d.id), " · " + (kurzdatum(d.datum) || "–") + " · " + (d.thema || "")))),
+        el("span", {}, d.archiv ? "📦 " : "", el("b", {}, d.id), " · " + (kurzdatum(d.datum) || "–") + " · " + (d.thema || "")))),
       sichtbar.map(l => { const f = fortschritt(d.id, l.id), p = Math.round(f.anteil * 100);
         return el("td", {}, f.zu ? el("div", { class: "ue-zelle" + (p === 100 ? " voll" : "") }, el("i", { style: `width:${p}%` }), el("span", {}, p + " %")) : el("span", { class: "gedaempft" }, "–")); })))),
     el("tfoot", {}, el("tr", {}, el("th", { class: "sp-auftrag", scope: "row" }, "XP total"),
@@ -1954,7 +2059,8 @@ function dlBearbeiten(dlId) {
 
   return el("div", { class: "karte" },
     el("div", { class: "zeile", style: "justify-content:space-between" }, el("h2", {}, `${dlId} bearbeiten`),
-      el("button", { class: "klein", onclick: () => wechsleAnsicht("klasse") }, "Zur Klassenansicht →")),
+      el("div", { class: "zeile" }, dlArchivKnopf(dlId), el("button", { class: "klein", onclick: () => wechsleAnsicht("klasse") }, "Zur Klassenansicht →"))),
+    archivBanner(dlId),
     el("div", { class: "raster2" },
       textfeld("Datum", d.datum, `${b}/datum`, "TT.MM.JJJJ"),
       textfeld("Thema der DL", d.thema, `${b}/thema`, "", true)),
@@ -2030,7 +2136,7 @@ function datenKarte() {
 function regelnKarte(art) {
   const text = {
     fehlt: ["Noch ein Schritt: Regeln einspielen", "Du bist angemeldet, aber die Datenbank lässt deine Änderungen noch nicht zu."],
-    veraltet: ["Regeln aktualisieren (1 Minute)", "Für «zur Korrektur» und das Archiv braucht die Datenbank die neuen Regeln. Bis dahin funktioniert alles andere wie bisher."],
+    veraltet: ["Regeln aktualisieren (1 Minute)", "Neu: Lernende können «zur Korrektur» nicht mehr selbst aufheben, und archivierte DL sind für sie gesperrt. Dafür braucht die Datenbank die neuen Regeln. Bis dahin funktioniert alles andere wie bisher."],
   }[art] || ["Sicherheitsregeln", ""];
   return el("div", { class: "karte " + (art ? "hinweis rot" : "") },
     el("h3", {}, text[0]),
