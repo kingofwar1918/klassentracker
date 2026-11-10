@@ -57,11 +57,15 @@ input[type=checkbox]{width:22px;height:22px;accent-color:var(--akzent)}
 
 /* Rahmen */
 .huelle{max-width:1240px;margin:0 auto;padding:14px 16px 80px}
-/* Raster (Klasse, Übersicht, Archiv): ganze Bildschirmbreite, damit alle SuS auf einen Blick sichtbar sind */
-.huelle:has(.raster){max-width:none;padding-left:8px;padding-right:8px}
-.huelle:has(.raster) .raster .sp-auftrag{width:210px;max-width:210px;min-width:160px;font-size:.9rem;padding:6px 8px}
-.huelle:has(.raster) .raster .zelle{font-size:.76rem;padding:3px 2px}
-.huelle:has(.raster) .raster .kopf-name{font-size:.9rem;padding:6px 2px}
+/* Raster (Klasse, Übersicht, Archiv): gleiche Seitenbreite wie sonst, nur schmalere Ränder, damit alle SuS Platz haben */
+.huelle:has(.raster){padding-left:8px;padding-right:8px}
+.raster .sp-auftrag{overflow-wrap:anywhere}
+.raster .sp-auftrag *{min-width:0;overflow-wrap:anywhere}
+@media (max-width:1100px){
+  table.raster .sp-auftrag{width:200px;max-width:200px;min-width:160px;font-size:.9rem;padding:6px 8px}
+  table.raster .zelle{font-size:.76rem;padding:3px 2px}
+  table.raster .kopf-name{font-size:.9rem;padding:6px 2px}
+}
 .schmal{max-width:860px;margin-left:auto;margin-right:auto}
 .karte{background:var(--karte);border:1px solid var(--rand);border-radius:var(--radius);padding:16px 18px;margin-bottom:14px}
 h2{font-size:1.25rem;margin:.1em 0 .35em}
@@ -199,7 +203,7 @@ table.raster{border-collapse:separate;border-spacing:0;width:100%}
 .raster-box{max-height:calc(100vh - var(--kopf-h, 120px) - 16px);max-height:calc(100dvh - var(--kopf-h, 120px) - 16px);overflow:auto;overscroll-behavior:contain}
 body.beamer .raster-box{max-height:calc(100vh - 150px);max-height:calc(100dvh - 150px)}
 .raster td,.raster thead th:not(.sp-auftrag){min-width:64px}
-.raster .sp-auftrag{text-align:left;min-width:190px;max-width:320px;position:sticky;left:0;background:#fff;z-index:1;
+.raster .sp-auftrag{text-align:left;min-width:230px;max-width:390px;position:sticky;left:0;background:#fff;z-index:1;
                     padding:8px 10px;font-weight:500;box-shadow:1px 0 0 #eef0f4}
 .auftrag-kopf{display:flex;gap:10px;align-items:flex-start;width:100%;text-align:left;min-height:0;padding:2px;border:none;background:transparent;font-weight:500}
 .auftrag-kopf .nr{width:28px;height:28px;font-size:.85rem}
