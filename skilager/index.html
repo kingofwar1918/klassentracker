@@ -1,0 +1,1245 @@
+<title>Skilager Gruppen</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap">
+<style>
+/* Layout: Pistenbrett – fixe Kopfleiste, darunter Tage und Rasterkarten pro Gruppe (Farbband = Gruppenfarbe, Pistenpunkt und Balken = Niveau), Bourbaki schraffiert. Leitung und Schüler/innen: eine Spalte fürs Handy. */
+:root{
+  --bg:#edf1f5; --surface:#ffffff; --soft:#e4eaf0; --ink:#13212e; --muted:#5a6a7a; --line:#d0d9e2;
+  --accent:#c8241f; --accent-ink:#ffffff; --info:#1d5fd1;
+  --ok:#1d7f46; --warn:#a96300; --bad:#c8241f;
+  --p-blau:#1d5fd1; --p-rot:#d42a24; --p-schwarz:#15191d;
+  --hatch:rgba(200,36,31,.07); --shadow:0 1px 2px rgba(19,33,46,.06),0 2px 8px rgba(19,33,46,.05);
+  --f-display:'Barlow Condensed','Arial Narrow',Arial,sans-serif;
+  --f-body:'Barlow',system-ui,-apple-system,'Segoe UI',Arial,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e151c; --surface:#16202a; --soft:#1f2b37; --ink:#e5ecf2; --muted:#93a3b3; --line:#2b3947;
+  --accent:#ff5d55; --accent-ink:#1a0605; --info:#6b9dff; --ok:#4cc884; --warn:#f0a73a; --bad:#ff5d55;
+  --p-blau:#4f8bff; --p-rot:#ff5d55; --p-schwarz:#05070a;
+  --hatch:rgba(255,93,85,.08); --shadow:0 1px 2px rgba(0,0,0,.3); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e151c; --surface:#16202a; --soft:#1f2b37; --ink:#e5ecf2; --muted:#93a3b3; --line:#2b3947;
+  --accent:#ff5d55; --accent-ink:#1a0605; --info:#6b9dff; --ok:#4cc884; --warn:#f0a73a; --bad:#ff5d55;
+  --p-blau:#4f8bff; --p-rot:#ff5d55; --p-schwarz:#05070a;
+  --hatch:rgba(255,93,85,.08); --shadow:0 1px 2px rgba(0,0,0,.3); color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.45}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));max-width:1500px;margin:0 auto}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--surface);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding-block:10px}
+.brand{font-family:var(--f-display);font-weight:700;font-size:23px;letter-spacing:.01em;text-transform:uppercase;display:flex;align-items:center;gap:10px;min-width:0}
+.brand svg{flex:none}
+.brand span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tabs{display:flex;gap:3px;margin-left:auto;background:var(--soft);padding:3px;border-radius:8px;overflow-x:auto;max-width:100%}
+.tab{border:0;background:transparent;padding:6px 12px;border-radius:6px;cursor:pointer;font-family:var(--f-display);font-weight:600;font-size:17px;letter-spacing:.03em;color:var(--muted);white-space:nowrap}
+.tab[aria-current="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.pill{font-family:var(--f-display);font-weight:600;font-size:13px;text-transform:uppercase;letter-spacing:.06em;padding:2px 9px;border-radius:20px;border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+.pill.ok{color:var(--ok);border-color:var(--ok)} .pill.warn{color:var(--warn);border-color:var(--warn)}
+main{padding-block:18px 60px}
+h2{font-family:var(--f-display);font-weight:700;font-size:22px;letter-spacing:.02em;text-transform:uppercase;margin:0;text-wrap:balance}
+h3{font-family:var(--f-display);font-weight:600;font-size:19px;margin:0}
+.eyebrow{font-family:var(--f-display);font-weight:600;text-transform:uppercase;letter-spacing:.08em;font-size:13px;color:var(--muted)}
+.btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surface);padding:7px 12px;border-radius:7px;cursor:pointer;font-weight:500;white-space:nowrap}
+.btn:hover{border-color:var(--muted)}
+.btn:disabled{opacity:.45;cursor:default}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:600}
+.btn.ghost{background:transparent}
+.btn.small{padding:4px 9px;font-size:13px}
+.btn.danger{color:var(--bad)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.muted{color:var(--muted)}
+.num{font-variant-numeric:tabular-nums}
+.fld{border:1px solid var(--line);background:var(--surface);border-radius:6px;padding:6px 8px;min-width:0}
+.seg{display:inline-flex;gap:3px;background:var(--soft);padding:3px;border-radius:8px;margin-bottom:14px;flex-wrap:wrap}
+.seg button{border:0;background:transparent;padding:5px 14px;border-radius:6px;cursor:pointer;font-family:var(--f-display);font-weight:600;font-size:16px;color:var(--muted)}
+.seg button[aria-current="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+
+/* Tagesleiste */
+.daybar{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.day{position:relative;border:1px solid var(--line);background:var(--surface);border-radius:7px;padding:6px 12px;cursor:pointer;font-family:var(--f-display);font-weight:600;font-size:17px;font-variant-numeric:tabular-nums}
+.day[aria-current="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.day .frei{position:absolute;top:-4px;right:-4px;width:10px;height:10px;border-radius:50%;background:var(--ok);border:2px solid var(--bg)}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.search{flex:1 1 180px;min-width:0;max-width:280px;border:1px solid var(--line);background:var(--surface);border-radius:7px;padding:7px 10px}
+.stats{display:flex;gap:18px;flex-wrap:wrap;margin-bottom:14px;font-family:var(--f-display);font-size:17px}
+.stats b{font-size:22px;font-weight:700;margin-right:4px;font-variant-numeric:tabular-nums}
+.note{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:10px 14px;margin-bottom:14px}
+.note.warn{border-color:var(--warn);background:color-mix(in srgb,var(--warn) 9%,var(--surface))}
+.note.info{border-color:var(--info);background:color-mix(in srgb,var(--info) 8%,var(--surface))}
+.note ul{margin:4px 0 0;padding-left:18px}
+.banner{position:sticky;top:calc(env(safe-area-inset-top,0px) + 62px);z-index:4;display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:var(--ink);color:var(--bg);padding:9px 14px;border-radius:8px;margin-bottom:14px}
+.banner .btn{background:transparent;color:inherit;border-color:currentColor}
+
+/* Karten */
+.sect{margin-top:22px}
+.sect-h{display:flex;align-items:baseline;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;align-items:start}
+.gcard{background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow:hidden;box-shadow:var(--shadow);transition:box-shadow .15s}
+.gcard.dragover,.gcard.target{box-shadow:0 0 0 3px var(--accent)}
+.gband{display:flex;align-items:center;gap:8px;padding:8px 10px 8px 12px;background:var(--soft);color:var(--ink)}
+.gname{flex:1;font-family:var(--f-display);font-weight:700;font-size:20px;letter-spacing:.02em;text-transform:uppercase;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gcount{font-family:var(--f-display);font-weight:700;font-size:18px;font-variant-numeric:tabular-nums;background:rgba(255,255,255,.25);padding:0 8px;border-radius:20px}
+.gcount.over{background:var(--bad);color:#fff}
+.zbtn{border:1.5px solid currentColor;background:transparent;color:inherit;border-radius:20px;padding:0 9px;font-family:var(--f-display);font-weight:600;font-size:13px;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;opacity:.85}
+.zbtn[aria-pressed="true"]{opacity:1;border-width:2.5px;font-weight:700}
+.gmeta{display:flex;align-items:center;flex-wrap:wrap;gap:6px;padding:6px 12px;font-size:13px;color:var(--muted);border-bottom:1px solid var(--line);min-width:0}
+.piste{display:inline-block;width:11px;height:11px;border-radius:50%;background:var(--pc);box-shadow:0 0 0 1.5px var(--surface),0 0 0 2.5px var(--line);flex:none}
+.pips{display:inline-flex;gap:2px;align-items:flex-end;flex:none}
+.pips i{display:block;width:5px;border-radius:1px;background:var(--line)}
+.pips i.on{background:var(--pc)}
+.chips{display:flex;flex-direction:column;gap:4px;padding:8px;min-height:44px}
+.chip{display:flex;align-items:center;gap:6px;width:100%;text-align:left;border:1px solid transparent;background:var(--soft);border-radius:6px;padding:5px 8px;cursor:grab;font-size:14.5px}
+.chip:hover{border-color:var(--line)}
+.chip .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chip .lv{font-family:var(--f-display);font-weight:600;font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.chip .mk{font-weight:700;font-size:13px;min-width:12px;text-align:center}
+.mk.up{color:var(--ok)} .mk.down{color:var(--warn)} .mk.side{color:var(--muted)} .mk.back{color:var(--accent)} .mk.rm{color:var(--info)}
+.chip.hit{outline:2.5px solid var(--accent);outline-offset:1px}
+.chip.dim{opacity:.35}
+.chip .why{display:block;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chip .stack{flex:1;min-width:0;display:flex;flex-direction:column}
+.empty{margin:4px;color:var(--muted);font-size:13px;font-style:italic}
+.gcard.sick{border-color:var(--bad);background:repeating-linear-gradient(135deg,var(--surface) 0 10px,var(--hatch) 10px 20px)}
+.gcard.sick .gband{background:var(--surface);color:var(--bad);border-bottom:2px solid var(--bad)}
+.gcard.pool{border-style:dashed}
+.cross{display:inline-grid;place-items:center;width:20px;height:20px;background:var(--bad);color:#fff;border-radius:3px;font-weight:700;font-size:16px;line-height:1;flex:none}
+.pgrp + .pgrp{border-top:1px solid var(--line)}
+.pgh{display:flex;align-items:center;gap:8px;padding:8px 10px 0;font-family:var(--f-display);font-weight:600;font-size:15px}
+.pgh .btn{margin-left:auto}
+.fb{list-style:none;margin:6px 0 0;padding:0;display:flex;flex-direction:column;gap:6px}
+.fb li{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:6px 8px;background:var(--surface);border:1px solid var(--line);border-radius:7px}
+.fb li.done{opacity:.55}
+.fb .t{color:var(--muted);font-size:13px;flex-basis:100%}
+
+/* Einrichten */
+.cards{display:grid;gap:16px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;min-width:0}
+.card > h2{margin-bottom:4px}
+.card > p.lead{margin:0 0 12px;color:var(--muted);max-width:75ch}
+.tbl-wrap{overflow-x:auto;margin-top:10px}
+table{border-collapse:collapse;width:100%}
+th{font-family:var(--f-display);font-weight:600;text-transform:uppercase;letter-spacing:.05em;font-size:13px;color:var(--muted);text-align:left;padding:6px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:4px 6px;border-bottom:1px solid var(--line);vertical-align:middle}
+td input[type=text],td input[type=number],td select{width:100%;min-width:70px;border:1px solid var(--line);background:var(--surface);border-radius:6px;padding:5px 7px}
+td input[type=color]{width:38px;height:30px;border:1px solid var(--line);border-radius:6px;padding:1px;background:var(--surface)}
+label.inl{display:flex;align-items:center;gap:6px}
+.qty{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;padding:12px;background:var(--soft);border-radius:8px}
+.qty label{display:flex;flex-direction:column;gap:2px;font-size:13px;color:var(--muted)}
+.qty input{width:80px;border:1px solid var(--line);border-radius:6px;padding:6px 8px;background:var(--surface)}
+textarea.fld{min-height:110px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;width:100%}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px}
+.fams{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+.fam{border:1px solid var(--line);border-radius:9px;padding:10px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.famh{display:flex;gap:6px;align-items:center}
+.famh .fld{flex:1;font-family:var(--f-display);font-weight:700;font-size:18px;text-transform:uppercase}
+.sub{background:var(--soft);border-radius:7px;padding:8px;display:grid;gap:6px}
+.subl{display:flex;align-items:center;gap:8px;font-family:var(--f-display);font-size:17px}
+.subl .row{margin-left:auto;gap:4px}
+.sub label{display:grid;grid-template-columns:80px 1fr;align-items:center;gap:6px;font-size:13px;color:var(--muted)}
+.sub label .fld{width:100%}
+.rulelist{list-style:none;padding:0;margin:10px 0 0;display:flex;flex-direction:column;gap:6px}
+.rulelist li{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:6px 10px;background:var(--soft);border-radius:7px}
+.tag{font-family:var(--f-display);font-weight:600;font-size:13px;text-transform:uppercase;letter-spacing:.05em;padding:1px 8px;border-radius:20px;border:1px solid currentColor}
+.tag.apart{color:var(--bad)} .tag.together{color:var(--ok)}
+.linkrow{display:grid;grid-template-columns:140px 1fr auto;gap:8px;align-items:center;margin-top:6px}
+.linkrow code{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:var(--soft);padding:5px 8px;border-radius:6px;font-size:12.5px;min-width:0}
+pre.rules{background:var(--soft);padding:10px;border-radius:7px;overflow:auto;max-height:260px;font-size:12px}
+@media (max-width:560px){.linkrow{grid-template-columns:1fr}}
+
+/* Einstieg, Login */
+.start{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:22px;max-width:760px}
+.steps{list-style:none;padding:0;margin:16px 0;display:grid;gap:10px;counter-reset:s}
+.steps li{display:flex;gap:12px;align-items:flex-start;counter-increment:s}
+.steps li::before{content:counter(s);flex:none;width:28px;height:28px;border-radius:50%;background:var(--ink);color:var(--bg);display:grid;place-items:center;font-family:var(--f-display);font-weight:700}
+.stackf{display:grid;gap:10px;margin-top:12px;max-width:360px}
+.stackf label{display:grid;gap:3px;font-size:13px;color:var(--muted)}
+
+/* Verlauf */
+.hist{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:10px}
+.hist table td,.hist table th{white-space:nowrap}
+.hist th:first-child,.hist td:first-child{position:sticky;left:0;background:var(--surface);z-index:1}
+.hcell{display:inline-flex;align-items:center;gap:6px}
+.dot{width:12px;height:12px;border-radius:3px;flex:none}
+
+/* Leitung und Schüler/innen */
+.preview{border:2px dashed var(--line);border-radius:14px;padding:14px;max-width:560px}
+.one{max-width:620px}
+.lband,.meband{border-radius:12px;padding:14px 16px;margin-bottom:12px}
+.big{font-family:var(--f-display);font-weight:700;font-size:34px;line-height:1.05;text-transform:uppercase;letter-spacing:.02em}
+.kann{margin:0 0 6px;font-size:14px}
+.kann b{font-family:var(--f-display);text-transform:uppercase;letter-spacing:.05em;font-size:13px}
+.lrow{display:grid;grid-template-columns:44px 1fr auto auto;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line)}
+.lname{min-width:0;display:flex;flex-direction:column}
+.lname b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ck{width:42px;height:42px;border-radius:50%;border:2px solid var(--line);background:var(--surface);cursor:pointer;font-size:20px;font-weight:700;color:transparent}
+.ck.on{background:var(--ok);border-color:var(--ok);color:#fff}
+.rmb{width:38px;height:38px;border-radius:8px;border:1px solid var(--line);background:var(--surface);cursor:pointer;font-weight:700;font-size:17px;color:var(--muted)}
+.rmb.on{background:var(--info);border-color:var(--info);color:#fff}
+.lnote{grid-column:2 / -1;width:100%;font-size:14px}
+.mini{list-style:none;margin:0;padding:8px 12px;display:flex;flex-direction:column;gap:2px;font-size:14px}
+.kv{display:grid;grid-template-columns:100px 1fr auto;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid var(--line)}
+.kv:last-child{border-bottom:0}
+.kv > span:first-child{font-family:var(--f-display);font-weight:600;text-transform:uppercase;letter-spacing:.05em;font-size:13px;color:var(--muted)}
+.kv.top{align-items:start}
+.sel{user-select:all;font-variant-numeric:tabular-nums}
+.namegrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px;margin-top:12px}
+.nbtn{border:1px solid var(--line);background:var(--soft);border-radius:8px;padding:10px;text-align:left;cursor:pointer;font-weight:500}
+.sv{display:grid;gap:12px}
+.sv .card{padding:12px 16px}
+.hello{font-size:28px}
+.sickcard{border-color:var(--bad);background:repeating-linear-gradient(135deg,var(--surface) 0 10px,var(--hatch) 10px 20px)}
+
+/* Dialog */
+.backdrop{position:fixed;inset:0;background:rgba(10,18,26,.45);z-index:20;display:flex;align-items:flex-start;justify-content:center;padding:calc(env(safe-area-inset-top,0px) + 40px) 16px 16px;overflow:auto}
+.dlg{background:var(--surface);border-radius:12px;max-width:560px;width:100%;padding:18px;box-shadow:0 10px 40px rgba(0,0,0,.25)}
+.dlg h3{font-size:22px}
+.dlg .sub2{color:var(--muted);font-size:14px;margin:2px 0 12px}
+.dest{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px;margin:6px 0 14px}
+.dest button{display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--surface);border-radius:7px;padding:7px 9px;cursor:pointer;text-align:left;min-width:0}
+.dest button span.n{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500}
+.dest button .c{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.dest button[aria-current="true"]{border-color:var(--ink);background:var(--soft)}
+.dest button.risk{border-color:var(--warn)}
+.back-btn{width:100%;justify-content:center;margin-bottom:12px}
+.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 18px);transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:8px;z-index:30;max-width:calc(100% - 32px);box-shadow:0 6px 24px rgba(0,0,0,.25)}
+@media (max-width:700px){.tabs{margin-left:0;width:100%}.tab{flex:1;padding:6px 8px;font-size:16px}.brand{font-size:20px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div id="app"></div>
+<div id="layer"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+"use strict";
+/* ==========================================================================
+   KONFIGURATION – nach der Einrichtung in Firebase ausfüllen (siehe LIESMICH)
+   Solange «PROJEKT» drinsteht, läuft die Seite lokal auf diesem Gerät.
+   ========================================================================== */
+const CONFIG = {
+  datenbank: "https://skilager-2027-default-rtdb.europe-west1.firebasedatabase.app",
+  projekt: "skilager",          // oberster Pfad, muss zu regeln.json passen
+  apiKey: "AIzaSyBJUoBEtC0TGToIn3uM47yY0PUnut_tLLM", // Web-API-Schlüssel (kein Geheimnis)
+  seite: "https://kingofwar1918.github.io/klassentracker/skilager/",
+  taktMs: 6000,
+};
+
+/* ==========================================================================
+   Synchronisierungsschicht (aus Skill firebase-github-pages, REST, ohne SDK)
+   Ergänzt: automatische Verlängerung der Anmeldung über das Refresh-Token,
+   damit Leitende im Lager nicht stündlich neu anmelden müssen.
+   ========================================================================== */
+const Sync = (() => {
+  let idToken = null, aktRT = null, abmeldeTimer = null, letzterFehler = null;
+  let beiAbmeldung = null, beiNeuemToken = null;
+  const WARTESCHLANGE = "skilager-warteschlange";
+  const ablage = {
+    lies(k, std) { try { const r = localStorage.getItem(k); return r == null ? std : JSON.parse(r); } catch (e) { return std; } },
+    schreib(k, w) { try { localStorage.setItem(k, JSON.stringify(w)); } catch (e) {} },
+  };
+  const url = (pfad) => {
+    const basis = `${CONFIG.datenbank.replace(/\/$/, "")}/${CONFIG.projekt}/${pfad.replace(/^\//, "")}.json`;
+    return idToken ? `${basis}?auth=${encodeURIComponent(idToken)}` : basis;
+  };
+  async function anfrage(pfad, methode, koerper) {
+    try {
+      const a = await fetch(url(pfad), { method: methode,
+        headers: koerper !== undefined ? { "Content-Type": "application/json" } : undefined,
+        body: koerper !== undefined ? JSON.stringify(koerper) : undefined });
+      if (!a.ok) { letzterFehler = `HTTP ${a.status}`; return { ok: false, status: a.status }; }
+      letzterFehler = null;
+      return { ok: true, daten: await a.json() };
+    } catch (e) { letzterFehler = "kein Netz"; return { ok: false, status: 0 }; }
+  }
+  async function nachliefern() {
+    const liste = ablage.lies(WARTESCHLANGE, []);
+    if (!liste.length) return 0;
+    let n = 0;
+    while (liste.length) {
+      const { pfad, wert } = liste[0];
+      const r = await anfrage(pfad, "PUT", wert);
+      if (r.ok) { liste.shift(); n++; continue; }
+      if (r.status === 0) break;
+      liste.shift();
+    }
+    ablage.schreib(WARTESCHLANGE, liste);
+    return n;
+  }
+  function abmeldenIntern(grund) {
+    idToken = null; aktRT = null;
+    if (abmeldeTimer) { clearTimeout(abmeldeTimer); abmeldeTimer = null; }
+    if (grund && typeof beiAbmeldung === "function") beiAbmeldung(grund);
+  }
+  function setzeSitzung(token, rt) {
+    idToken = token; aktRT = rt;
+    if (abmeldeTimer) clearTimeout(abmeldeTimer);
+    abmeldeTimer = setTimeout(async () => {
+      if (aktRT) { const r = await Sync.erneuern(aktRT); if (r.ok) return; }
+      abmeldenIntern("Anmeldung abgelaufen, bitte neu anmelden");
+    }, 50 * 60 * 1000);
+    if (typeof beiNeuemToken === "function") beiNeuemToken(rt);
+  }
+  if (typeof window !== "undefined") window.addEventListener("online", () => { nachliefern(); });
+  const Sync = {
+    get fehler() { return letzterFehler; },
+    get angemeldet() { return idToken !== null; },
+    get wartend() { return ablage.lies(WARTESCHLANGE, []).length; },
+    lies: (p) => anfrage(p, "GET"),
+    schreib: (p, w) => anfrage(p, "PUT", w),
+    async schreibSicher(pfad, wert) {
+      const r = await anfrage(pfad, "PUT", wert);
+      if (r.ok || r.status !== 0) return r;
+      const liste = ablage.lies(WARTESCHLANGE, []);
+      liste.push({ pfad, wert, zeit: Date.now() });
+      ablage.schreib(WARTESCHLANGE, liste);
+      return { ok: false, gepuffert: true };
+    },
+    nachliefern,
+    set beiAbmeldung(f) { beiAbmeldung = f; },
+    set beiNeuemToken(f) { beiNeuemToken = f; },
+    async anmelden(email, passwort) {
+      if (!CONFIG.apiKey) return { ok: false, grund: "kein apiKey gesetzt" };
+      try {
+        const a = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${CONFIG.apiKey}`,
+          { method: "POST", headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password: passwort, returnSecureToken: true }) });
+        if (!a.ok) return { ok: false, grund: "E-Mail oder Passwort stimmt nicht" };
+        const d = await a.json();
+        setzeSitzung(d.idToken, d.refreshToken);
+        return { ok: true, uid: d.localId };
+      } catch (e) { return { ok: false, grund: "kein Netz" }; }
+    },
+    async erneuern(rt) {
+      if (!CONFIG.apiKey || !rt) return { ok: false, status: 400 };
+      try {
+        const a = await fetch(`https://securetoken.googleapis.com/v1/token?key=${CONFIG.apiKey}`,
+          { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: "grant_type=refresh_token&refresh_token=" + encodeURIComponent(rt) });
+        if (!a.ok) return { ok: false, status: a.status };
+        const d = await a.json();
+        setzeSitzung(d.id_token, d.refresh_token);
+        return { ok: true, uid: d.user_id };
+      } catch (e) { return { ok: false, status: 0 }; }
+    },
+    abmelden() { abmeldenIntern(null); },
+  };
+  return Sync;
+})();
+/* Abgleich im Takt, mehrere Pfade mit eigenem Takt; pausiert im Hintergrund */
+const Takt = (() => {
+  let jobs = [], timer = [];
+  function lauf() {
+    jobs.forEach(j => {
+      const f = async () => { await Sync.nachliefern(); const r = await Sync.lies(j.p); netz(r); if (r.ok) j.cb(r.daten); else if (r.status === 401 || r.status === 403) j.cb(undefined, r.status); };
+      f(); timer.push(setInterval(f, j.ms));
+    });
+  }
+  function halt() { timer.forEach(clearInterval); timer = []; }
+  document.addEventListener("visibilitychange", () => { if (document.hidden) halt(); else if (jobs.length && !timer.length) lauf(); });
+  return { start(js) { halt(); jobs = js; if (!document.hidden) lauf(); }, stop() { halt(); jobs = []; } };
+})();
+
+/* ==========================================================================
+   Grunddaten und Hilfen
+   ========================================================================== */
+const ONLINE = !CONFIG.datenbank.includes("PROJEKT") && !!CONFIG.apiKey;
+const Q = new URLSearchParams(location.search);
+const ROLE = !ONLINE ? "lp" : (Q.get("ansicht") === "lp" ? "lp" : Q.get("ansicht") === "leiter" ? "leiter" : "sus");
+const LS = "skilager-gruppen-v1", LSN = "skilager-namen", LSRT = "skilager-rt-" + ROLE, LSC = "skilager-cache-" + ROLE;
+const TYPES = { ski: "Ski", snowboard: "Snowboard", poly: "Polysportiv" };
+const TYPE_ORDER = ["ski", "snowboard", "poly"];
+const PALETTE = ["#e53935","#1e63d6","#f2c200","#2e9d4b","#f57c00","#7b3fbf","#222831","#e84f9b","#0aa5a8","#8d5a3b","#7a8794","#9bc53d","#00838f","#c2185b"];
+const PISTE = ["var(--p-blau)", "var(--p-rot)", "var(--p-schwarz)"];
+const WD = ["So","Mo","Di","Mi","Do","Fr","Sa"];
+const uid = () => { try { const b = new Uint8Array(6); crypto.getRandomValues(b); return [...b].map(x => x.toString(36).padStart(2, "0")).join("").slice(0, 9); } catch (e) { return Math.random().toString(36).slice(2, 11); } };
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+const $ = s => document.querySelector(s);
+const lsGet = (k, d = null) => { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } };
+const lsSet = (k, v) => { try { if (v == null) localStorage.removeItem(k); else localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
+const arr = x => Array.isArray(x) ? x.filter(v => v != null) : (x && typeof x === "object" ? Object.keys(x).sort((a, b) => a - b).map(k => x[k]).filter(v => v != null) : []);
+function toast(msg) { const t = document.createElement("div"); t.className = "toast"; t.textContent = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 3400); }
+function textOn(hex) { const h = String(hex || "#888").replace("#", ""); const n = h.length === 3 ? h.split("").map(c => c + c).join("") : h; const r = parseInt(n.slice(0,2),16), g = parseInt(n.slice(2,4),16), b = parseInt(n.slice(4,6),16); return (0.299*r + 0.587*g + 0.114*b) / 255 > 0.6 ? "#13212e" : "#ffffff"; }
+const opt = (v, l, sel) => `<option value="${esc(v)}"${sel ? " selected" : ""}>${esc(l)}</option>`;
+
+/* Namen: nie in der Datenbank, nur über den Link (#n=…) und lokal auf dem Gerät */
+function encNames(list) { const s = list.map(([i, n]) => i + "\u001f" + n).join("\u001e"); const b = new TextEncoder().encode(s); let bin = ""; b.forEach(x => bin += String.fromCharCode(x)); return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, ""); }
+function decNames(t) { try { const bin = atob(t.replace(/-/g, "+").replace(/_/g, "/")); const s = new TextDecoder().decode(Uint8Array.from(bin, c => c.charCodeAt(0))); const m = {}; s.split("\u001e").forEach(p => { const [i, n] = p.split("\u001f"); if (i && n) m[i] = n; }); return Object.keys(m).length ? m : null; } catch (e) { return null; } }
+let NAMES = {};
+(() => { const h = location.hash.match(/[#&]n=([A-Za-z0-9_-]+)/); const m = h && decNames(h[1]); if (m) { NAMES = m; lsSet(LSN, m); } else NAMES = lsGet(LSN, {}) || {}; })();
+const LINKNAMES = { ...NAMES };
+const nameOf = id => NAMES[id] || "Unbekannt";
+const firstName = n => String(n || "").split(" ")[0];
+
+/* ==========================================================================
+   Zustand (Lagerleitung)
+   ========================================================================== */
+const DEF_FAM = [
+  ["Anfänger", [["Erstes Mal auf Ski: gleiten, im Pflug anhalten", "Erstes Mal auf dem Board: seitlich rutschen, anhalten"],
+                ["Pflugbogen, Ankerlift allein, leichte blaue Piste", "Pendeln auf beiden Kanten, Ankerlift allein"]]],
+  ["Fortgeschritten", [["Stemmbogen, blaue Pisten sicher", "Verbundene Kurven auf der blauen Piste"],
+                       ["Parallele Kurven, rote Pisten", "Verbundene Kurven auf der roten Piste, Tempo im Griff"]]],
+  ["Könner", [["Kurzschwung, rote Piste zügig, schwarze Piste", "Carving-Ansätze, schwarze Piste, erste Sprünge"],
+              ["Alle Pisten sicher, carven, Buckel und Neuschnee", "Alle Pisten, Park und Gelände, sauberes Carving"]]],
+];
+function newDay() { return { id: uid(), assign: {}, sick: {}, aem: {}, frei: false }; }
+function defaultState() {
+  const fam = DEF_FAM.map(([name, ss]) => ({ id: uid(), name, subs: ss.map(([ski, board]) => ({ id: uid(), ski, board })) }));
+  const L = p => p ? fam[p[0]].subs[p[1]].id : null;
+  const groups = [
+    ["Schneehasen","ski",[0,0],"#e53935"],["Murmeltiere","ski",[0,1],"#1e63d6"],["Füchse","ski",[1,0],"#f2c200"],
+    ["Adler","ski",[1,0],"#2e9d4b"],["Gämsen","ski",[1,1],"#f57c00"],["Steinböcke","ski",[2,0],"#7b3fbf"],["Bartgeier","ski",[2,1],"#222831"],
+    ["Wölfe","snowboard",[0,0],"#e84f9b"],["Luchse","snowboard",[1,0],"#0aa5a8"],["Bernhardiner","poly",null,"#8d5a3b"],
+  ].map(([name, type, p, color]) => ({ id: uid(), name, type, level: L(p), color, leader: "", contact: "", showContact: false, meet: "", max: "" }));
+  return { v: 2, lager: { name: "Skilager 2027", start: "", url: "" }, fam, groups, students: [], rules: [], rooms: [], roomAssign: {},
+    aemtli: [["Tischdienst","Tische decken und abräumen"],["Abwasch","Geschirr nach dem Essen"],["Küchenhilfe","Rüsten und Schöpfen"],["Aufenthaltsraum","Aufräumen und wischen"]].map(([name, desc]) => ({ id: uid(), name, desc })),
+    slots: ["Morgen", "Nachmittag"], days: [newDay()], cur: 0, view: "board", board: "gruppen", local: { appell: {}, rm: {} },
+    leiterUids: "", uidLP: "", linkSig: "", ts: 0 };
+}
+function norm(o) {
+  o.lager = o.lager || {}; o.lager.name = o.lager.name || "Skilager"; o.lager.start = o.lager.start || ""; o.lager.url = o.lager.url || "";
+  o.fam = arr(o.fam).map(f => ({ id: f.id, name: f.name || "", subs: arr(f.subs).map(s => ({ id: s.id, ski: s.ski || "", board: s.board || "" })) }));
+  o.groups = arr(o.groups).map(g => ({ leader: "", contact: "", showContact: false, meet: "", max: "", level: null, ...g }));
+  o.students = arr(o.students); o.rules = arr(o.rules).map(r => ({ ...r, ids: arr(r.ids), scope: r.scope || "beide" }));
+  o.rooms = arr(o.rooms); o.roomAssign = o.roomAssign || {}; o.aemtli = arr(o.aemtli);
+  o.slots = arr(o.slots); if (!o.slots.length) o.slots = ["Morgen", "Nachmittag"];
+  o.days = arr(o.days).map(d => ({ id: d.id || uid(), assign: d.assign || {}, sick: d.sick || {}, aem: d.aem || {}, frei: !!d.frei }));
+  if (!o.days.length) o.days = [newDay()];
+  o.local = o.local || {}; o.local.appell = o.local.appell || {}; o.local.rm = o.local.rm || {};
+  o.cur = Math.min(Math.max(0, o.cur | 0), o.days.length - 1);
+  o.view = o.view || "board"; o.board = o.board || "gruppen";
+  return o;
+}
+function migrate(o) {
+  if (!o) return null;
+  if (o.v === 2) return norm(o);
+  const n = defaultState();   // Entwurf v1: Namen und Regeln übernehmen, Einteilung neu
+  n.lager = { ...n.lager, ...(o.lager || {}) };
+  n.students = arr(o.students).map(s => ({ id: s.id, name: s.name, klasse: s.klasse || "", sex: s.sex || "", disc: s.disc || "ski", self: null, note: s.note || "" }));
+  n.rules = arr(o.rules).map(r => ({ type: r.type, ids: arr(r.ids), scope: "beide" }));
+  return norm(n);
+}
+let S = null;        // Zustand der Lagerleitung
+let D = null;        // aktive Datenquelle der Zeichenfunktionen (S oder Stand vom Server)
+let REMOTE = { appell: {}, rm: {} };   // Appell und Rückmeldungen vom Server
+let NET = { ok: null };
+let TARGET = null, search = "", APS = 0, PV = "leitung";
+let LV = { gid: lsGet("skilager-meinegruppe"), day: null, slot: 0, tab: "gruppe" };
+let SV = { me: lsGet("skilager-ich"), q: "" };
+let PUB = null, MYUID = "", DENIED = false;
+
+/* Niveaus */
+let LC = null;
+function subsList() { if (LC && LC.src === D) return LC.list; const o = []; D.fam.forEach((f, fi) => f.subs.forEach((s, si) => o.push({ id: s.id, f, fi, si, s }))); o.forEach((x, i) => x.rank = i); LC = { src: D, list: o, map: Object.fromEntries(o.map(x => [x.id, x])) }; return o; }
+const lvInfo = id => { if (!id) return null; subsList(); return LC.map[id] || null; };
+const lvLabel = id => { const x = lvInfo(id); return x ? (x.f.subs.length > 1 ? `${x.f.name} ${x.si + 1}` : x.f.name) : ""; };
+const lvAbbr = id => { const x = lvInfo(id); return x ? (x.f.name[0] || "?").toUpperCase() + (x.f.subs.length > 1 ? x.si + 1 : "") : "–"; };
+const lvRank = id => { const x = lvInfo(id); return x ? x.rank : null; };
+const lvPiste = id => { const x = lvInfo(id); return x ? PISTE[Math.min(2, x.fi)] : "var(--muted)"; };
+const lvDesc = (id, type) => { const x = lvInfo(id); return x ? (type === "snowboard" ? x.s.board : x.s.ski) : ""; };
+function pips(id, h = 12) { const x = lvInfo(id); if (!x || x.f.subs.length < 2) return ""; return `<span class="pips" style="--pc:${lvPiste(id)}" title="Unterstufe ${x.si + 1} von ${x.f.subs.length}">${x.f.subs.map((_, i) => `<i class="${i <= x.si ? "on" : ""}" style="height:${Math.round(h * (0.45 + 0.55 * (i + 1) / x.f.subs.length))}px"></i>`).join("")}</span>`; }
+function lvTag(id, emptyText) { return id ? `<span class="piste" style="--pc:${lvPiste(id)}"></span>${pips(id)}<span>${esc(lvLabel(id))}</span>` : `<span>${esc(emptyText)}</span>`; }
+
+const day = () => D.days[ROLE === "lp" ? S.cur : 0];
+const stu = id => D.students.find(s => s.id === id);
+const grp = id => D.groups.find(g => g.id === id);
+const room = id => D.rooms.find(r => r.id === id);
+const aem = id => D.aemtli.find(a => a.id === id);
+function groupsOf(type) { return D.groups.map((g, i) => ({ g, i })).filter(x => x.g.type === type).sort((a, b) => { const ra = lvRank(a.g.level), rb = lvRank(b.g.level); if (ra != null && rb != null && ra !== rb) return ra - rb; if (ra == null && rb != null) return 1; if (rb == null && ra != null) return -1; return a.i - b.i; }).map(x => x.g); }
+const allGroups = () => TYPE_ORDER.flatMap(groupsOf);
+function dayLabel(i) { const st = D.lager.start; if (st) { const d = new Date(st + "T12:00:00"); if (!isNaN(d)) { d.setDate(d.getDate() + i); return WD[d.getDay()] + " " + d.getDate() + "." + (d.getMonth() + 1) + "."; } } return "Tag " + (i + 1); }
+const byName = (a, b) => nameOf(a.id).localeCompare(nameOf(b.id), "de");
+function adjacent(gid, dir) { const g = grp(gid); if (!g) return null; const gs = groupsOf(g.type); const r = lvRank(g.level); if (r == null) return null; return dir === "auf" ? gs.find(x => lvRank(x.level) != null && lvRank(x.level) > r) || null : [...gs].reverse().find(x => lvRank(x.level) != null && lvRank(x.level) < r) || null; }
+function getR() { return (ROLE === "lp" && !(ONLINE && Sync.angemeldet)) ? S.local : REMOTE; }
+const serverWrites = () => ONLINE && (ROLE === "leiter" || Sync.angemeldet);
+
+/* Regeln prüfen (nur Hinweise – die Einteilung macht ihr von Hand) */
+function rulesFor(kind) { return D.rules.filter(r => r.scope === "beide" || (kind === "zimmer" ? r.scope === "zimmer" : r.scope === "gruppe")); }
+function assignMap(kind, d) { return kind === "zimmer" ? D.roomAssign : d.assign; }
+function violations(kind, d) {
+  const A = assignMap(kind, d), out = [], cname = id => kind === "zimmer" ? room(id)?.name : grp(id)?.name;
+  for (const r of rulesFor(kind)) {
+    const ids = r.ids.filter(id => { const a = A[id]; return a && a !== "B" && stu(id); });
+    if (r.type === "apart") { for (let i = 0; i < ids.length; i++) for (let j = i + 1; j < ids.length; j++) if (A[ids[i]] === A[ids[j]]) out.push(`${nameOf(ids[i])} und ${nameOf(ids[j])} sind beide in «${cname(A[ids[i]])}» (Regel: nicht zusammen)`); }
+    else if (new Set(ids.map(id => A[id])).size > 1) out.push(`${ids.map(nameOf).join(", ")} sind getrennt (Regel: zusammen)`);
+  }
+  if (kind === "zimmer") {
+    for (const rm of D.rooms) { const m = D.students.filter(s => A[s.id] === rm.id); const cap = +rm.cap; if (cap && m.length > cap) out.push(`«${rm.name}» hat ${m.length} statt höchstens ${cap}`); if (m.some(s => s.sex === "m") && m.some(s => s.sex === "w")) out.push(`«${rm.name}» ist gemischt (m und w)`); }
+  } else {
+    for (const g of D.groups) { const mx = +g.max; if (mx) { const n = D.students.filter(s => A[s.id] === g.id).length; if (n > mx) out.push(`«${g.name}» hat ${n} statt höchstens ${mx}`); } }
+  }
+  return out;
+}
+function wouldClash(kind, sid, target, d) {
+  const A = assignMap(kind, d); const out = [];
+  for (const r of rulesFor(kind)) if (r.type === "apart" && r.ids.includes(sid)) for (const o of r.ids) if (o !== sid && A[o] === target) out.push(nameOf(o));
+  return out;
+}
+
+/* ==========================================================================
+   Veröffentlichen: was wohin geht
+   /oeffentlich       – alle: Gruppen, Zuteilung per Zufallskennung, keine Namen
+   /leitstand/stand   – Lagerleitung + Leitende: alles ausser Namen und Bemerkungen
+   ========================================================================== */
+function lastFrei() { for (let i = S.days.length - 1; i >= 0; i--) if (S.days[i].frei) return i; return -1; }
+function buildPub() {
+  const prevD = D; D = S;
+  const fi = lastFrei(), d = fi >= 0 ? S.days[fi] : null;
+  const gruppen = {}; S.groups.forEach(g => gruppen[g.id] = { n: g.name, t: g.type, c: g.color, l: lvLabel(g.level) || "", ld: g.leader || "", kt: g.showContact ? (g.contact || "") : "", tp: g.meet || "" });
+  const z = {}, az = {};
+  if (d) for (const s of S.students) { const a = d.assign[s.id]; if (a === "B" || grp(a)) z[s.id] = a; if (d.aem[s.id] && aem(d.aem[s.id])) az[s.id] = d.aem[s.id]; }
+  const zz = {}; for (const s of S.students) if (room(S.roomAssign[s.id])) zz[s.id] = S.roomAssign[s.id];
+  const out = { lager: { n: S.lager.name }, tag: d ? { id: d.id, lb: dayLabel(fi) } : null, gruppen, zuteilung: z,
+    zimmer: Object.fromEntries(S.rooms.map(r => [r.id, { n: r.name }])), zimmerZ: zz,
+    aemtli: Object.fromEntries(S.aemtli.map(a => [a.id, { n: a.name, d: a.desc || "" }])), aemtliZ: az, ts: Date.now() };
+  D = prevD; return out;
+}
+function buildStand() {
+  return { lager: { name: S.lager.name, start: S.lager.start }, fam: S.fam, groups: S.groups,
+    students: S.students.map(s => ({ id: s.id, disc: s.disc, self: s.self || null })),
+    rules: S.rules, rooms: S.rooms, roomAssign: S.roomAssign, aemtli: S.aemtli, slots: S.slots,
+    days: S.days.map(d => ({ id: d.id, assign: d.assign, sick: d.sick, aem: d.aem, frei: d.frei })), ts: S.ts || Date.now() };
+}
+let pubTimer = null;
+function schedulePublish() { if (!(ONLINE && ROLE === "lp" && Sync.angemeldet)) return; clearTimeout(pubTimer); pubTimer = setTimeout(publish, 1200); }
+async function publish() {
+  const a = await Sync.schreibSicher("leitstand/stand", buildStand());
+  const b = await Sync.schreibSicher("oeffentlich", buildPub());
+  if ((a.status === 401 || a.status === 403) || (b.status === 401 || b.status === 403)) { NET.ok = false; toast("Server lehnt ab: Regeln noch nicht eingespielt? (Einrichten → Online)"); }
+  else netz(a.ok && b.ok ? { ok: true } : { ok: false, status: 0 });
+}
+function netz(r) { const was = NET.ok; NET.ok = r.ok || (r.status === 401 || r.status === 403); NET.at = Date.now(); if (was !== NET.ok) paintPill(); }
+function pill() {
+  let t = "lokal", c = "";
+  if (ONLINE) {
+    if (ROLE !== "sus" && !Sync.angemeldet) { t = lsGet(LSRT) ? "verbinde …" : "nicht angemeldet"; c = "warn"; }
+    else if (Sync.wartend) { t = `offline · ${Sync.wartend} wartend`; c = "warn"; }
+    else if (NET.ok === false) { t = "offline"; c = "warn"; }
+    else { t = "online"; c = "ok"; }
+  }
+  return `<span class="pill ${c}" id="pill" title="${ONLINE ? "Verbindung zur Datenbank" : "Firebase noch nicht eingerichtet: alles bleibt auf diesem Gerät"}">${t}</span>`;
+}
+function paintPill() { const p = $("#pill"); if (p) p.outerHTML = pill(); }
+
+/* ==========================================================================
+   Zeichnen
+   ========================================================================== */
+let lastSig = null;
+function persist() {
+  if (ROLE !== "lp") return;
+  const sig = JSON.stringify(S, (k, v) => (["view","cur","board","ts","local","linkSig"].includes(k) ? undefined : v));
+  if (lastSig !== null && sig !== lastSig) { S.ts = Date.now(); schedulePublish(); }
+  lastSig = sig;
+  try { localStorage.setItem(LS, JSON.stringify(S)); } catch (e) {}
+}
+function paint(html) { const y = window.scrollY; $("#app").innerHTML = html; try { window.scrollTo(0, y); } catch (e) {} }
+const LOGO = `<svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true"><path d="M2 22 L10 8 L14 14 L17 10 L24 22 Z" fill="var(--ink)"/><path d="M10 8 L12.4 12 L11 12.8 L9.4 11.2 L8 12.6 Z" fill="var(--bg)"/></svg>`;
+function render() {
+  LC = null;
+  if (ROLE === "lp") { D = S; NAMES = Object.fromEntries(S.students.map(s => [s.id, s.name])); renderMaster(); persist(); }
+  else if (ROLE === "leiter") renderLeaderShell();
+  else renderStudentShell();
+}
+
+/* ---------- Lagerleitung ---------- */
+function renderMaster() {
+  const tabs = [["board","Einteilung"],["appell","Appell"],["hist","Verlauf"],["setup","Einrichten"],["preview","Vorschau"]];
+  const head = `<header class="top"><div class="wrap"><div class="brand">${LOGO}<span>${esc(S.lager.name)}</span></div>${pill()}<nav class="tabs" aria-label="Ansicht">${tabs.map(([v, l]) => `<button class="tab" data-act="view" data-v="${v}" aria-current="${S.view === v}">${l}</button>`).join("")}</nav></div></header>`;
+  const body = S.view === "setup" ? renderSetup() : S.view === "hist" ? renderHist() : S.view === "appell" ? renderAppell() : S.view === "preview" ? renderPreview() : renderBoard();
+  const banner = ONLINE && !Sync.angemeldet && S.view !== "setup" ? `<div class="note warn row"><span>Nicht angemeldet: Änderungen bleiben auf diesem Gerät und erreichen Leitung und Schüler/innen nicht.</span><button class="btn small" data-act="view" data-v="setup">Anmelden</button></div>` : "";
+  paint(head + `<main class="wrap">${banner}${body}</main>`);
+}
+function renderStart() {
+  return `<div class="start"><p class="eyebrow">Neues Lager</p><h2>Gruppeneinteilung einrichten</h2>
+  <ol class="steps">
+    <li><div><b>Niveaus und Gruppen prüfen.</b> Vorbereitet sind Anfänger, Fortgeschritten und Könner mit je zwei Unterstufen, dazu 7 Ski-, 2 Snowboard- und 1 Polysportgruppe. Unterstufen wie «Anfänger 3» fügst du jederzeit hinzu.</div></li>
+    <li><div><b>Namen einlesen.</b> Excel-Liste hochladen oder aus Excel einfügen: Name, Klasse, Geschlecht, Disziplin, Selbsteinschätzung.</div></li>
+    <li><div><b>Von Hand einteilen.</b> Bei einer Gruppe «Ziel» antippen, dann die Namen antippen, die dorthin gehören.</div></li>
+    <li><div><b>Freigeben.</b> Erst dann sehen die Schüler/innen ihre Gruppe. Die Leitung sieht alles sofort.</div></li>
+  </ol>
+  <div class="row"><button class="btn primary" data-act="view" data-v="setup">Einrichten öffnen</button><button class="btn" data-act="sample">Beispiellager laden</button></div></div>`;
+}
+function dayBar(act = "day", cur = S.cur, withAdd = true) {
+  return `<div class="daybar">${D.days.map((x, i) => `<button class="day" data-act="${act}" data-i="${i}" aria-current="${i === cur}">${dayLabel(i)}${x.frei && ROLE === "lp" ? '<span class="frei" title="für Schüler/innen freigegeben"></span>' : ""}</button>`).join("")}${withAdd ? `<button class="btn small" data-act="addday" title="Neuer Tag – übernimmt Gruppen, Bourbaki und Ämtli vom letzten Tag">+ Tag</button>${S.days.length > 1 && S.cur === S.days.length - 1 ? '<button class="btn small ghost danger" data-act="delday">Tag löschen</button>' : ""}` : ""}</div>`;
+}
+function renderBoard() {
+  if (!S.students.length) return renderStart();
+  const bs = [["gruppen","Gruppen"],["zimmer","Zimmer"],["aemtli","Ämtli"]];
+  let h = (S.board === "zimmer" ? "" : dayBar()) + `<div class="seg" role="tablist">${bs.map(([k, l]) => `<button data-act="board" data-v="${k}" aria-current="${S.board === k}">${l}</button>`).join("")}</div>`;
+  if (TARGET && TARGET.kind === S.board) { const t = TARGET.kind === "zimmer" ? room(TARGET.id) : TARGET.kind === "aemtli" ? aem(TARGET.id) : grp(TARGET.id); h += `<div class="banner"><span>Antippen schickt Namen zu <b>«${esc(t?.name || "?")}»</b></span><button class="btn small" data-act="endtarget">Fertig</button></div>`; }
+  return h + (S.board === "zimmer" ? boardZimmer() : S.board === "aemtli" ? boardAemtli() : boardGruppen());
+}
+const searchBox = () => `<input class="search" id="search" type="search" placeholder="Name suchen …" value="${esc(search)}" aria-label="Name suchen">`;
+function chip(s, kind, o = {}) {
+  const q = search.trim().toLowerCase(), nm = nameOf(s.id), hit = q && nm.toLowerCase().includes(q), dim = q && !hit;
+  const lv = o.tag != null ? o.tag : (s.self ? lvAbbr(s.self) : "–");
+  const body = o.extra ? `<span class="stack"><span class="nm">${esc(nm)}</span><span class="why">${esc(o.extra)}</span></span>` : `<span class="nm">${esc(nm)}</span>`;
+  return `<button class="chip${hit ? " hit" : ""}${dim ? " dim" : ""}" draggable="true" data-act="pick" data-kind="${kind}" data-sid="${s.id}" title="${esc(nm)}${s.klasse ? " · " + esc(s.klasse) : ""}">${body}<span class="lv" title="${o.tag != null ? "" : "Selbsteinschätzung"}">${esc(lv)}</span>${o.mark || ""}</button>`;
+}
+function card(o) {
+  const over = o.max && o.count > o.max, isT = TARGET && TARGET.kind === o.kind && TARGET.id === o.id;
+  const band = o.color ? ` style="background:${esc(o.color)};color:${textOn(o.color)}"` : "";
+  return `<section class="gcard ${o.cls || ""}${isT ? " target" : ""}" data-drop="${o.id}" data-kind="${o.kind}"><header class="gband"${band}><span class="gname">${esc(o.title)}</span>${o.ziel !== false ? `<button class="zbtn" data-act="target" data-kind="${o.kind}" data-id="${o.id}" aria-pressed="${!!isT}"><span>${isT ? "Ziel ✓" : "Ziel"}</span></button>` : (o.icon || "")}<span class="gcount${over ? " over" : ""}">${o.count}${o.max ? "/" + o.max : ""}</span></header>${o.meta ? `<div class="gmeta">${o.meta}</div>` : ""}<div class="chips">${o.members || '<p class="empty">noch niemand</p>'}</div></section>`;
+}
+function pendingRM() {
+  const R = getR(), d = day(), out = {};
+  [S.cur - 1, S.cur].forEach(i => { if (i < 0) return; const dd = S.days[i]; const m = R.rm[dd.id] || {}; for (const sid in m) { if (!stu(sid)) continue; out[sid] = { ...m[sid], di: i, open: d.assign[sid] === m[sid].g }; } });
+  return out;
+}
+function boardGruppen() {
+  const d = day(), prev = S.cur > 0 ? S.days[S.cur - 1] : null, pend = pendingRM();
+  const cnt = t => S.students.filter(s => { const g = grp(d.assign[s.id]); return g && g.type === t; }).length;
+  const sick = S.students.filter(s => d.assign[s.id] === "B").sort(byName);
+  const pool = S.students.filter(s => { const a = d.assign[s.id]; return !a || (a !== "B" && !grp(a)); })
+    .sort((a, b) => (TYPE_ORDER.indexOf(a.disc) - TYPE_ORDER.indexOf(b.disc)) || ((lvRank(a.self) ?? -1) - (lvRank(b.self) ?? -1)) || byName(a, b));
+  const viol = violations("gruppen", d);
+  const mark = s => {
+    let m = ""; const a = d.assign[s.id], p = prev ? prev.assign[s.id] : undefined;
+    if (prev && a && a !== "B") {
+      if (p === "B") m = '<span class="mk back" title="zurück aus Bourbaki">↺</span>';
+      else if (p && p !== a && grp(p)) { const rp = lvRank(grp(p).level), ra = lvRank(grp(a)?.level); m = (rp != null && ra != null && ra > rp) ? '<span class="mk up" title="aufgestuft">↑</span>' : (rp != null && ra != null && ra < rp) ? '<span class="mk down" title="abgestuft">↓</span>' : '<span class="mk side" title="Gruppe gewechselt">⇄</span>'; }
+    }
+    const f = pend[s.id]; if (f && f.open && f.r !== "ok") m += `<span class="mk rm" title="Leitung schlägt vor: ${f.r === "auf" ? "aufstufen" : "abstufen"}${f.t ? " – " + esc(f.t) : ""}">${f.r === "auf" ? "⇡" : "⇣"}</span>`;
+    return m;
+  };
+  let h = `<div class="toolbar">${searchBox()}<button class="btn ${d.frei ? "" : "primary"}" data-act="frei">${d.frei ? "Für Schüler/innen sichtbar ✓" : "Für Schüler/innen freigeben"}</button><button class="btn" data-act="copy">Liste kopieren</button><button class="btn" data-act="xlsx">Excel</button></div>`;
+  h += `<div class="stats">${TYPE_ORDER.filter(t => S.groups.some(g => g.type === t)).map(t => `<span><b>${cnt(t)}</b>${TYPES[t]}</span>`).join("")}<span style="color:var(--bad)"><b>${sick.length}</b>Bourbaki</span>${pool.length ? `<span class="muted"><b>${pool.length}</b>offen</span>` : ""}<span class="muted"><b>${S.students.length}</b>total</span></div>`;
+  if (viol.length) h += `<div class="note warn"><b>Achtung</b><ul>${viol.map(v => `<li>${esc(v)}</li>`).join("")}</ul></div>`;
+  const fb = Object.entries(pend);
+  if (fb.length) h += `<div class="note info"><b>Rückmeldungen der Leitung</b> <span class="muted">(${[...new Set(fb.map(([, f]) => dayLabel(f.di)))].join(", ")})</span><ul class="fb">${fb.sort((a, b) => b[1].open - a[1].open).map(([sid, f]) => {
+    const to = f.r === "ok" ? null : adjacent(f.g, f.r);
+    const act = f.r === "ok" ? "" : !f.open ? '<span class="muted">umgesetzt</span>' : to ? `<button class="btn small" data-act="applyrm" data-sid="${sid}" data-to="${to.id}">→ ${esc(to.name)}</button>` : '<span class="muted">keine passende Gruppe</span>';
+    return `<li class="${f.open ? "" : "done"}"><b>${esc(nameOf(sid))}</b><span class="muted">${esc(grp(f.g)?.name || "")}</span><span class="tag ${f.r === "ab" ? "apart" : "together"}">${f.r === "auf" ? "aufstufen" : f.r === "ab" ? "abstufen" : "Bemerkung"}</span>${act}${f.t ? `<span class="t">${esc(f.t)}</span>` : ""}</li>`; }).join("")}</ul></div>`;
+  if (pool.length) h += `<div class="sect"><div class="grid">${card({ kind: "gruppen", id: "none", title: "Noch nicht eingeteilt", count: pool.length, ziel: false, cls: "pool", meta: "<span>nach Disziplin und Selbsteinschätzung sortiert</span>", members: pool.map(s => chip(s, "gruppen", { extra: TYPES[s.disc] + (s.self ? " · " + lvLabel(s.self) : "") })).join("") })}</div></div>`;
+  for (const t of TYPE_ORDER) {
+    const gs = groupsOf(t); if (!gs.length) continue;
+    h += `<div class="sect"><div class="sect-h"><h2>${TYPES[t]}</h2><span class="eyebrow">${gs.length} ${gs.length === 1 ? "Gruppe" : "Gruppen"} · ${cnt(t)} Personen</span></div><div class="grid">${gs.map(g => {
+      const mem = S.students.filter(s => d.assign[s.id] === g.id).sort(byName);
+      return card({ kind: "gruppen", id: g.id, title: g.name, color: g.color, count: mem.length, max: +g.max || 0,
+        meta: lvTag(g.level, g.type === "poly" ? "Programm ohne Niveau" : "kein Niveau gesetzt") + (g.leader ? `<span>· ${esc(g.leader)}</span>` : ""),
+        members: mem.map(s => chip(s, "gruppen", { mark: mark(s) })).join("") }); }).join("")}</div></div>`;
+  }
+  h += `<div class="sect"><div class="grid">${card({ kind: "gruppen", id: "B", title: "Krank · Bourbaki", cls: "sick", ziel: false, icon: '<span class="cross" aria-hidden="true">+</span>', count: sick.length,
+    members: sick.map(s => { const k = d.sick[s.id] || {}; return chip(s, "gruppen", { extra: [k.reason, k.since != null ? "seit " + dayLabel(k.since) : ""].filter(Boolean).join(" · ") }); }).join("") || '<p class="empty">alle gesund</p>' })}</div></div>`;
+  return h;
+}
+function boardZimmer() {
+  if (!S.rooms.length) return `<div class="start"><h2>Noch keine Zimmer</h2><p>Lege die Zimmer unter «Einrichten» an, z.B. «6 Zimmer à 6 Plätze». Die Zimmer gelten fürs ganze Lager.</p><button class="btn primary" data-act="view" data-v="setup">Einrichten öffnen</button></div>`;
+  const pool = S.students.filter(s => !room(S.roomAssign[s.id])).sort((a, b) => (a.sex || "z").localeCompare(b.sex || "z") || byName(a, b));
+  const viol = violations("zimmer");
+  let h = `<p class="muted" style="margin-top:0">Zimmer gelten fürs ganze Lager, nicht pro Tag.</p><div class="toolbar">${searchBox()}<button class="btn" data-act="copy">Liste kopieren</button></div>`;
+  h += `<div class="stats"><span><b>${S.students.length - pool.length}</b>im Zimmer</span>${pool.length ? `<span class="muted"><b>${pool.length}</b>ohne Zimmer</span>` : ""}<span class="muted"><b>${S.rooms.reduce((a, r) => a + (+r.cap || 0), 0)}</b>Plätze</span></div>`;
+  if (viol.length) h += `<div class="note warn"><b>Achtung</b><ul>${viol.map(v => `<li>${esc(v)}</li>`).join("")}</ul></div>`;
+  const ztag = s => [s.sex, s.klasse].filter(Boolean).join(" ");
+  if (pool.length) h += `<div class="sect"><div class="grid">${card({ kind: "zimmer", id: "none", title: "Ohne Zimmer", count: pool.length, ziel: false, cls: "pool", members: pool.map(s => chip(s, "zimmer", { tag: ztag(s) })).join("") })}</div></div>`;
+  h += `<div class="sect"><div class="grid">${S.rooms.map(r => { const mem = S.students.filter(s => S.roomAssign[s.id] === r.id).sort(byName); return card({ kind: "zimmer", id: r.id, title: r.name, count: mem.length, max: +r.cap || 0, meta: r.leader ? `<span>Verantwortlich: ${esc(r.leader)}</span>` : "", members: mem.map(s => chip(s, "zimmer", { tag: ztag(s) })).join("") }); }).join("")}</div></div>`;
+  return h;
+}
+function boardAemtli() {
+  if (!S.aemtli.length) return `<div class="start"><h2>Noch keine Ämtli</h2><p>Lege die Ämtli unter «Einrichten» an.</p><button class="btn primary" data-act="view" data-v="setup">Einrichten öffnen</button></div>`;
+  const d = day();
+  const pool = S.students.filter(s => !aem(d.aem[s.id]));
+  let h = `<div class="toolbar">${searchBox()}${S.cur > 0 ? '<button class="btn" data-act="rotate">Vom Vortag rotieren</button>' : ""}<button class="btn" data-act="aemclear">Leeren</button><button class="btn" data-act="copy">Liste kopieren</button></div>`;
+  h += `<div class="stats"><span><b>${S.students.length - pool.length}</b>mit Ämtli</span><span class="muted"><b>${pool.length}</b>frei</span></div>`;
+  if (pool.length) {
+    const byRoom = {}; pool.forEach(s => { const r = room(S.roomAssign[s.id]) ? S.roomAssign[s.id] : "_"; (byRoom[r] = byRoom[r] || []).push(s); });
+    const order = [...S.rooms.map(r => r.id), "_"].filter(k => byRoom[k]);
+    h += `<div class="sect"><section class="gcard pool" data-drop="none" data-kind="aemtli"><header class="gband"><span class="gname">Ohne Ämtli</span><span class="gcount">${pool.length}</span></header>${order.map(k => `<div class="pgrp"><div class="pgh">${k === "_" ? "ohne Zimmer" : esc(room(k).name)}${k !== "_" ? `<button class="btn small" data-act="roomaem" data-rid="${k}">${TARGET && TARGET.kind === "aemtli" ? "ganzes Zimmer → " + esc(aem(TARGET.id)?.name || "") : "ganzes Zimmer zuteilen"}</button>` : ""}</div><div class="chips">${byRoom[k].sort(byName).map(s => chip(s, "aemtli", { tag: s.klasse || "" })).join("")}</div></div>`).join("")}</section></div>`;
+  }
+  h += `<div class="sect"><div class="grid">${S.aemtli.map(a => { const mem = S.students.filter(s => d.aem[s.id] === a.id).sort(byName); return card({ kind: "aemtli", id: a.id, title: a.name, count: mem.length, meta: a.desc ? `<span>${esc(a.desc)}</span>` : "", members: mem.map(s => chip(s, "aemtli", { tag: room(S.roomAssign[s.id])?.name || "" })).join("") }); }).join("")}</div></div>`;
+  return h;
+}
+function renderAppell() {
+  if (!S.students.length) return renderStart();
+  const d = day(), ap = getR().appell[d.id] || {};
+  const slot = Math.min(APS, S.slots.length - 1);
+  let tot = 0, here = 0, done = 0;
+  const cards = allGroups().map(g => {
+    const mem = S.students.filter(s => d.assign[s.id] === g.id).sort(byName);
+    const p = (ap[g.id] || {})[slot] || {}; const n = mem.filter(s => p[s.id]).length; const missing = mem.filter(s => !p[s.id]);
+    tot += mem.length; here += n; if (n) done++;
+    const status = !mem.length ? '<p class="empty">keine Personen</p>' : !n ? '<p class="empty">noch nicht erfasst</p>' : missing.length ? `<ul class="mini">${missing.map(s => `<li><b style="color:var(--bad)">fehlt</b> ${esc(nameOf(s.id))}</li>`).join("")}</ul>` : '<p class="empty" style="color:var(--ok);font-style:normal"><b>alle da</b></p>';
+    return `<section class="gcard"><header class="gband" style="background:${esc(g.color)};color:${textOn(g.color)}"><span class="gname">${esc(g.name)}</span><span class="gcount">${n}/${mem.length}</span></header><div class="gmeta"><span>${esc(g.leader || "ohne Leitung")}</span></div>${status}</section>`;
+  }).join("");
+  const sick = S.students.filter(s => d.assign[s.id] === "B").length;
+  return dayBar("day", S.cur, false) + `<div class="seg">${S.slots.map((s, i) => `<button data-act="aps" data-i="${i}" aria-current="${i === slot}">${esc(s)}</button>`).join("")}</div>
+    <div class="stats"><span><b>${here}</b>von ${tot} da</span><span class="muted"><b>${done}</b>von ${allGroups().length} Gruppen gemeldet</span><span style="color:var(--bad)"><b>${sick}</b>Bourbaki</span></div>
+    <p class="muted" style="margin-top:0">Die Leitenden haken ihre Gruppe in der Leiteransicht ab. Diese Übersicht aktualisiert sich von selbst.</p>
+    <div class="grid">${cards}</div>`;
+}
+function renderHist() {
+  if (!S.students.length) return renderStart();
+  const studs = [...S.students].sort((a, b) => (TYPE_ORDER.indexOf(a.disc) - TYPE_ORDER.indexOf(b.disc)) || byName(a, b));
+  const cell = (d, s) => { const a = d.assign[s.id]; const am = aem(d.aem[s.id]); const sub = am ? `<br><span class="muted" style="font-size:12px">${esc(am.name)}</span>` : "";
+    if (a === "B") return `<span class="hcell" style="color:var(--bad)"><span class="cross" style="width:14px;height:14px;font-size:12px">+</span>${esc(d.sick[s.id]?.reason || "Bourbaki")}</span>${sub}`;
+    const g = grp(a); return (g ? `<span class="hcell"><span class="dot" style="background:${esc(g.color)}"></span>${esc(g.name)}</span>` : '<span class="muted">–</span>') + sub; };
+  const moves = S.students.reduce((n, s) => n + S.days.slice(1).filter((d, i) => d.assign[s.id] !== S.days[i].assign[s.id]).length, 0);
+  return `<div class="sect-h"><h2>Verlauf</h2><span class="eyebrow">${S.days.length} ${S.days.length === 1 ? "Tag" : "Tage"} · ${moves} Wechsel</span></div>
+  <div class="hist"><table><thead><tr><th>Name</th><th>Klasse</th><th>Zimmer</th><th>Selbsteinsch.</th>${S.days.map((d, i) => `<th>${dayLabel(i)}</th>`).join("")}</tr></thead>
+  <tbody>${studs.map(s => `<tr><td><b>${esc(s.name)}</b> <span class="muted">${esc(TYPES[s.disc] || "")}</span></td><td>${esc(s.klasse || "")}</td><td>${esc(room(S.roomAssign[s.id])?.name || "–")}</td><td>${esc(lvLabel(s.self) || "–")}</td>${S.days.map(d => `<td>${cell(d, s)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
+}
+function renderPreview() {
+  if (!S.students.length) return renderStart();
+  let inner;
+  if (PV === "sus") { const P = normPub(buildPub()); inner = studentInner(P); }
+  else inner = leaderInner();
+  return `<div class="seg">${[["leitung","Leitung"],["sus","Schüler/innen"]].map(([k, l]) => `<button data-act="pv" data-v="${k}" aria-current="${PV === k}">${l}</button>`).join("")}</div>
+  <p class="muted" style="margin-top:0">${PV === "sus" ? "So sieht es auf dem Handy der Schüler/innen aus. Sie sehen nur freigegebene Tage." : "So sieht es bei den Leitenden aus. Appell und Rückmeldungen hier wirken wie echte Einträge."}</p>
+  <div class="preview">${inner}</div>`;
+}
+
+/* ---------- Einrichten ---------- */
+function levelSelect(cur, f, id, noneLabel) { return `<select data-f="${f}" data-id="${id}">${opt("", noneLabel, !cur)}${D.fam.map(fm => `<optgroup label="${esc(fm.name)}">${fm.subs.map(s => opt(s.id, lvLabel(s.id), s.id === cur)).join("")}</optgroup>`).join("")}</select>`; }
+function renderSetup() {
+  const n = t => S.groups.filter(g => g.type === t).length;
+  const sorted = [...S.students].sort(byName);
+  const sOpts = sorted.map(s => opt(s.id, s.name)).join("");
+  return `<div class="cards">
+  ${setupOnline()}
+  <section class="card"><h2>Lager</h2><p class="lead">Mit Startdatum heissen die Tage «Mo 2.2.» statt «Tag 1». Appell-Zeitpunkte durch Komma trennen.</p>
+    <div class="row"><label class="inl">Name <input class="fld" style="width:220px" data-f="lagername" value="${esc(S.lager.name)}"></label>
+    <label class="inl">Startdatum <input class="fld" type="date" data-f="start" value="${esc(S.lager.start)}"></label>
+    <label class="inl">Appell <input class="fld" style="width:220px" data-f="slots" value="${esc(S.slots.join(", "))}"></label></div></section>
+
+  ${setupLevels()}
+
+  <section class="card"><h2>Gruppen</h2><p class="lead">Kontakt erscheint immer in der Leiteransicht, bei den Schüler/innen nur mit Häkchen «für SuS». Treffpunkt sehen alle.</p>
+    <div class="qty"><label>Ski<input type="number" min="0" max="20" id="q-ski" value="${n("ski")}"></label><label>Snowboard<input type="number" min="0" max="20" id="q-snowboard" value="${n("snowboard")}"></label><label>Polysportiv<input type="number" min="0" max="10" id="q-poly" value="${n("poly")}"></label><button class="btn" data-act="qty">Anzahl übernehmen</button></div>
+    <div class="tbl-wrap"><table><thead><tr><th>Farbe</th><th>Name</th><th>Art</th><th>Niveau</th><th>Leitung</th><th>Kontakt</th><th>für SuS</th><th>Treffpunkt</th><th>Max.</th><th></th></tr></thead><tbody>
+    ${allGroups().map(g => `<tr><td><input type="color" data-f="g-color" data-id="${g.id}" value="${esc(g.color)}" aria-label="Farbe"></td>
+      <td><input type="text" data-f="g-name" data-id="${g.id}" value="${esc(g.name)}"></td>
+      <td><select data-f="g-type" data-id="${g.id}">${TYPE_ORDER.map(t => opt(t, TYPES[t], t === g.type)).join("")}</select></td>
+      <td>${levelSelect(g.level, "g-level", g.id, "– kein –")}</td>
+      <td><input type="text" data-f="g-leader" data-id="${g.id}" value="${esc(g.leader)}" placeholder="Name"></td>
+      <td><input type="text" data-f="g-contact" data-id="${g.id}" value="${esc(g.contact)}" placeholder="079 …"></td>
+      <td style="text-align:center"><input type="checkbox" data-f="g-show" data-id="${g.id}"${g.showContact ? " checked" : ""} aria-label="Kontakt für Schüler/innen sichtbar"></td>
+      <td><input type="text" data-f="g-meet" data-id="${g.id}" value="${esc(g.meet)}" placeholder="9.00 Talstation"></td>
+      <td><input type="number" min="0" style="width:64px" data-f="g-max" data-id="${g.id}" value="${esc(g.max)}"></td>
+      <td><button class="btn small danger" data-act="delgroup" data-id="${g.id}" aria-label="Gruppe löschen">✕</button></td></tr>`).join("")}
+    </tbody></table></div>
+    <div class="row" style="margin-top:8px"><button class="btn small" data-act="addgroup">+ Gruppe</button></div></section>
+
+  <div class="two">
+  <section class="card"><h2>Zimmer</h2><p class="lead">Gelten fürs ganze Lager. Gemischte Zimmer (m/w) und zu volle Zimmer werden gemeldet.</p>
+    <div class="qty"><label>Anzahl<input type="number" min="1" max="40" id="rb-n" value="6"></label><label>Plätze je Zimmer<input type="number" min="1" max="30" id="rb-c" value="6"></label><button class="btn" data-act="roomsbulk">Zimmer anlegen</button></div>
+    <div class="tbl-wrap"><table><thead><tr><th>Name</th><th>Plätze</th><th>Verantwortlich</th><th></th></tr></thead><tbody>${S.rooms.map(r => `<tr><td><input type="text" data-f="r-name" data-id="${r.id}" value="${esc(r.name)}"></td><td><input type="number" min="0" style="width:64px" data-f="r-cap" data-id="${r.id}" value="${esc(r.cap)}"></td><td><input type="text" data-f="r-leader" data-id="${r.id}" value="${esc(r.leader || "")}"></td><td><button class="btn small danger" data-act="delroom" data-id="${r.id}" aria-label="Zimmer löschen">✕</button></td></tr>`).join("") || '<tr><td colspan="4" class="muted">noch keine</td></tr>'}</tbody></table></div>
+    <div class="row" style="margin-top:8px"><button class="btn small" data-act="addroom">+ Zimmer</button></div></section>
+
+  <section class="card"><h2>Ämtli</h2><p class="lead">Pro Tag. «Vom Vortag rotieren» schiebt alle ins nächste Ämtli dieser Liste.</p>
+    <div class="tbl-wrap"><table><thead><tr><th>Name</th><th>Was</th><th></th></tr></thead><tbody>${S.aemtli.map((a, i) => `<tr><td><input type="text" data-f="a-name" data-id="${a.id}" value="${esc(a.name)}"></td><td><input type="text" data-f="a-desc" data-id="${a.id}" value="${esc(a.desc || "")}"></td><td class="row" style="flex-wrap:nowrap"><button class="btn small" data-act="aemup" data-i="${i}"${i ? "" : " disabled"} aria-label="nach oben">↑</button><button class="btn small danger" data-act="delaem" data-id="${a.id}" aria-label="Ämtli löschen">✕</button></td></tr>`).join("")}</tbody></table></div>
+    <div class="row" style="margin-top:8px"><button class="btn small" data-act="addaem">+ Ämtli</button></div></section>
+  </div>
+
+  <section class="card"><h2>Regeln</h2><p class="lead">Wer nicht zusammen sein darf oder zusammen sein soll. Ihr teilt von Hand ein; die App meldet Verstösse im Brett und markiert riskante Ziele beim Verschieben.</p>
+    ${S.students.length ? `<div class="row"><select class="fld" id="r1"><option value="">Person 1</option>${sOpts}</select><select class="fld" id="r2"><option value="">Person 2</option>${sOpts}</select><select class="fld" id="r3"><option value="">(Person 3)</option>${sOpts}</select>
+    <select class="fld" id="rt">${opt("apart","nicht zusammen")}${opt("together","zusammen")}</select><select class="fld" id="rs">${opt("beide","Gruppe und Zimmer")}${opt("gruppe","nur Gruppe")}${opt("zimmer","nur Zimmer")}</select><button class="btn" data-act="addrule">+ Regel</button></div>` : '<p class="muted">Zuerst Namen einlesen.</p>'}
+    <ul class="rulelist">${S.rules.map((r, i) => `<li><span class="tag ${r.type}">${r.type === "apart" ? "nicht zusammen" : "zusammen"}</span>${r.ids.map(id => esc(stu(id)?.name || "?")).join(" · ")}<span class="muted">${r.scope === "beide" ? "Gruppe und Zimmer" : r.scope === "gruppe" ? "nur Gruppe" : "nur Zimmer"}</span><button class="btn small ghost danger" style="margin-left:auto" data-act="delrule" data-i="${i}" aria-label="Regel löschen">✕</button></li>`).join("")}</ul></section>
+
+  <section class="card"><h2>Schülerinnen und Schüler</h2><p class="lead">Excel- oder CSV-Datei wählen oder Zeilen aus Excel einfügen. Erkannt werden: Name (oder Vorname + Nachname), Klasse, Geschlecht, Disziplin, Niveau (Selbsteinschätzung, als «Anfänger 2», «A2» oder Zahl 1 = tiefste), Bemerkung. Bemerkungen bleiben auf diesem Gerät und gehen nie online.</p>
+    <div class="row"><input type="file" id="file" accept=".xlsx,.xls,.csv,.txt"><label class="inl"><input type="checkbox" id="replace"> bestehende Liste ersetzen</label></div>
+    <textarea class="fld" id="paste" style="margin-top:8px" placeholder="Name&#9;Klasse&#9;Geschlecht&#9;Disziplin&#9;Niveau&#10;Lena Keller&#9;1A&#9;w&#9;Ski&#9;Fortgeschritten 1"></textarea>
+    <div class="row" style="margin-top:6px"><button class="btn" data-act="paste">Eingefügte Zeilen übernehmen</button><button class="btn small" data-act="addstud">+ Person von Hand</button></div>
+    ${S.students.length ? `<div class="tbl-wrap"><table><thead><tr><th>Name</th><th>Klasse</th><th>m/w</th><th>Disziplin</th><th>Selbsteinsch.</th><th>Bemerkung (lokal)</th><th></th></tr></thead><tbody>
+    ${sorted.map(s => `<tr><td><input type="text" data-f="s-name" data-id="${s.id}" value="${esc(s.name)}"></td>
+      <td><input type="text" style="width:70px" data-f="s-klasse" data-id="${s.id}" value="${esc(s.klasse || "")}"></td>
+      <td><select data-f="s-sex" data-id="${s.id}">${opt("", "–", !s.sex)}${opt("m", "m", s.sex === "m")}${opt("w", "w", s.sex === "w")}</select></td>
+      <td><select data-f="s-disc" data-id="${s.id}">${TYPE_ORDER.map(t => opt(t, TYPES[t], t === s.disc)).join("")}</select></td>
+      <td>${levelSelect(s.self, "s-self", s.id, "–")}</td>
+      <td><input type="text" data-f="s-note" data-id="${s.id}" value="${esc(s.note || "")}"></td>
+      <td><button class="btn small danger" data-act="delstud" data-id="${s.id}" aria-label="Person löschen">✕</button></td></tr>`).join("")}</tbody></table></div>` : ""}</section>
+
+  <section class="card"><h2>Daten</h2><p class="lead">Alles wird auf diesem Gerät gespeichert, angemeldet zusätzlich online. Das Backup enthält auch Namen und Bemerkungen.</p>
+    <div class="row"><button class="btn" data-act="backup">Backup speichern</button><button class="btn" data-act="backupcopy">Backup kopieren</button>
+    <label class="btn" for="restore">Backup laden<input type="file" id="restore" accept=".json,.txt" hidden></label>
+    <button class="btn" data-act="restorepaste">Backup einfügen</button>
+    <button class="btn" data-act="sample">Beispiellager laden</button><button class="btn danger" data-act="reset">Alles löschen</button></div></section>
+  </div>`;
+}
+function setupLevels() {
+  const L = subsList();
+  return `<section class="card"><h2>Niveaus</h2><p class="lead">Jede Stufe hat Unterstufen. <b>Höhere Nummer = stärker:</b> Anfänger 3 ist stärker als Anfänger 2 und schwächer als Fortgeschritten 1. Oben in jeder Spalte steht die stärkste Unterstufe. Die Kann-Sätze sagen, was jemand auf dieser Unterstufe sicher kann. Sie helfen beim Einteilen und beim Auf- und Abstufen und erscheinen in der Leiteransicht. Fügst du unten etwas ein, verschieben sich die Nummern; die Gruppen bleiben richtig zugeordnet.</p>
+  <div class="fams">${S.fam.map((f, fi) => `<div class="fam"><div class="famh"><span class="piste" style="--pc:${PISTE[Math.min(2, fi)]}"></span><input class="fld" data-f="fam-name" data-id="${f.id}" value="${esc(f.name)}" aria-label="Name der Stufe"><button class="btn small" data-act="famup" data-i="${fi}"${fi ? "" : " disabled"} aria-label="Stufe nach links">←</button><button class="btn small danger" data-act="famdel" data-id="${f.id}" aria-label="Stufe löschen">✕</button></div>
+    <button class="btn small" data-act="subadd" data-fid="${f.id}" data-pos="top">+ ${esc(f.name)} ${f.subs.length + 1} (stärker)</button>
+    ${f.subs.map((s, si) => ({ s, si })).reverse().map(({ s, si }) => `<div class="sub"><div class="subl">${pips(s.id, 14)}<b>${esc(lvLabel(s.id))}</b><span class="muted num" style="font-size:13px">Stufe ${LC.map[s.id].rank + 1} von ${L.length}</span><span class="row"><button class="btn small" data-act="submove" data-fid="${f.id}" data-i="${si}" data-d="1"${si === f.subs.length - 1 ? " disabled" : ""} aria-label="stärker">▲</button><button class="btn small" data-act="submove" data-fid="${f.id}" data-i="${si}" data-d="-1"${si ? "" : " disabled"} aria-label="schwächer">▼</button><button class="btn small danger" data-act="subdel" data-fid="${f.id}" data-sid="${s.id}" aria-label="Unterstufe löschen">✕</button></span></div>
+      <label>Ski<input class="fld" data-f="sub-ski" data-id="${s.id}" value="${esc(s.ski)}" placeholder="Kann …"></label><label>Snowboard<input class="fld" data-f="sub-board" data-id="${s.id}" value="${esc(s.board)}" placeholder="Kann …"></label></div>`).join("")}
+    <button class="btn small ghost" data-act="subadd" data-fid="${f.id}" data-pos="bottom">+ unten einfügen (schwächer)</button></div>`).join("")}</div>
+  <div class="row" style="margin-top:10px"><button class="btn small" data-act="famadd">+ Stufe</button></div></section>`;
+}
+function siteBase() { const b = CONFIG.seite || S.lager.url || (location.origin + location.pathname); return b.split("#")[0].split("?")[0]; }
+function nameHash() { return encNames(S.students.map(s => [s.id, s.name])); }
+function setupOnline() {
+  const links = [["Schüler/innen", ""], ["Leitung", "?ansicht=leiter"], ["Lagerleitung", "?ansicht=lp"]];
+  const hashNow = nameHash(), stale = S.linkSig && S.linkSig !== hashNow;
+  const linkBox = S.students.length ? `<h3 style="margin-top:14px">Links</h3><p class="muted" style="margin:2px 0 4px">Die Namen stecken im Link (Teil nach #) und landen nie in der Datenbank. Kommt eine Person dazu oder ändert ein Name, die Links neu verschicken.</p>
+    ${stale ? '<div class="note warn">Die Namensliste hat sich geändert: Links neu kopieren und verschicken.</div>' : ""}
+    ${links.map(([l, q], i) => `<div class="linkrow"><b>${l}</b><code>${esc(siteBase() + q)}#n=…</code><button class="btn small" data-act="copylink" data-i="${i}">Kopieren</button></div>`).join("")}
+    ${!CONFIG.seite ? `<label class="inl" style="margin-top:8px">Adresse der Seite <input class="fld" style="flex:1" data-f="url" value="${esc(S.lager.url)}" placeholder="https://…github.io/…/skilager/"></label>` : ""}` : "";
+  if (!ONLINE) return `<section class="card"><h2>Online</h2><p class="lead">Noch lokal: Alles bleibt auf diesem Gerät. Für Leiter- und Schüleransicht in <code>index.html</code> oben bei CONFIG die Datenbank-Adresse und den apiKey eintragen (Schritte im LIESMICH). Unter «Vorschau» siehst du schon jetzt, wie es bei Leitung und Schüler/innen aussieht.</p>${linkBox}</section>`;
+  if (!Sync.angemeldet) return `<section class="card"><h2>Online</h2>${loginForm("lp")}</section>`;
+  const lu = S.leiterUids.split(/[\s,;]+/).filter(Boolean);
+  return `<section class="card"><h2>Online</h2><p class="lead">Angemeldet. Änderungen gehen nach gut einer Sekunde an Leitung und Schüler/innen.</p>
+    <div class="row"><span class="muted">Dein Konto:</span><code class="sel">${esc(S.uidLP)}</code><button class="btn small" data-act="logout">Abmelden</button></div>
+    <h3 style="margin-top:14px">Leitungskonten</h3><p class="muted" style="margin:2px 0 6px">UID aus Firebase → Authentication → Users. Mehrere durch Komma trennen. Danach die Regeln neu einspielen.</p>
+    <input class="fld" style="width:100%" data-f="leiterUids" value="${esc(S.leiterUids)}" placeholder="UID Leitungskonto">
+    ${linkBox}
+    <h3 style="margin-top:14px">Regeln</h3><p class="muted" style="margin:2px 0 6px">Firebase-Konsole → Realtime Database → Rules: ersetzen und veröffentlichen.${lu.length ? "" : " Noch kein Leitungskonto eingetragen."}</p>
+    <pre class="rules" id="rulestext">${esc(JSON.stringify(rulesJSON(S.uidLP, lu), null, 2))}</pre><button class="btn small" data-act="copyrules">Regeln kopieren</button>
+    <h3 style="margin-top:14px">Nach dem Lager</h3><p class="muted" style="margin:2px 0 6px">Die Datenbank ist kein Archiv: Excel exportieren, Backup speichern, dann online löschen.</p><button class="btn small danger" data-act="wipe">Online-Daten löschen</button></section>`;
+}
+function rulesJSON(lp, leiter) {
+  const L = leiter.length ? leiter : ["LEITER_UID"];
+  const isLP = `auth != null && auth.uid === '${lp || "LEHRER_UID"}'`;
+  const isAny = `auth != null && (auth.uid === '${lp || "LEHRER_UID"}'${L.map(u => ` || auth.uid === '${u}'`).join("")})`;
+  return { rules: { ".read": false, ".write": false, [CONFIG.projekt]: {
+    oeffentlich: { ".read": true, ".write": isLP },
+    leitstand: { ".read": isAny, ".write": isLP,
+      appell: { "$tag": { "$gruppe": { "$slot": { "$sid": { ".write": isAny, ".validate": "newData.isBoolean() && $sid.length <= 20" } } } } },
+      rueckmeldung: { "$tag": { "$sid": { ".write": isAny,
+        ".validate": "newData.hasChildren(['r', 'g', 'z']) && $sid.length <= 20",
+        r: { ".validate": "newData.val() === 'auf' || newData.val() === 'ab' || newData.val() === 'ok'" },
+        g: { ".validate": "newData.isString() && newData.val().length <= 20" },
+        z: { ".validate": "newData.isNumber()" },
+        t: { ".validate": "newData.isString() && newData.val().length <= 200" },
+        "$anderes": { ".validate": false } } } } } } } };
+}
+function loginForm(role) {
+  return `<form id="loginform" data-role="${role}"><p class="eyebrow">${role === "lp" ? "Lagerleitung" : "Leitung"}</p><h2>Anmelden</h2><div class="stackf">
+    <label>E-Mail<input class="fld" id="lmail" type="email" autocomplete="username" required></label>
+    <label>Passwort<input class="fld" id="lpw" type="password" autocomplete="current-password" required></label>
+    <button class="btn primary" type="submit">Anmelden</button><p class="muted" id="lmsg" style="margin:0"></p></div></form>`;
+}
+
+/* ---------- Leitung ---------- */
+function leaderInner() {
+  if (!D || !D.days || !D.days.length) return '<p class="muted">Noch keine Daten von der Lagerleitung.</p>';
+  const di = Math.min(LV.day ?? D.days.length - 1, D.days.length - 1), d = D.days[di];
+  const g = grp(LV.gid);
+  let h = dayBar("lday", di, false);
+  h += `<div class="toolbar"><label class="inl"><span class="eyebrow">Meine Gruppe</span><select class="fld" data-f="l-gid">${opt("", "– wählen –", !g)}${allGroups().map(x => opt(x.id, x.name + (x.leader ? " · " + x.leader : ""), g && x.id === g.id)).join("")}</select></label></div>`;
+  h += `<div class="seg">${[["gruppe","Meine Gruppe"],["alle","Alle Gruppen"],["zimmer","Zimmer & Ämtli"]].map(([k, l]) => `<button data-act="ltab" data-v="${k}" aria-current="${LV.tab === k}">${l}</button>`).join("")}</div>`;
+  if (LV.tab === "alle") return h + leaderAll(d);
+  if (LV.tab === "zimmer") return h + leaderRooms(d);
+  return h + (g ? leaderGroup(d, g) : '<p class="muted">Wähle oben deine Gruppe. Das Gerät merkt sich die Wahl.</p>');
+}
+function leaderGroup(d, g) {
+  const mem = D.students.filter(s => d.assign[s.id] === g.id).sort(byName);
+  const slot = Math.min(LV.slot, D.slots.length - 1);
+  const ap = ((getR().appell[d.id] || {})[g.id] || {})[slot] || {};
+  const here = mem.filter(s => ap[s.id]).length;
+  const rm = getR().rm[d.id] || {};
+  const up = adjacent(g.id, "auf"), down = adjacent(g.id, "ab");
+  let h = `<section class="lband" style="background:${esc(g.color)};color:${textOn(g.color)}"><div class="eyebrow" style="color:inherit;opacity:.85">${TYPES[g.type]} · ${esc(lvLabel(g.level) || "ohne Niveau")}</div><div class="big">${esc(g.name)}</div>${g.meet ? `<div>Treffpunkt: ${esc(g.meet)}</div>` : ""}</section>`;
+  if (g.level) h += `<div class="card" style="margin-bottom:12px"><p class="kann"><b>Kann</b> ${esc(lvDesc(g.level, g.type) || "–")}</p>${up ? `<p class="kann muted"><b>Aufstufen nach ${esc(up.name)} (${esc(lvLabel(up.level))})</b> ${esc(lvDesc(up.level, g.type))}</p>` : ""}${down ? `<p class="kann muted"><b>Abstufen nach ${esc(down.name)} (${esc(lvLabel(down.level))})</b> ${esc(lvDesc(down.level, g.type))}</p>` : ""}</div>`;
+  h += `<div class="sect-h"><h2>Appell</h2><span class="eyebrow num">${here} von ${mem.length} da</span></div>
+    <div class="row" style="margin-bottom:6px"><div class="seg" style="margin:0">${D.slots.map((s, i) => `<button data-act="lslot" data-i="${i}" aria-current="${i === slot}">${esc(s)}</button>`).join("")}</div><button class="btn small" data-act="apall" data-gid="${g.id}">alle da</button><button class="btn small ghost" data-act="apnone" data-gid="${g.id}">zurücksetzen</button></div>`;
+  h += mem.map(s => { const r = rm[s.id]; return `<div class="lrow"><button class="ck${ap[s.id] ? " on" : ""}" data-act="ap" data-gid="${g.id}" data-sid="${s.id}" aria-pressed="${!!ap[s.id]}" aria-label="${esc(nameOf(s.id))} anwesend">✓</button>
+      <div class="lname"><b>${esc(nameOf(s.id))}</b><span class="muted" style="font-size:13px">${s.self ? "selbst: " + esc(lvLabel(s.self)) : ""}${r ? ` · <span style="color:var(--info)">${r.r === "auf" ? "aufstufen gemeldet" : r.r === "ab" ? "abstufen gemeldet" : "Bemerkung"}</span>` : ""}</span></div>
+      <button class="rmb${r && r.r === "auf" ? " on" : ""}" data-act="rm" data-gid="${g.id}" data-sid="${s.id}" data-r="auf" title="aufstufen vorschlagen"${up ? "" : " disabled"}>↑</button><button class="rmb${r && r.r === "ab" ? " on" : ""}" data-act="rm" data-gid="${g.id}" data-sid="${s.id}" data-r="ab" title="abstufen vorschlagen"${down ? "" : " disabled"}>↓</button>
+      ${r ? `<input class="fld lnote" data-f="l-note" data-gid="${g.id}" data-sid="${s.id}" maxlength="200" placeholder="Bemerkung für die Lagerleitung" value="${esc(r.t || "")}">` : ""}</div>`; }).join("") || '<p class="empty">Niemand in dieser Gruppe.</p>';
+  const miss = mem.filter(s => !ap[s.id]);
+  if (here && miss.length) h += `<div class="note warn" style="margin-top:12px"><b>Fehlt:</b> ${miss.map(s => esc(nameOf(s.id))).join(", ")}</div>`;
+  h += `<p class="muted" style="font-size:13px">↑ ↓ schlägt der Lagerleitung vor, die Person morgen eine Gruppe höher oder tiefer einzuteilen. Ein zweites Antippen nimmt den Vorschlag zurück.</p>`;
+  return h;
+}
+function leaderAll(d) {
+  const sick = D.students.filter(s => d.assign[s.id] === "B").sort(byName);
+  let h = `<div class="grid">${allGroups().map(g => { const mem = D.students.filter(s => d.assign[s.id] === g.id).sort(byName);
+    return `<section class="gcard"><header class="gband" style="background:${esc(g.color)};color:${textOn(g.color)}"><span class="gname">${esc(g.name)}</span><span class="gcount">${mem.length}</span></header><div class="gmeta">${lvTag(g.level, TYPES[g.type])}${g.leader ? `<span>· ${esc(g.leader)}</span>` : ""}${g.contact ? `<span class="sel">· ${esc(g.contact)}</span>` : ""}</div><ul class="mini">${mem.map(s => `<li>${esc(nameOf(s.id))}</li>`).join("") || '<li class="muted">–</li>'}</ul></section>`; }).join("")}
+    <section class="gcard sick"><header class="gband"><span class="gname">Krank · Bourbaki</span><span class="gcount">${sick.length}</span></header><ul class="mini">${sick.map(s => { const k = d.sick[s.id] || {}; return `<li><b>${esc(nameOf(s.id))}</b> <span class="muted">${esc([k.reason, k.since != null ? "seit " + dayLabel(k.since) : ""].filter(Boolean).join(" · "))}</span></li>`; }).join("") || '<li class="muted">alle gesund</li>'}</ul></section></div>`;
+  return h;
+}
+function leaderRooms(d) {
+  const rooms = D.rooms.map(r => { const m = D.students.filter(s => D.roomAssign[s.id] === r.id).sort(byName); return `<section class="gcard"><header class="gband"><span class="gname">${esc(r.name)}</span><span class="gcount">${m.length}</span></header>${r.leader ? `<div class="gmeta"><span>Verantwortlich: ${esc(r.leader)}</span></div>` : ""}<ul class="mini">${m.map(s => `<li>${esc(nameOf(s.id))}</li>`).join("") || '<li class="muted">–</li>'}</ul></section>`; }).join("");
+  const am = D.aemtli.map(a => { const m = D.students.filter(s => d.aem[s.id] === a.id).sort(byName); return `<section class="gcard"><header class="gband"><span class="gname">${esc(a.name)}</span><span class="gcount">${m.length}</span></header>${a.desc ? `<div class="gmeta"><span>${esc(a.desc)}</span></div>` : ""}<ul class="mini">${m.map(s => `<li>${esc(nameOf(s.id))}</li>`).join("") || '<li class="muted">–</li>'}</ul></section>`; }).join("");
+  return `<div class="sect-h"><h2>Ämtli</h2></div><div class="grid">${am || '<p class="muted">keine</p>'}</div><div class="sect"><div class="sect-h"><h2>Zimmer</h2></div><div class="grid">${rooms || '<p class="muted">keine</p>'}</div></div>`;
+}
+function renderLeaderShell() {
+  const head = `<header class="top"><div class="wrap"><div class="brand">${LOGO}<span>${esc(D?.lager?.name || "Skilager")} · Leitung</span></div>${pill()}${Sync.angemeldet || lsGet(LSRT) ? '<button class="btn small" data-act="logout" style="margin-left:auto">Abmelden</button>' : ""}</div></header>`;
+  let body;
+  if (!Sync.angemeldet && !lsGet(LSRT)) body = `<div class="start">${loginForm("leiter")}</div>`;
+  else if (DENIED) body = `<div class="start"><h2>Noch kein Zugriff</h2><p>Dieses Konto ist noch nicht als Leitung freigeschaltet. Gib der Lagerleitung diese Kennung:</p><p><code class="sel">${esc(MYUID)}</code></p></div>`;
+  else if (!D) body = '<p class="muted">Lade …</p>';
+  else body = `<div class="one">${leaderInner()}</div>`;
+  if (!Object.keys(NAMES).length && D) body = `<div class="note warn">Die Namen fehlen: Öffne die Seite einmal über den Leitungslink der Lagerleitung.</div>` + body;
+  paint(head + `<main class="wrap">${body}</main>`);
+}
+
+/* ---------- Schüler/innen ---------- */
+function normPub(p) { p = p || {}; ["gruppen","zuteilung","zimmer","zimmerZ","aemtli","aemtliZ"].forEach(k => p[k] = p[k] || {}); p.lager = p.lager || {}; return p; }
+function studentInner(P) {
+  const ids = Object.keys(NAMES);
+  if (!ids.length) return `<div class="start"><h2>Link fehlt</h2><p>Öffne den Link, den du von der Lagerleitung bekommen hast. Er enthält die Namensliste.</p></div>`;
+  const me = SV.me && NAMES[SV.me] ? SV.me : null;
+  if (!me) {
+    const q = SV.q.trim().toLowerCase();
+    const list = ids.filter(id => !q || NAMES[id].toLowerCase().includes(q)).sort((a, b) => NAMES[a].localeCompare(NAMES[b], "de"));
+    return `<div class="start"><p class="eyebrow">${esc(P.lager.n || "Skilager")}</p><h2>Wer bist du?</h2><input class="fld" id="ssearch" type="search" style="width:100%;margin-top:10px" placeholder="Namen suchen" value="${esc(SV.q)}" aria-label="Namen suchen"><div class="namegrid">${list.map(id => `<button class="nbtn" data-act="sme" data-sid="${id}">${esc(NAMES[id])}</button>`).join("")}</div></div>`;
+  }
+  const a = P.zuteilung[me], g = a && a !== "B" ? P.gruppen[a] : null;
+  let h = `<div class="sv"><div><p class="eyebrow" style="margin:0">${esc(P.lager.n || "")}${P.tag ? " · Einteilung " + esc(P.tag.lb) : ""}</p><h2 class="hello">Hallo ${esc(firstName(NAMES[me]))}</h2></div>`;
+  if (!P.tag) h += `<div class="card">Die Gruppen sind noch nicht freigegeben. Schau später wieder rein.</div>`;
+  else if (a === "B") h += `<div class="card sickcard"><div class="row"><span class="cross">+</span><b>Bourbaki</b></div><p style="margin:6px 0 0">Du bist heute nicht auf der Piste. Melde dich bei der Lagerleitung.</p></div>`;
+  else if (g) {
+    const mates = Object.keys(P.zuteilung).filter(x => x !== me && P.zuteilung[x] === a).map(x => NAMES[x] || "?").sort((x, y) => x.localeCompare(y, "de"));
+    h += `<section class="meband" style="background:${esc(g.c)};color:${textOn(g.c)};margin:0"><div class="eyebrow" style="color:inherit;opacity:.85">Deine Gruppe · ${esc(TYPES[g.t] || "")}</div><div class="big">${esc(g.n)}</div>${g.l ? `<div>${esc(g.l)}</div>` : ""}</section>
+      <div class="card">${g.ld ? `<div class="kv"><span>Leitung</span><b>${esc(g.ld)}</b><span></span></div>` : ""}${g.kt ? `<div class="kv"><span>Kontakt</span><span class="sel">${esc(g.kt)}</span><button class="btn small" data-act="copytxt" data-t="${esc(g.kt)}">Kopieren</button></div>` : ""}${g.tp ? `<div class="kv"><span>Treffpunkt</span><b>${esc(g.tp)}</b><span></span></div>` : ""}<div class="kv top"><span>Mit dir</span><div>${mates.length ? mates.map(esc).join(", ") : "–"}</div><span></span></div></div>`;
+  } else h += `<div class="card">Du bist für diesen Tag noch keiner Gruppe zugeteilt.</div>`;
+  const rid = P.zimmerZ[me];
+  if (rid && P.zimmer[rid]) { const mates = Object.keys(P.zimmerZ).filter(x => x !== me && P.zimmerZ[x] === rid).map(x => NAMES[x] || "?").sort((x, y) => x.localeCompare(y, "de")); h += `<div class="card"><div class="kv"><span>Zimmer</span><b>${esc(P.zimmer[rid].n)}</b><span></span></div><div class="kv top"><span>Mit dir</span><div>${mates.map(esc).join(", ") || "–"}</div><span></span></div></div>`; }
+  const aid = P.aemtliZ[me];
+  if (aid && P.aemtli[aid]) { const mates = Object.keys(P.aemtliZ).filter(x => x !== me && P.aemtliZ[x] === aid).map(x => firstName(NAMES[x] || "?")).sort(); h += `<div class="card"><div class="kv"><span>Ämtli</span><b>${esc(P.aemtli[aid].n)}</b><span></span></div>${P.aemtli[aid].d ? `<div class="kv"><span>Was</span><span>${esc(P.aemtli[aid].d)}</span><span></span></div>` : ""}<div class="kv top"><span>Mit dir</span><div>${mates.map(esc).join(", ") || "–"}</div><span></span></div></div>`; }
+  return h + `<div><button class="btn ghost" data-act="snot">Nicht du? Anderen Namen wählen</button></div></div>`;
+}
+function renderStudentShell() {
+  const P = normPub(PUB);
+  paint(`<header class="top"><div class="wrap"><div class="brand">${LOGO}<span>${esc(P.lager.n || "Skilager")}</span></div>${pill()}</div></header><main class="wrap"><div class="one">${studentInner(P)}</div></main>`);
+}
+
+/* ==========================================================================
+   Aktionen
+   ========================================================================== */
+function openDlg(html, onMount) { const l = $("#layer"); l.innerHTML = `<div class="backdrop" data-act="close"><div class="dlg" role="dialog" aria-modal="true">${html}</div></div>`; onMount && onMount(l.querySelector(".dlg")); }
+function closeDlg() { $("#layer").innerHTML = ""; }
+function ask(title, text, okLabel, fn, danger) { openDlg(`<h3>${esc(title)}</h3><p class="sub2">${esc(text)}</p><div class="row" style="justify-content:flex-end"><button class="btn" data-act="close">Abbrechen</button><button class="btn ${danger ? "danger" : "primary"}" id="okbtn">${esc(okLabel)}</button></div>`, dl => dl.querySelector("#okbtn").onclick = () => { closeDlg(); fn(); }); }
+
+function openMove(kind, sid) {
+  const s = stu(sid), d = day();
+  const head = `<h3>${esc(s.name)}</h3><p class="sub2">${[s.klasse, TYPES[s.disc], s.self ? "Selbsteinschätzung " + lvLabel(s.self) : "", s.note].filter(Boolean).map(esc).join(" · ")}</p>`;
+  const destBtn = (id, name, color, c, cur, clash) => `<button data-to="${id}" aria-current="${cur}" class="${clash.length ? "risk" : ""}" title="${clash.length ? "Regel: nicht mit " + esc(clash.join(", ")) : ""}">${color ? `<span class="dot" style="background:${esc(color)}"></span>` : ""}<span class="n">${clash.length ? "⚠ " : ""}${esc(name)}</span><span class="c">${esc(c)}</span></button>`;
+  let body = "";
+  if (kind === "gruppen") {
+    const cur = d.assign[sid], from = cur === "B" ? d.sick[sid]?.from : null, k = d.sick[sid] || {};
+    const count = g => S.students.filter(x => d.assign[x.id] === g.id).length;
+    const hist = S.days.slice(0, S.cur).map((x, i) => { const a = x.assign[sid], g = grp(a); return `<span class="hcell" style="margin-right:10px"><span class="muted">${dayLabel(i)}</span> ${a === "B" ? '<b style="color:var(--bad)">Bourbaki</b>' : g ? `<span class="dot" style="background:${esc(g.color)}"></span>${esc(g.name)}` : "–"}</span>`; }).join("");
+    body = (from && grp(from) ? `<button class="btn primary back-btn" data-to="${from}">Gesund – zurück zu «${esc(grp(from).name)}»</button>` : "") +
+      TYPE_ORDER.filter(t => S.groups.some(g => g.type === t)).map(t => `<div class="eyebrow">${TYPES[t]}${t !== s.disc ? " (Wechsel)" : ""}</div><div class="dest">${groupsOf(t).map(g => destBtn(g.id, g.name, g.color, (g.level ? lvAbbr(g.level) + " · " : "") + count(g), cur === g.id, wouldClash("gruppen", sid, g.id, d))).join("")}</div>`).join("") +
+      `<div class="eyebrow" style="color:var(--bad)">Krank · Bourbaki</div><div class="row" style="margin:6px 0 14px"><input class="fld" id="reason" style="flex:1" placeholder="Grund, z.B. Knie, Fieber" value="${esc(k.reason || "")}"><button class="btn" data-to="B" style="color:var(--bad);border-color:var(--bad)">${cur === "B" ? "Grund speichern" : "In Bourbaki"}</button></div>` +
+      `<div class="row" style="justify-content:flex-end;border-top:1px solid var(--line);padding-top:12px">${cur ? '<button class="btn small" data-to="none">Herausnehmen</button>' : ""}<button class="btn small" data-act="close">Schliessen</button></div>` + (hist ? `<div style="margin-top:12px;font-size:13px">${hist}</div>` : "");
+  } else if (kind === "zimmer") {
+    const cur = S.roomAssign[sid];
+    body = `<div class="dest">${S.rooms.map(r => destBtn(r.id, r.name, null, S.students.filter(x => S.roomAssign[x.id] === r.id).length + (r.cap ? "/" + r.cap : ""), cur === r.id, wouldClash("zimmer", sid, r.id, d))).join("")}</div><div class="row" style="justify-content:flex-end">${cur ? '<button class="btn small" data-to="none">Herausnehmen</button>' : ""}<button class="btn small" data-act="close">Schliessen</button></div>`;
+  } else {
+    const cur = d.aem[sid];
+    body = `<div class="dest">${S.aemtli.map(a => destBtn(a.id, a.name, null, String(S.students.filter(x => d.aem[x.id] === a.id).length), cur === a.id, [])).join("")}</div><div class="row" style="justify-content:flex-end">${cur ? '<button class="btn small" data-to="none">Herausnehmen</button>' : ""}<button class="btn small" data-act="close">Schliessen</button></div>`;
+  }
+  openDlg(head + body, dl => dl.querySelectorAll("[data-to]").forEach(b => b.onclick = () => { const r = dl.querySelector("#reason"); moveTo(kind, sid, b.dataset.to, r ? r.value.trim() : ""); closeDlg(); }));
+}
+function askReason(sid) {
+  openDlg(`<h3>${esc(stu(sid).name)} in Bourbaki</h3><p class="sub2">Grund (optional)</p><input class="fld" id="reason" style="width:100%" placeholder="z.B. Knie, Fieber"><div class="row" style="justify-content:flex-end;margin-top:12px"><button class="btn" data-act="close">Abbrechen</button><button class="btn primary" id="okbtn">Übernehmen</button></div>`, dl => {
+    const inp = dl.querySelector("#reason"); inp.focus(); const ok = () => { moveTo("gruppen", sid, "B", inp.value.trim()); closeDlg(); };
+    dl.querySelector("#okbtn").onclick = ok; inp.onkeydown = e => { if (e.key === "Enter") ok(); };
+  });
+}
+function moveTo(kind, sid, t, reason) {
+  const d = day(), s = stu(sid);
+  if (kind === "zimmer") { if (t === "none") delete S.roomAssign[sid]; else S.roomAssign[sid] = t; }
+  else if (kind === "aemtli") { if (t === "none") delete d.aem[sid]; else d.aem[sid] = t; }
+  else {
+    const cur = d.assign[sid];
+    if (t === "B") { const old = d.sick[sid]; d.sick[sid] = { reason: reason || "", since: old && cur === "B" ? old.since : S.cur, from: cur && cur !== "B" ? cur : (old?.from || null) }; d.assign[sid] = "B"; }
+    else {
+      if (cur === "B") delete d.sick[sid];
+      if (t === "none") delete d.assign[sid];
+      else { d.assign[sid] = t; const g = grp(t); if (g && g.type !== s.disc) { s.disc = g.type; toast(`${s.name} wechselt zu ${TYPES[g.type]}`); } }
+    }
+  }
+  render();
+}
+
+/* Appell und Rückmeldung (Leitung) */
+function setAppell(dayId, gid, slot, sid, val) {
+  const R = getR(); const a = R.appell[dayId] = R.appell[dayId] || {}; const b = a[gid] = a[gid] || {}; const c = b[slot] = b[slot] || {};
+  if (val) c[sid] = true; else delete c[sid];
+  if (serverWrites()) Sync.schreibSicher(`leitstand/appell/${dayId}/${gid}/${slot}/${sid}`, val ? true : null).then(r => { netz(r); paintPill(); });
+  cache(); render();
+}
+function setRM(dayId, sid, val) {
+  const R = getR(); const m = R.rm[dayId] = R.rm[dayId] || {};
+  if (val) m[sid] = val; else delete m[sid];
+  if (serverWrites()) Sync.schreibSicher(`leitstand/rueckmeldung/${dayId}/${sid}`, val || null).then(r => { netz(r); paintPill(); });
+  cache(); render();
+}
+function leaderDay() { return D.days[Math.min(LV.day ?? D.days.length - 1, D.days.length - 1)]; }
+function cache() { if (ROLE === "leiter") lsSet(LSC, { stand: D, remote: REMOTE }); if (ROLE === "sus") lsSet(LSC, PUB); }
+
+/* Import */
+function parseLevel(v) {
+  if (v == null) return null; const t = String(v).trim().toLowerCase(); if (!t) return null; const L = subsList();
+  if (/^\d+$/.test(t)) { const i = Math.min(L.length, Math.max(1, +t)) - 1; return L[i]?.id || null; }
+  const x = L.find(s => lvLabel(s.id).toLowerCase() === t) || L.find(s => lvAbbr(s.id).toLowerCase() === t.replace(/\s/g, ""));
+  if (x) return x.id;
+  const key = t.startsWith("anf") ? "anf" : t.startsWith("fort") ? "fort" : /^(könn|koenn|profi|exp|sehr gut)/.test(t) ? "kön" : t.slice(0, 4);
+  const f = S.fam.find(f => f.name.toLowerCase().startsWith(key)); if (!f) return null;
+  const n = t.match(/\d+/); return (f.subs[n ? +n[0] - 1 : 0] || f.subs[0])?.id || null;
+}
+const parseDisc = v => { const t = String(v || "").toLowerCase(); if (/snow|board/.test(t)) return "snowboard"; if (/poly|sport|wander|winter|schlitt|langl/.test(t)) return "poly"; return "ski"; };
+const parseSex = v => { const t = String(v || "").trim().toLowerCase(); if (/^(m|männlich|maennlich|knabe|junge|j|male)/.test(t)) return "m"; if (/^(w|f|weiblich|mädchen|maedchen|female)/.test(t)) return "w"; return ""; };
+function importRows(rows, replace) {
+  rows = rows.map(r => r.map(c => c == null ? "" : String(c).trim())).filter(r => r.some(c => c));
+  if (!rows.length) { toast("Keine Zeilen gefunden."); return; }
+  const hdr = rows[0].map(c => c.toLowerCase()), find = re => hdr.findIndex(h => re.test(h));
+  const hasHdr = hdr.some(h => /name|klasse|geschl|disziplin|niveau|sport|level/.test(h));
+  let ci = { name: 0, vor: -1, nach: -1, kl: -1, sex: -1, disc: -1, lvl: -1, note: -1 };
+  if (hasHdr) { ci = { vor: find(/^vorname/), nach: find(/nachname|familienname/), name: find(/^(name|schüler|sus|teilnehm)/), kl: find(/klasse/), sex: find(/geschl|m\/w|sex/), disc: find(/disziplin|sport|^art|gerät|ski\/|board/), lvl: find(/niveau|level|könn|stufe|einsch/), note: find(/bemerk|notiz|hinweis/) }; rows = rows.slice(1); }
+  else { const w = rows[0].length; for (let c = 1; c < w; c++) { const col = rows.map(r => r[c] || "");
+    if (ci.sex < 0 && col.every(x => !x || parseSex(x))) ci.sex = c;
+    else if (ci.disc < 0 && col.some(x => /ski|snow|board|poly/i.test(x))) ci.disc = c;
+    else if (ci.lvl < 0 && col.some(x => /anf|fort|könn|^\d$/i.test(x))) ci.lvl = c;
+    else if (ci.kl < 0) ci.kl = c; } }
+  if (replace) { S.students = []; S.rules = []; S.roomAssign = {}; S.days = [newDay()]; S.cur = 0; }
+  const have = new Set(S.students.map(s => s.name.toLowerCase())); let add = 0, noLvl = 0; const per = { ski: 0, snowboard: 0, poly: 0 };
+  for (const r of rows) {
+    const name = ci.vor >= 0 && ci.nach >= 0 ? `${r[ci.vor]} ${r[ci.nach]}`.trim() : (r[ci.name >= 0 ? ci.name : (ci.vor >= 0 ? ci.vor : 0)] || "");
+    if (!name || have.has(name.toLowerCase())) continue; have.add(name.toLowerCase());
+    const disc = ci.disc >= 0 ? parseDisc(r[ci.disc]) : "ski", self = ci.lvl >= 0 ? parseLevel(r[ci.lvl]) : null;
+    if (!self && disc !== "poly") noLvl++; per[disc]++;
+    S.students.push({ id: uid(), name, klasse: ci.kl >= 0 ? r[ci.kl] || "" : "", sex: ci.sex >= 0 ? parseSex(r[ci.sex]) : "", disc, self, note: ci.note >= 0 ? r[ci.note] || "" : "" }); add++;
+  }
+  render();
+  toast(`${add} Namen übernommen (Ski ${per.ski}, Snowboard ${per.snowboard}, Poly ${per.poly})${noLvl ? ` · ${noLvl} ohne Selbsteinschätzung` : ""}`);
+}
+const splitText = t => t.split(/\r?\n/).map(l => l.includes("\t") ? l.split("\t") : l.includes(";") ? l.split(";") : l.split(","));
+
+/* Export */
+function columns(i, kind) {
+  const d = S.days[i];
+  if (kind === "zimmer") return S.rooms.map(r => ({ h: r.name, sub: r.leader || "", names: S.students.filter(s => S.roomAssign[s.id] === r.id).sort(byName).map(s => s.name) }));
+  if (kind === "aemtli") return S.aemtli.map(a => ({ h: a.name, sub: a.desc || "", names: S.students.filter(s => d.aem[s.id] === a.id).sort(byName).map(s => s.name) }));
+  const cols = allGroups().map(g => ({ h: `${g.name}${g.level ? " (" + lvLabel(g.level) + ")" : ""}`, sub: [g.leader, g.contact].filter(Boolean).join(" "), names: S.students.filter(s => d.assign[s.id] === g.id).sort(byName).map(s => s.name) }));
+  cols.push({ h: "Krank · Bourbaki", sub: "", names: S.students.filter(s => d.assign[s.id] === "B").sort(byName).map(s => s.name + (d.sick[s.id]?.reason ? " (" + d.sick[s.id].reason + ")" : "")) });
+  return cols;
+}
+function colsToAoa(cols) { const max = Math.max(0, ...cols.map(c => c.names.length)); const a = [cols.map(c => c.h), cols.map(c => c.sub)]; for (let r = 0; r < max; r++) a.push(cols.map(c => c.names[r] || "")); return a; }
+function copyText(txt, msg) { if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(() => toast(msg), () => fallbackCopy(txt)); else fallbackCopy(txt); }
+function fallbackCopy(txt) { openDlg(`<h3>Zum Kopieren markieren</h3><p class="sub2">Kopieren wurde blockiert. Der Text ist markiert – mit Strg/Cmd+C kopieren.</p><textarea class="fld" style="min-height:200px" id="cp">${esc(txt)}</textarea><div class="row" style="justify-content:flex-end;margin-top:10px"><button class="btn" data-act="close">Fertig</button></div>`, dl => { const t = dl.querySelector("#cp"); t.focus(); t.select(); }); }
+function download(name, blob) { try { const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500); } catch (e) { toast("Download nicht möglich – nutze «kopieren»."); } }
+const stamp = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; };
+
+/* Beispiel */
+function sample() {
+  let seed = 11; const rnd = () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+  const M = ["Luca","Noah","Leon","Elias","Jan","Nico","Levin","Tim","Gian","Robin","Jonas","Fabio","Samuel","Dario","Nils","Lars","Matteo","Mika","Joel","Sven","Andrin","Yanis","Ben","Lino","Cyril","Raphael","Julian","Simon","Alessio","Remo","Silvan","Marco"];
+  const F = ["Lena","Mia","Elena","Lara","Nina","Alina","Sara","Jana","Lea","Chiara","Lia","Selina","Anja","Zoe","Livia","Leonie","Ronja","Malin","Emma","Elin","Seraina","Aline","Noemi","Nora","Mara","Julia","Tamara","Larissa","Flurina","Valentina","Ladina","Sofia"];
+  const N = ["Keller","Brunner","Frei","Huber","Meier","Baumann","Fischer","Gerber","Zünd","Rüegg","Koller","Egger","Graf","Bühler","Stäheli","Schmid","Wick","Lüthi","Hug","Ammann"];
+  const L = (D = S, subsList()); const st = [];
+  for (let i = 0; i < 64; i++) { const m = i % 2 === 0, first = (m ? M : F)[Math.floor(i / 2) % 32];
+    const disc = i < 48 ? "ski" : i < 60 ? "snowboard" : "poly";
+    const r = Math.min(L.length - 1, Math.max(0, Math.round((rnd() + rnd()) / 2 * (L.length - 1) + (disc === "snowboard" ? -1 : 0))));
+    st.push({ id: uid(), name: `${first} ${N[Math.floor(rnd() * N.length)]}`, klasse: ["1A","1B","1C"][i % 3], sex: m ? "m" : "w", disc, self: disc === "poly" ? null : L[r].id, note: "" }); }
+  S.students = st; S.days = [newDay()]; S.cur = 0; S.local = { appell: {}, rm: {} };
+  S.rules = [{ type: "apart", ids: [st[0].id, st[4].id], scope: "beide" }, { type: "together", ids: [st[1].id, st[3].id], scope: "zimmer" }];
+  S.rooms = Array.from({ length: 10 }, (_, i) => ({ id: uid(), name: `Zimmer ${i + 1}`, cap: 7, leader: "" }));
+  S.roomAssign = {}; const boys = st.filter(s => s.sex === "m"), girls = st.filter(s => s.sex === "w");
+  boys.forEach((s, i) => S.roomAssign[s.id] = S.rooms[Math.floor(i / 7)].id); girls.forEach((s, i) => S.roomAssign[s.id] = S.rooms[5 + Math.floor(i / 7)].id);
+  // Beispiel-Einteilung: nächste passende Gruppe zur Selbsteinschätzung (im echten Lager teilt ihr von Hand ein)
+  const d = S.days[0];
+  for (const s of st) { const gs = S.groups.filter(g => g.type === s.disc); if (!gs.length) continue; const sr = lvRank(s.self);
+    const best = gs.map(g => ({ g, c: (sr == null || lvRank(g.level) == null ? 0 : Math.abs(sr - lvRank(g.level))) * 100 + st.filter(x => d.assign[x.id] === g.id).length })).sort((a, b) => a.c - b.c)[0].g; d.assign[s.id] = best.id; }
+  d.assign[st[7].id] = "B"; d.sick[st[7].id] = { reason: "Knie", since: 0, from: null };
+  S.rooms.slice(0, 4).forEach((r, i) => st.filter(s => S.roomAssign[s.id] === r.id).forEach(s => d.aem[s.id] = S.aemtli[i].id));
+  S.groups.forEach((g, i) => { g.leader = ["Lewin S.","Andrea K.","Marco B.","Sabine R.","Thomas W.","Nadia F.","Reto M.","Jasmin L.","Patrick Z.","Corinne H."][i] || ""; g.contact = "079 000 00 " + String(10 + i); g.meet = "9.00 Talstation"; });
+  d.frei = true;
+  const g0 = S.groups[2], mem = st.filter(s => d.assign[s.id] === g0.id);
+  if (mem[0]) S.local.rm[d.id] = { [mem[0].id]: { r: "auf", g: g0.id, z: Date.now(), t: "fährt schon parallel" } };
+  S.lager.name = "Beispiel – Skilager"; S.view = "board"; S.board = "gruppen"; render(); toast("Beispiellager mit 64 erfundenen Namen geladen.");
+}
+
+/* Online: Anmeldung und Abgleich */
+async function afterLoginLP(uidLP) {
+  S.uidLP = uidLP;
+  const r = await Sync.lies("leitstand/stand"); netz(r);
+  const st = r.ok ? r.daten : null;
+  if (!st) { publish(); }
+  else if (!S.students.length) adoptStand(st);
+  else if ((st.ts || 0) > (S.ts || 0) + 2000) {
+    ask("Neuerer Stand online", `Online liegt ein Stand von ${new Date(st.ts).toLocaleString("de-CH")}. Laden? Sonst überschreibt dieses Gerät den Online-Stand.`, "Online-Stand laden", () => adoptStand(st));
+    setTimeout(() => { const c = document.querySelector('.dlg [data-act="close"]'); if (c) c.textContent = "Meinen Stand behalten"; }, 0);
+  } else publish();
+  Takt.start([
+    { p: "leitstand/appell", ms: CONFIG.taktMs, cb: v => { if (v === undefined) return; if (sig("ap", v)) { REMOTE.appell = v || {}; redraw(); } } },
+    { p: "leitstand/rueckmeldung", ms: CONFIG.taktMs * 2, cb: v => { if (v === undefined) return; if (sig("rm", v)) { REMOTE.rm = v || {}; redraw(); } } },
+  ]);
+  render();
+}
+function adoptStand(st) {
+  st = norm(JSON.parse(JSON.stringify(st)));
+  const old = Object.fromEntries(S.students.map(s => [s.id, s]));
+  st.students = st.students.map(s => ({ id: s.id, name: old[s.id]?.name || LINKNAMES[s.id] || "Unbekannt", klasse: old[s.id]?.klasse || "", sex: old[s.id]?.sex || "", disc: s.disc, self: s.self || null, note: old[s.id]?.note || "" }));
+  S = { ...S, lager: { ...S.lager, ...st.lager }, fam: st.fam, groups: st.groups, students: st.students, rules: st.rules, rooms: st.rooms, roomAssign: st.roomAssign, aemtli: st.aemtli, slots: st.slots, days: st.days, ts: st.ts };
+  S = norm(S); lastSig = null; render(); toast("Online-Stand geladen.");
+}
+const SIGS = {};
+function sig(k, v) { const s = JSON.stringify(v ?? null); if (SIGS[k] === s) return false; SIGS[k] = s; return true; }
+function redraw() { const a = document.activeElement; if (a && /INPUT|TEXTAREA|SELECT/.test(a.tagName)) return; if ($("#layer").innerHTML) return; render(); }
+function startLeaderPoll() {
+  Takt.start([
+    { p: "leitstand/stand", ms: CONFIG.taktMs * 3, cb: (v, st) => { if (st) { DENIED = true; render(); return; } DENIED = false; if (v && sig("st", v)) { D = norm(v); cache(); redraw(); } } },
+    { p: "leitstand/appell", ms: CONFIG.taktMs, cb: v => { if (v === undefined) return; if (sig("ap", v)) { REMOTE.appell = v || {}; cache(); redraw(); } } },
+    { p: "leitstand/rueckmeldung", ms: CONFIG.taktMs, cb: v => { if (v === undefined) return; if (sig("rm", v)) { REMOTE.rm = v || {}; cache(); redraw(); } } },
+  ]);
+}
+
+/* Ereignisse */
+const ACT = {
+  close: (el, e) => { if (e.target === el) closeDlg(); },
+  view: el => { S.view = el.dataset.v; TARGET = null; render(); },
+  board: el => { S.board = el.dataset.v; TARGET = null; render(); },
+  day: el => { S.cur = +el.dataset.i; render(); },
+  addday: () => { const last = S.days[S.days.length - 1], nd = newDay(); nd.assign = { ...last.assign }; nd.sick = JSON.parse(JSON.stringify(last.sick)); nd.aem = { ...last.aem }; S.days.push(nd); S.cur = S.days.length - 1; render(); toast(`${dayLabel(S.cur)} angelegt – Gruppen, Bourbaki und Ämtli übernommen. Noch nicht freigegeben.`); },
+  delday: () => ask("Tag löschen?", `${dayLabel(S.cur)} mit seiner Einteilung wird gelöscht.`, "Löschen", () => { S.days.splice(S.cur, 1); S.cur = S.days.length - 1; render(); }, true),
+  frei: () => { const d = day(); d.frei = !d.frei; render(); toast(d.frei ? "Freigegeben: Schüler/innen sehen diese Einteilung." : "Freigabe zurückgenommen."); },
+  target: el => { const k = el.dataset.kind, id = el.dataset.id; TARGET = TARGET && TARGET.kind === k && TARGET.id === id ? null : { kind: k, id }; render(); },
+  endtarget: () => { TARGET = null; render(); },
+  pick: el => { const k = el.dataset.kind, sid = el.dataset.sid; if (TARGET && TARGET.kind === k) { moveTo(k, sid, TARGET.id); return; } openMove(k, sid); },
+  applyrm: el => moveTo("gruppen", el.dataset.sid, el.dataset.to),
+  copy: () => { const cols = columns(S.cur, S.board), a = colsToAoa(cols); copyText([`${S.lager.name} – ${S.board === "zimmer" ? "Zimmer" : dayLabel(S.cur)}`, ...a.map(r => r.join("\t"))].join("\n"), "Liste kopiert – in Excel oder Word einfügen."); },
+  xlsx: () => { if (typeof XLSX === "undefined") { toast("Excel-Bibliothek nicht geladen (offline?) – nutze «Liste kopieren»."); return; }
+    const wb = XLSX.utils.book_new(), add = (aoa, n) => { const ws = XLSX.utils.aoa_to_sheet(aoa); ws["!cols"] = (aoa[0] || []).map(() => ({ wch: 22 })); XLSX.utils.book_append_sheet(wb, ws, n.replace(/[\\/?*[\]:]/g, ".").slice(0, 31)); };
+    S.days.forEach((d, i) => add(colsToAoa(columns(i, "gruppen")), dayLabel(i)));
+    if (S.rooms.length) add(colsToAoa(columns(0, "zimmer")), "Zimmer");
+    if (S.aemtli.length) add([["Ämtli", ...S.days.map((d, i) => dayLabel(i))], ...S.aemtli.map(a => [a.name, ...S.days.map(d => S.students.filter(s => d.aem[s.id] === a.id).map(s => s.name).join(", "))])], "Ämtli");
+    add([["Name","Klasse","Disziplin","Selbsteinsch.","Zimmer",...S.days.map((d, i) => dayLabel(i))], ...[...S.students].sort(byName).map(s => [s.name, s.klasse, TYPES[s.disc], lvLabel(s.self), room(S.roomAssign[s.id])?.name || "", ...S.days.map(d => { const a = d.assign[s.id]; return a === "B" ? "Bourbaki" + (d.sick[s.id]?.reason ? " (" + d.sick[s.id].reason + ")" : "") : grp(a)?.name || ""; })])], "Verlauf");
+    try { XLSX.writeFile(wb, `Skilager_${stamp()}.xlsx`); } catch (e) { toast("Download nicht möglich – nutze «Liste kopieren»."); } },
+  rotate: () => { const prev = S.days[S.cur - 1], d = day(), n = S.aemtli.length, run = () => { d.aem = {}; for (const sid in prev.aem) { const i = S.aemtli.findIndex(a => a.id === prev.aem[sid]); if (i >= 0) d.aem[sid] = S.aemtli[(i + 1) % n].id; } render(); toast("Ämtli rotiert."); };
+    if (Object.keys(d.aem).length) ask("Ämtli rotieren?", "Die Ämtli dieses Tages werden ersetzt: alle rücken ins nächste Ämtli vom Vortag.", "Rotieren", run); else run(); },
+  aemclear: () => ask("Ämtli leeren?", `Alle Ämtli für ${dayLabel(S.cur)} werden entfernt.`, "Leeren", () => { day().aem = {}; render(); }, true),
+  roomaem: el => { const rid = el.dataset.rid, d = day(), mem = S.students.filter(s => S.roomAssign[s.id] === rid && !aem(d.aem[s.id]));
+    if (TARGET && TARGET.kind === "aemtli") { mem.forEach(s => d.aem[s.id] = TARGET.id); render(); return; }
+    openDlg(`<h3>${esc(room(rid).name)} → Ämtli</h3><p class="sub2">${mem.map(s => esc(s.name)).join(", ")}</p><div class="dest">${S.aemtli.map(a => `<button data-to="${a.id}"><span class="n">${esc(a.name)}</span></button>`).join("")}</div><div class="row" style="justify-content:flex-end"><button class="btn small" data-act="close">Abbrechen</button></div>`, dl => dl.querySelectorAll("[data-to]").forEach(b => b.onclick = () => { mem.forEach(s => d.aem[s.id] = b.dataset.to); closeDlg(); render(); })); },
+  aps: el => { APS = +el.dataset.i; render(); },
+  pv: el => { PV = el.dataset.v; render(); },
+  sample: () => { if (S.students.length) ask("Beispiel laden?", "Namen, Regeln, Zimmer und alle Tage werden ersetzt. Niveaus und Gruppen bleiben.", "Beispiel laden", sample, true); else sample(); },
+  qty: () => { const want = { ski: +$("#q-ski").value || 0, snowboard: +$("#q-snowboard").value || 0, poly: +$("#q-poly").value || 0 }, drop = [];
+    for (const t of TYPE_ORDER) { const gs = S.groups.filter(g => g.type === t);
+      for (let i = gs.length; i < want[t]; i++) { const mid = subsList()[Math.floor(subsList().length / 2)]; S.groups.push({ id: uid(), name: `${TYPES[t]} ${i + 1}`, type: t, level: t === "poly" ? null : (mid ? mid.id : null), color: PALETTE[S.groups.length % PALETTE.length], leader: "", contact: "", showContact: false, meet: "", max: "" }); }
+      if (gs.length > want[t]) drop.push(...gs.slice(want[t])); }
+    if (drop.length) ask("Gruppen entfernen?", `Entfernt: ${drop.map(g => g.name).join(", ")}. Wer darin eingeteilt ist, wird «nicht eingeteilt».`, "Entfernen", () => { drop.forEach(g => removeGroup(g.id)); render(); }, true); else render(); },
+  addgroup: () => { S.groups.push({ id: uid(), name: "Neue Gruppe", type: "ski", level: null, color: PALETTE[S.groups.length % PALETTE.length], leader: "", contact: "", showContact: false, meet: "", max: "" }); render(); },
+  delgroup: el => { const g = grp(el.dataset.id); ask("Gruppe löschen?", `«${g.name}» wird gelöscht. Wer darin eingeteilt ist, wird «nicht eingeteilt».`, "Löschen", () => { removeGroup(g.id); render(); }, true); },
+  famadd: () => { S.fam.push({ id: uid(), name: "Neue Stufe", subs: [{ id: uid(), ski: "", board: "" }] }); render(); },
+  famup: el => { const i = +el.dataset.i; if (i > 0) { [S.fam[i - 1], S.fam[i]] = [S.fam[i], S.fam[i - 1]]; render(); } },
+  famdel: el => { const f = S.fam.find(x => x.id === el.dataset.id); const ids = f.subs.map(s => s.id); const used = S.groups.some(g => ids.includes(g.level)) || S.students.some(s => ids.includes(s.self));
+    const run = () => { S.fam = S.fam.filter(x => x !== f); clearLevels(ids); render(); };
+    if (used) ask("Stufe löschen?", `«${f.name}» wird von Gruppen oder Selbsteinschätzungen verwendet. Diese verlieren ihr Niveau.`, "Löschen", run, true); else run(); },
+  subadd: el => { const f = S.fam.find(x => x.id === el.dataset.fid), s = { id: uid(), ski: "", board: "" }; if (el.dataset.pos === "bottom") f.subs.unshift(s); else f.subs.push(s); render(); toast(el.dataset.pos === "bottom" ? `Neue schwächste Unterstufe – die übrigen Nummern rücken nach.` : `${lvLabel(s.id)} angelegt.`); },
+  submove: el => { const f = S.fam.find(x => x.id === el.dataset.fid), i = +el.dataset.i, j = i + +el.dataset.d; if (j < 0 || j >= f.subs.length) return; [f.subs[i], f.subs[j]] = [f.subs[j], f.subs[i]]; render(); },
+  subdel: el => { const f = S.fam.find(x => x.id === el.dataset.fid), id = el.dataset.sid; if (f.subs.length < 2) { toast("Die letzte Unterstufe einer Stufe kann nicht gelöscht werden – lösche die ganze Stufe."); return; }
+    const run = () => { f.subs = f.subs.filter(s => s.id !== id); clearLevels([id]); render(); };
+    if (S.groups.some(g => g.level === id) || S.students.some(s => s.self === id)) ask("Unterstufe löschen?", `${lvLabel(id)} wird verwendet. Betroffene Gruppen und Selbsteinschätzungen verlieren ihr Niveau.`, "Löschen", run, true); else run(); },
+  roomsbulk: () => { const n = +$("#rb-n").value || 0, c = $("#rb-c").value; const start = S.rooms.length; for (let i = 0; i < n; i++) S.rooms.push({ id: uid(), name: `Zimmer ${start + i + 1}`, cap: c, leader: "" }); render(); },
+  addroom: () => { S.rooms.push({ id: uid(), name: `Zimmer ${S.rooms.length + 1}`, cap: "", leader: "" }); render(); },
+  delroom: el => { const id = el.dataset.id; S.rooms = S.rooms.filter(r => r.id !== id); for (const k in S.roomAssign) if (S.roomAssign[k] === id) delete S.roomAssign[k]; render(); },
+  addaem: () => { S.aemtli.push({ id: uid(), name: "Neues Ämtli", desc: "" }); render(); },
+  aemup: el => { const i = +el.dataset.i; if (i > 0) { [S.aemtli[i - 1], S.aemtli[i]] = [S.aemtli[i], S.aemtli[i - 1]]; render(); } },
+  delaem: el => { const id = el.dataset.id; S.aemtli = S.aemtli.filter(a => a.id !== id); S.days.forEach(d => { for (const k in d.aem) if (d.aem[k] === id) delete d.aem[k]; }); render(); },
+  addrule: () => { const ids = [...new Set([$("#r1").value, $("#r2").value, $("#r3").value].filter(Boolean))]; if (ids.length < 2) { toast("Mindestens zwei verschiedene Personen wählen."); return; } S.rules.push({ type: $("#rt").value, ids, scope: $("#rs").value }); render(); },
+  delrule: el => { S.rules.splice(+el.dataset.i, 1); render(); },
+  paste: () => { const t = $("#paste").value; if (!t.trim()) { toast("Zuerst Zeilen aus Excel einfügen."); return; } importRows(splitText(t), $("#replace").checked); },
+  addstud: () => { S.students.push({ id: uid(), name: "Neue Person", klasse: "", sex: "", disc: "ski", self: null, note: "" }); render(); },
+  delstud: el => { const s = stu(el.dataset.id); ask("Person löschen?", `${s.name} wird aus Liste, Regeln, Zimmern und allen Tagen entfernt.`, "Löschen", () => { removeStudent(s.id); render(); }, true); },
+  backup: () => download(`Skilager_Backup_${stamp()}.json`, new Blob([JSON.stringify(S, null, 1)], { type: "application/json" })),
+  backupcopy: () => copyText(JSON.stringify(S), "Backup kopiert."),
+  restorepaste: () => openDlg(`<h3>Backup einfügen</h3><p class="sub2">Backup-Text hier einfügen. Die aktuellen Daten werden ersetzt.</p><textarea class="fld" id="bk" style="min-height:160px"></textarea><div class="row" style="justify-content:flex-end;margin-top:10px"><button class="btn" data-act="close">Abbrechen</button><button class="btn primary" id="okbtn">Laden</button></div>`, dl => dl.querySelector("#okbtn").onclick = () => { restore(dl.querySelector("#bk").value); closeDlg(); }),
+  reset: () => ask("Alles löschen?", "Namen, Regeln, Tage, Zimmer und Gruppen werden zurückgesetzt. Vorher ein Backup speichern.", "Alles löschen", () => { const keep = { uidLP: S.uidLP, leiterUids: S.leiterUids }; S = { ...defaultState(), ...keep }; render(); }, true),
+  copylink: el => { const q = ["", "?ansicht=leiter", "?ansicht=lp"][+el.dataset.i]; const h = nameHash(); S.linkSig = h; copyText(siteBase() + q + "#n=" + h, "Link kopiert."); render(); },
+  copyrules: () => copyText($("#rulestext").textContent, "Regeln kopiert – in Firebase einfügen und veröffentlichen."),
+  wipe: () => ask("Online-Daten löschen?", "Gruppen, Zuteilungen, Appell und Rückmeldungen werden in Firebase gelöscht. Auf diesem Gerät bleibt alles.", "Online löschen", async () => { clearTimeout(pubTimer); const a = await Sync.schreib("leitstand", null), b = await Sync.schreib("oeffentlich", null); toast(a.ok && b.ok ? "Online-Daten gelöscht." : "Löschen fehlgeschlagen."); }, true),
+  logout: () => { Sync.abmelden(); lsSet(LSRT, null); Takt.stop(); if (ROLE === "leiter") { D = null; lsSet(LSC, null); } render(); },
+  /* Leitung */
+  lday: el => { LV.day = +el.dataset.i; render(); },
+  ltab: el => { LV.tab = el.dataset.v; render(); },
+  lslot: el => { LV.slot = +el.dataset.i; render(); },
+  ap: el => { const d = leaderDay(), slot = Math.min(LV.slot, D.slots.length - 1), cur = (((getR().appell[d.id] || {})[el.dataset.gid] || {})[slot] || {})[el.dataset.sid]; setAppell(d.id, el.dataset.gid, slot, el.dataset.sid, !cur); },
+  apall: el => { const d = leaderDay(), slot = Math.min(LV.slot, D.slots.length - 1); D.students.filter(s => d.assign[s.id] === el.dataset.gid).forEach(s => setAppell(d.id, el.dataset.gid, slot, s.id, true)); },
+  apnone: el => { const d = leaderDay(), slot = Math.min(LV.slot, D.slots.length - 1); D.students.filter(s => d.assign[s.id] === el.dataset.gid).forEach(s => setAppell(d.id, el.dataset.gid, slot, s.id, false)); },
+  rm: el => { const d = leaderDay(), cur = (getR().rm[d.id] || {})[el.dataset.sid]; if (cur && cur.r === el.dataset.r) setRM(d.id, el.dataset.sid, cur.t ? { r: "ok", g: el.dataset.gid, z: Date.now(), t: cur.t } : null); else setRM(d.id, el.dataset.sid, { r: el.dataset.r, g: el.dataset.gid, z: Date.now(), ...(cur && cur.t ? { t: cur.t } : {}) }); },
+  /* Schüler/innen */
+  sme: el => { SV.me = el.dataset.sid; lsSet("skilager-ich", SV.me); render(); window.scrollTo(0, 0); },
+  snot: () => { SV.me = null; SV.q = ""; lsSet("skilager-ich", null); render(); },
+  copytxt: el => copyText(el.dataset.t, "Kopiert."),
+};
+function clearLevels(ids) { S.groups.forEach(g => { if (ids.includes(g.level)) g.level = null; }); S.students.forEach(s => { if (ids.includes(s.self)) s.self = null; }); }
+function removeGroup(id) { S.groups = S.groups.filter(g => g.id !== id); S.days.forEach(d => { for (const k in d.assign) if (d.assign[k] === id) delete d.assign[k]; for (const k in d.sick) if (d.sick[k].from === id) d.sick[k].from = null; }); }
+function removeStudent(id) { S.students = S.students.filter(s => s.id !== id); S.rules = S.rules.map(r => ({ ...r, ids: r.ids.filter(x => x !== id) })).filter(r => r.ids.length > 1); delete S.roomAssign[id]; S.days.forEach(d => { delete d.assign[id]; delete d.sick[id]; delete d.aem[id]; }); }
+function restore(txt) { try { const o = JSON.parse(txt); if (!o || !o.students || !o.groups) throw 0; S = migrate(o); render(); toast("Backup geladen."); } catch (e) { toast("Das ist kein gültiges Backup."); } }
+
+document.addEventListener("click", e => { const a = e.target.closest("[data-act]"); if (!a) return; const f = ACT[a.dataset.act]; if (f) f(a, e); });
+document.addEventListener("input", e => {
+  const id = e.target.id;
+  if (id === "search" || id === "ssearch") { const pos = e.target.selectionStart; if (id === "search") search = e.target.value; else SV.q = e.target.value; render(); const s = $("#" + id); if (s) { s.focus(); try { s.setSelectionRange(pos, pos); } catch (x) {} } }
+});
+document.addEventListener("submit", async e => {
+  if (e.target.id !== "loginform") return; e.preventDefault();
+  const msg = $("#lmsg"); msg.textContent = "Melde an …";
+  const r = await Sync.anmelden($("#lmail").value.trim(), $("#lpw").value);
+  if (!r.ok) { msg.textContent = r.grund; return; }
+  if (ROLE === "lp") afterLoginLP(r.uid); else { MYUID = r.uid; startLeaderPoll(); render(); }
+});
+document.addEventListener("change", e => {
+  const el = e.target;
+  if (el.id === "file") { const f = el.files[0]; if (!f) return; const rd = new FileReader();
+    if (/\.(xlsx|xls)$/i.test(f.name)) { if (typeof XLSX === "undefined") { toast("Excel-Bibliothek nicht geladen – Zeilen aus Excel kopieren und einfügen."); return; }
+      rd.onload = () => { const wb = XLSX.read(rd.result, { type: "array" }); importRows(XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1, raw: false, defval: "" }), $("#replace").checked); }; rd.readAsArrayBuffer(f); }
+    else { rd.onload = () => importRows(splitText(rd.result), $("#replace").checked); rd.readAsText(f); }
+    return; }
+  if (el.id === "restore") { const f = el.files[0]; if (!f) return; const rd = new FileReader(); rd.onload = () => restore(rd.result); rd.readAsText(f); return; }
+  const f = el.dataset.f; if (!f) return;
+  const id = el.dataset.id, v = el.type === "checkbox" ? el.checked : el.value;
+  if (f === "l-gid") { LV.gid = v || null; lsSet("skilager-meinegruppe", LV.gid); LV.tab = "gruppe"; render(); return; }
+  if (f === "l-note") { const d = leaderDay(), cur = (getR().rm[d.id] || {})[el.dataset.sid]; const t = v.trim().slice(0, 200); setRM(d.id, el.dataset.sid, { r: cur ? cur.r : "ok", g: el.dataset.gid, z: Date.now(), ...(t ? { t } : {}) }); return; }
+  const g = id && grp(id), s = id && stu(id), r = id && room(id), a = id && aem(id);
+  const sub = id && S.fam.flatMap(x => x.subs).find(x => x.id === id), fm = id && S.fam.find(x => x.id === id);
+  switch (f) {
+    case "lagername": S.lager.name = v; break; case "start": S.lager.start = v; break; case "url": S.lager.url = v.trim(); break;
+    case "slots": S.slots = v.split(",").map(x => x.trim()).filter(Boolean); if (!S.slots.length) S.slots = ["Appell"]; break;
+    case "leiterUids": S.leiterUids = v.trim(); break;
+    case "fam-name": fm.name = v; break; case "sub-ski": sub.ski = v; break; case "sub-board": sub.board = v; break;
+    case "g-color": g.color = v; break; case "g-name": g.name = v; break; case "g-type": g.type = v; if (v === "poly") g.level = null; break;
+    case "g-level": g.level = v || null; break; case "g-leader": g.leader = v; break; case "g-contact": g.contact = v; break;
+    case "g-show": g.showContact = v; break; case "g-meet": g.meet = v; break; case "g-max": g.max = v; break;
+    case "r-name": r.name = v; break; case "r-cap": r.cap = v; break; case "r-leader": r.leader = v; break;
+    case "a-name": a.name = v; break; case "a-desc": a.desc = v; break;
+    case "s-name": s.name = v; break; case "s-klasse": s.klasse = v; break; case "s-sex": s.sex = v; break;
+    case "s-disc": s.disc = v; break; case "s-self": s.self = v || null; break; case "s-note": s.note = v; break;
+  }
+  render();
+});
+/* Ziehen und Ablegen am Laptop */
+document.addEventListener("dragstart", e => { const c = e.target.closest && e.target.closest(".chip"); if (c) { e.dataTransfer.setData("text/plain", c.dataset.kind + "|" + c.dataset.sid); e.dataTransfer.effectAllowed = "move"; } });
+document.addEventListener("dragover", e => { const z = e.target.closest && e.target.closest("[data-drop]"); if (z) { e.preventDefault(); document.querySelectorAll(".dragover").forEach(x => x !== z && x.classList.remove("dragover")); z.classList.add("dragover"); } });
+document.addEventListener("dragleave", e => { const z = e.target.closest && e.target.closest("[data-drop]"); if (z && !z.contains(e.relatedTarget)) z.classList.remove("dragover"); });
+document.addEventListener("drop", e => { const z = e.target.closest && e.target.closest("[data-drop]"); if (!z) return; e.preventDefault(); z.classList.remove("dragover");
+  const [kind, sid] = e.dataTransfer.getData("text/plain").split("|"); if (!stu(sid) || kind !== z.dataset.kind) return; const t = z.dataset.drop;
+  if (kind === "gruppen" && t === "B") { if (day().assign[sid] !== "B") askReason(sid); } else moveTo(kind, sid, t); });
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeDlg(); });
+
+/* ==========================================================================
+   Start
+   ========================================================================== */
+(async function boot() {
+  Sync.beiNeuemToken = rt => lsSet(LSRT, rt);
+  Sync.beiAbmeldung = grund => { lsSet(LSRT, null); toast(grund); render(); };
+  if (ROLE === "lp") {
+    S = migrate(lsGet(LS)) || defaultState(); D = S; render();
+    if (ONLINE && lsGet(LSRT)) { const r = await Sync.erneuern(lsGet(LSRT)); if (r.ok) afterLoginLP(r.uid); else { if (r.status !== 0) lsSet(LSRT, null); render(); } }
+    return;
+  }
+  if (ROLE === "leiter") {
+    const c = lsGet(LSC); if (c && c.stand) { D = norm(c.stand); REMOTE = c.remote || REMOTE; }
+    render();
+    const rt = lsGet(LSRT);
+    if (rt) {
+      const r = await Sync.erneuern(rt);
+      if (r.ok) { MYUID = r.uid; startLeaderPoll(); }
+      else if (r.status === 0) { NET.ok = false; const retry = setInterval(async () => { const x = await Sync.erneuern(lsGet(LSRT)); if (x.ok) { clearInterval(retry); MYUID = x.uid; NET.ok = true; startLeaderPoll(); render(); } }, 30000); }
+      else lsSet(LSRT, null);
+      render();
+    }
+    return;
+  }
+  PUB = lsGet(LSC); render();
+  Takt.start([{ p: "oeffentlich", ms: CONFIG.taktMs * 3, cb: v => { if (v === undefined) return; if (sig("pub", v)) { PUB = v; cache(); redraw(); } } }]);
+})();
+</script>

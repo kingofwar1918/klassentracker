@@ -1,0 +1,51 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "skilager": {
+      "oeffentlich": {
+        ".read": true,
+        ".write": "auth != null && auth.uid === 'LEHRER_UID'"
+      },
+      "leitstand": {
+        ".read": "auth != null && (auth.uid === 'LEHRER_UID' || auth.uid === 'LEITUNG_UID')",
+        ".write": "auth != null && auth.uid === 'LEHRER_UID'",
+        "appell": {
+          "$tag": {
+            "$gruppe": {
+              "$slot": {
+                "$sid": {
+                  ".write": "auth != null && (auth.uid === 'LEHRER_UID' || auth.uid === 'LEITUNG_UID')",
+                  ".validate": "newData.isBoolean() && $sid.length <= 20"
+                }
+              }
+            }
+          }
+        },
+        "rueckmeldung": {
+          "$tag": {
+            "$sid": {
+              ".write": "auth != null && (auth.uid === 'LEHRER_UID' || auth.uid === 'LEITUNG_UID')",
+              ".validate": "newData.hasChildren(['r', 'g', 'z']) && $sid.length <= 20",
+              "r": {
+                ".validate": "newData.val() === 'auf' || newData.val() === 'ab' || newData.val() === 'ok'"
+              },
+              "g": {
+                ".validate": "newData.isString() && newData.val().length <= 20"
+              },
+              "z": {
+                ".validate": "newData.isNumber()"
+              },
+              "t": {
+                ".validate": "newData.isString() && newData.val().length <= 200"
+              },
+              "$anderes": {
+                ".validate": false
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
