@@ -428,7 +428,7 @@ let NET = { ok: null };
 let TARGET = null, search = "", APS = 0, PV = "leitung";
 let LV = { gid: lsGet("skilager-meinegruppe"), day: null, slot: 0, tab: "gruppe" };
 let SV = { me: lsGet("skilager-ich"), q: "" };
-let PUB = null, MYUID = "", DENIED = false;
+let PUB = null, MYUID = "", DENIED = false, STAND_LEER = false;
 
 /* Niveaus */
 let LC = null;
@@ -507,7 +507,8 @@ function schedulePublish() { if (!(ONLINE && ROLE === "lp" && Sync.angemeldet)) 
 async function publish() {
   const a = await Sync.schreibSicher("leitstand/stand", buildStand());
   const b = await Sync.schreibSicher("oeffentlich", buildPub());
-  if ((a.status === 401 || a.status === 403) || (b.status === 401 || b.status === 403)) { NET.ok = false; toast("Server lehnt ab: Regeln noch nicht eingespielt? (Einrichten → Online)"); }
+  if ((a.status === 401 || a.status === 403) || (b.status === 401 || b.status === 403)) { NET.ok = false; DENIED = true; toast("Server lehnt ab: Regeln passen nicht zu deinem Konto (Einrichten → Online)"); render(); }
+  else if (a.ok && b.ok) { if (DENIED) { DENIED = false; render(); } }
   else netz(a.ok && b.ok ? { ok: true } : { ok: false, status: 0 });
 }
 function netz(r) { const was = NET.ok; NET.ok = r.ok || (r.status === 401 || r.status === 403); NET.at = Date.now(); if (was !== NET.ok) paintPill(); }
@@ -548,7 +549,7 @@ function renderMaster() {
   const tabs = [["board","Einteilung"],["appell","Appell"],["hist","Verlauf"],["setup","Einrichten"],["preview","Vorschau"]];
   const head = `<header class="top"><div class="wrap"><div class="brand">${LOGO}<span>${esc(S.lager.name)}</span></div>${pill()}<nav class="tabs" aria-label="Ansicht">${tabs.map(([v, l]) => `<button class="tab" data-act="view" data-v="${v}" aria-current="${S.view === v}">${l}</button>`).join("")}</nav></div></header>`;
   const body = S.view === "setup" ? renderSetup() : S.view === "hist" ? renderHist() : S.view === "appell" ? renderAppell() : S.view === "preview" ? renderPreview() : renderBoard();
-  const banner = ONLINE && !Sync.angemeldet && S.view !== "setup" ? `<div class="note warn row"><span>Nicht angemeldet: Änderungen bleiben auf diesem Gerät und erreichen Leitung und Schüler/innen nicht.</span><button class="btn small" data-act="view" data-v="setup">Anmelden</button></div>` : "";
+  const banner = ONLINE && Sync.angemeldet && DENIED ? `<div class="note warn row"><span><b>Speichern abgelehnt.</b> Die Regeln in Firebase passen nicht zu deinem Konto. Unter Einrichten → Online die Regeln neu kopieren und in Firebase veröffentlichen.</span><button class="btn small" data-act="view" data-v="setup">Öffnen</button></div>` : ONLINE && !Sync.angemeldet && S.view !== "setup" ? `<div class="note warn row"><span>Nicht angemeldet: Änderungen bleiben auf diesem Gerät und erreichen Leitung und Schüler/innen nicht.</span><button class="btn small" data-act="view" data-v="setup">Anmelden</button></div>` : "";
   paint(head + `<main class="wrap">${banner}${body}</main>`);
 }
 function renderStart() {
@@ -785,7 +786,7 @@ function setupOnline() {
     <input class="fld" style="width:100%" data-f="leiterUids" value="${esc(S.leiterUids)}" placeholder="UID Leitungskonto">
     ${linkBox}
     <h3 style="margin-top:14px">Regeln</h3><p class="muted" style="margin:2px 0 6px">Firebase-Konsole → Realtime Database → Rules: ersetzen und veröffentlichen.${lu.length ? "" : " Noch kein Leitungskonto eingetragen."}</p>
-    <pre class="rules" id="rulestext">${esc(JSON.stringify(rulesJSON(S.uidLP, lu), null, 2))}</pre><button class="btn small" data-act="copyrules">Regeln kopieren</button>
+    <pre class="rules" id="rulestext">${esc(JSON.stringify(rulesJSON(S.uidLP || MYUID, lu), null, 2))}</pre><button class="btn small" data-act="copyrules">Regeln kopieren</button>
     <h3 style="margin-top:14px">Nach dem Lager</h3><p class="muted" style="margin:2px 0 6px">Die Datenbank ist kein Archiv: Excel exportieren, Backup speichern, dann online löschen.</p><button class="btn small danger" data-act="wipe">Online-Daten löschen</button></section>`;
 }
 function rulesJSON(lp, leiter) {
@@ -860,7 +861,7 @@ function renderLeaderShell() {
   let body;
   if (!Sync.angemeldet && !lsGet(LSRT)) body = `<div class="start">${loginForm("leiter")}</div>`;
   else if (DENIED) body = `<div class="start"><h2>Noch kein Zugriff</h2><p>Dieses Konto ist noch nicht als Leitung freigeschaltet. Gib der Lagerleitung diese Kennung:</p><p><code class="sel">${esc(MYUID)}</code></p></div>`;
-  else if (!D) body = '<p class="muted">Lade …</p>';
+  else if (!D) body = STAND_LEER ? `<div class="start"><h2>Noch keine Einteilung</h2><p>Du bist angemeldet, aber die Lagerleitung hat noch nichts veröffentlicht. Die Seite aktualisiert sich von selbst.</p></div>` : '<p class="muted">Lade …</p>';
   else body = `<div class="one">${leaderInner()}</div>`;
   if (!Object.keys(NAMES).length && D) body = `<div class="note warn">Die Namen fehlen: Öffne die Seite einmal über den Leitungslink der Lagerleitung.</div>` + body;
   paint(head + `<main class="wrap">${body}</main>`);
@@ -1048,7 +1049,7 @@ function sample() {
 
 /* Online: Anmeldung und Abgleich */
 async function afterLoginLP(uidLP) {
-  S.uidLP = uidLP;
+  MYUID = uidLP; S.uidLP = uidLP;
   const r = await Sync.lies("leitstand/stand"); netz(r);
   const st = r.ok ? r.daten : null;
   if (!st) { publish(); }
@@ -1075,7 +1076,7 @@ function sig(k, v) { const s = JSON.stringify(v ?? null); if (SIGS[k] === s) ret
 function redraw() { const a = document.activeElement; if (a && /INPUT|TEXTAREA|SELECT/.test(a.tagName)) return; if ($("#layer").innerHTML) return; render(); }
 function startLeaderPoll() {
   Takt.start([
-    { p: "leitstand/stand", ms: CONFIG.taktMs * 3, cb: (v, st) => { if (st) { DENIED = true; render(); return; } DENIED = false; if (v && sig("st", v)) { D = norm(v); cache(); redraw(); } } },
+    { p: "leitstand/stand", ms: CONFIG.taktMs * 3, cb: (v, st) => { if (st) { DENIED = true; render(); return; } DENIED = false; if (!v) { if (!STAND_LEER) { STAND_LEER = true; render(); } return; } STAND_LEER = false; if (sig("st", v)) { D = norm(v); cache(); redraw(); } } },
     { p: "leitstand/appell", ms: CONFIG.taktMs, cb: v => { if (v === undefined) return; if (sig("ap", v)) { REMOTE.appell = v || {}; cache(); redraw(); } } },
     { p: "leitstand/rueckmeldung", ms: CONFIG.taktMs, cb: v => { if (v === undefined) return; if (sig("rm", v)) { REMOTE.rm = v || {}; cache(); redraw(); } } },
   ]);
@@ -1163,7 +1164,7 @@ const ACT = {
 function clearLevels(ids) { S.groups.forEach(g => { if (ids.includes(g.level)) g.level = null; }); S.students.forEach(s => { if (ids.includes(s.self)) s.self = null; }); }
 function removeGroup(id) { S.groups = S.groups.filter(g => g.id !== id); S.days.forEach(d => { for (const k in d.assign) if (d.assign[k] === id) delete d.assign[k]; for (const k in d.sick) if (d.sick[k].from === id) d.sick[k].from = null; }); }
 function removeStudent(id) { S.students = S.students.filter(s => s.id !== id); S.rules = S.rules.map(r => ({ ...r, ids: r.ids.filter(x => x !== id) })).filter(r => r.ids.length > 1); delete S.roomAssign[id]; S.days.forEach(d => { delete d.assign[id]; delete d.sick[id]; delete d.aem[id]; }); }
-function restore(txt) { try { const o = JSON.parse(txt); if (!o || !o.students || !o.groups) throw 0; S = migrate(o); render(); toast("Backup geladen."); } catch (e) { toast("Das ist kein gültiges Backup."); } }
+function restore(txt) { try { const o = JSON.parse(txt); if (!o || !o.students || !o.groups) throw 0; const keep = { uidLP: S.uidLP || MYUID, leiterUids: S.leiterUids }; S = migrate(o); if (keep.uidLP) S.uidLP = keep.uidLP; if (keep.leiterUids && !S.leiterUids) S.leiterUids = keep.leiterUids; lastSig = null; render(); toast("Backup geladen."); } catch (e) { toast("Das ist kein gültiges Backup."); } }
 
 document.addEventListener("click", e => { const a = e.target.closest("[data-act]"); if (!a) return; const f = ACT[a.dataset.act]; if (f) f(a, e); });
 document.addEventListener("input", e => {
