@@ -22,7 +22,7 @@ Beamer direkt öffnen: `…/arbeitsplan/?beamer=1`
 
 ## Plan-Update 16.11.2026 (DL01–DL12)
 
-DL05 (Mi 18.11.) ist neu: Wortschatz R4, KI-Workshop (30', zwei Gruppen), Posten 1 «Velotour» und Posten 2 W-Fragen aus dem Teamteaching, Arbeitsplan, Rückmeldung zum Bericht. Die nicht behandelten Aufträge der bisherigen DL05 (Zeugen-Puzzle, Unfallbericht, R5, Bild-Anleitung …) stehen in DL06 (25.11.). Alle späteren DL rücken eine DL nach hinten:
+DL05 (Mi 18.11.) ist neu: Wortschatz R4, KI-Workshop (30', zwei Gruppen), Posten 2 W-Fragen aus dem Teamteaching, Arbeitsplan, Rückmeldung zum Bericht. Die nicht behandelten Aufträge der bisherigen DL05 (Zeugen-Puzzle, Unfallbericht, R5, Bild-Anleitung …) stehen in DL06 (25.11.). Alle späteren DL rücken eine DL nach hinten:
 
 | DL | Datum | Thema |
 |---|---|---|
@@ -40,6 +40,10 @@ DL05 (Mi 18.11.) ist neu: Wortschatz R4, KI-Workshop (30', zwei Gruppen), Posten
 ### Plan-Update 16.11.2026 (2): Portfolio-Aufträge entfernt
 
 Alle Portfolio-Aufträge sind entfernt: «Portfolio-Satz schreiben» (DL01-DL11), «Endfassung ins Portfolio» (DL04), «Portfolio durchblättern», «Portfolio ordnen» und Puffer «Text aus dem Portfolio» (DL11), «Portfolio-Gespräch» (DL12). Grund: Jeder Wechsel zu einer anderen Unterlage bringt Unruhe, und die Portfolioarbeit bringt beim jetzigen Stand der Klasse wenig. DL10: Prüfungsrückgabe ohne Portfolio. DL11 heisst neu «Lernbericht», DL12 «Rückblick und Abschluss». In der Datenbank einmalig: Bearbeiten → Karte «Plan-Update 16.11.2026: Portfolio-Aufträge entfernen» → «Sicherung herunterladen und Portfolio-Aufträge entfernen».
+
+### Plan-Update 16.11.2026 (3): Posten 1 «Velotour» entfernt
+
+Posten 1 («Velotour» bewerten) fällt in DL05 weg; Posten 2 (W-Fragen) und Arbeitsplan haben je 15 Minuten. In der Datenbank einmalig: Bearbeiten → Karte «Plan-Update 16.11.2026: Posten 1 «Velotour» entfernen» → «Sicherung herunterladen und Posten 1 entfernen».
 
 ## Datenschutz
 

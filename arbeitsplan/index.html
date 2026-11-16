@@ -454,7 +454,6 @@ const DATEN = {
       auftraege: [   // [Art, Auftrag, Wo]   Art: "P" = Pflicht (allen zugeteilt), "Z" = ★ Zusatz, "Puffer"
         ["P", "Wortschatz R4: Unfall- und Polizeiwörter (aus DL 4)", "AB 3, R4 · Version B: auch S. 13"],
         ["P", "KI-Workshop (30'): der KI einen klaren Auftrag geben und ihre Antwort prüfen", "AB 6, AB 7"],
-        ["P", "Posten 1: Einen Bericht bewerten («Velotour»), 2 Stellen verbessern", "Stationsblatt S. 2"],
         ["P", "Posten 2: W-Fragen in einem Bericht finden (Text 2)", "Stationsblatt S. 3-4"],
         ["P", "Arbeitsplan: zuerst Korrekturen, dann nächstes Kästchen der Laufkarte", "Laufkarte"],
         ["P", "Rückmeldung zum Bericht: 3 Stellen verbessern (andere Farbe)", "Rückmeldung"],
@@ -1588,12 +1587,11 @@ const UPDATE_1611 = {
   bleibenIn05: ["n1011r4", "amvyafzh2is8", "a11"],   // Wortschatz R4, Reporterteam (Zusatz), Puffer-Box
   neu05: [   // [ID, Art, Auftrag, Wo, nicht zugeteilt]
     ["n1116ki", "P", "KI-Workshop (30'): der KI einen klaren Auftrag geben und ihre Antwort prüfen", "AB 6, AB 7"],
-    ["n1116p1", "P", "Posten 1: Einen Bericht bewerten («Velotour»), 2 Stellen verbessern", "Stationsblatt S. 2"],
     ["n1116p2", "P", "Posten 2: W-Fragen in einem Bericht finden (Text 2)", "Stationsblatt S. 3-4"],
     ["n1116plan", "P", "Arbeitsplan: zuerst Korrekturen, dann nächstes Kästchen der Laufkarte", "Laufkarte"],
     ["n1116rm", "P", "Rückmeldung zum Bericht: 3 Stellen verbessern (andere Farbe)", "Rückmeldung", ["s1"]],   // s1: noch keine Rückmeldung zur Version 2
   ],
-  reihenfolge05: ["n1011r4", "n1116ki", "n1116p1", "n1116p2", "n1116plan", "n1116rm", "amvyafzh2is8", "a11"],
+  reihenfolge05: ["n1011r4", "n1116ki", "n1116p2", "n1116plan", "n1116rm", "amvyafzh2is8", "a11"],
   // alte DL → neue DL (DL05 wird geteilt: Rest → DL06)
   ziele: { DL05: "DL06", DL06: "DL07", DL07: "DL08", DL08: "DL09", DL09: "DL10", DL10: "DL11", DL11: "DL12" },
   daten: { DL06: "25.11.2026", DL07: "02.12.2026", DL08: "09.12.2026", DL09: "16.12.2026",
@@ -1683,8 +1681,8 @@ const UPDATE_1611_PS = {
   ],
   themen: [["DL11", "Portfolio I: Lernbericht", "Lernbericht"], ["DL12", "Portfolio II und Abschluss", "Rückblick und Abschluss"]],
 };
-function update1611PsPlan(d) {
-  const dl = (d && d.plan && d.plan.dls) || {}, U = UPDATE_1611_PS;
+function update1611PsPlan(d, U = UPDATE_1611_PS) {
+  const dl = (d && d.plan && d.plan.dls) || {};
   const auf = (x, aid) => dl[x] && dl[x].auftraege && dl[x].auftraege[aid];
   return {
     loeschen: U.loeschen.filter(([x, aid, anfang]) => { const a = auf(x, aid); return !!(a && (a.text || "").startsWith(anfang)); }),
@@ -1692,9 +1690,9 @@ function update1611PsPlan(d) {
     themen: U.themen.filter(([x, alt]) => !!(dl[x] && dl[x].thema === alt)),
   };
 }
-const update1611PsNoetig = d => { const p = update1611PsPlan(d); return p.loeschen.length + p.texte.length + p.themen.length > 0; };
-function update1611PsAenderungen(d) {   // rein, für Test und Anwendung
-  const p = update1611PsPlan(d), upd = {};
+const update1611PsNoetig = (d, U) => { const p = update1611PsPlan(d, U); return p.loeschen.length + p.texte.length + p.themen.length > 0; };
+function update1611PsAenderungen(d, U) {   // rein, für Test und Anwendung
+  const p = update1611PsPlan(d, U), upd = {};
   p.loeschen.forEach(([x, aid]) => { upd[`plan/dls/${x}/auftraege/${aid}`] = null; upd[`stand/${x}/${aid}`] = null; });
   p.texte.forEach(([x, aid, , neu]) => { upd[`plan/dls/${x}/auftraege/${aid}/text`] = neu; });
   p.themen.forEach(([x, , neu]) => { upd[`plan/dls/${x}/thema`] = neu; });
@@ -1716,6 +1714,24 @@ function update1611PsKarte() {
       + "«Portfolio-Gespräch» (DL12). In DL10 heisst die Prüfungsrückgabe neu «1 Satz daraus richtig schreiben» (ohne Portfolio). "
       + "Neue Themen: DL11 «Lernbericht», DL12 «Rückblick und Abschluss»."),
     el("button", { class: "primaer", onclick: update1611PsAnwenden }, "Sicherung herunterladen und Portfolio-Aufträge entfernen"));
+}
+
+// ---------- Einmal-Update 16.11.2026 (3): Posten 1 «Velotour» aus DL05 entfernen ----------
+const UPDATE_1611_P1 = {
+  loeschen: [["DL05", "n1116p1", "Posten 1: Einen Bericht bewerten"]], texte: [], themen: [],
+};
+function update1611P1Anwenden() {
+  frage("Posten 1 «Velotour» aus DL05 entfernen (samt Stand)? Zuerst wird eine Sicherung heruntergeladen.", async () => {
+    sicherungHerunterladen();
+    const ok = await schreibeMehrere(update1611PsAenderungen(Daten, UPDATE_1611_P1));
+    if (ok) { toast("Posten 1 aus DL05 entfernt"); zeichnen(); }
+  }, "Entfernen");
+}
+function update1611P1Karte() {
+  return el("div", { class: "karte" }, el("h2", {}, "Plan-Update 16.11.2026: Posten 1 «Velotour» entfernen"),
+    el("p", {}, "Der Auftrag «Posten 1: Einen Bericht bewerten («Velotour»)» wird aus DL05 entfernt, samt Stand der Lernenden. "
+      + "Posten 2 (W-Fragen) und alle anderen Aufträge bleiben."),
+    el("button", { class: "primaer", onclick: update1611P1Anwenden }, "Sicherung herunterladen und Posten 1 entfernen"));
 }
 
 function wechsleAnsicht(id) {
@@ -2168,6 +2184,7 @@ function ansichtLehrer() {
   }
   if (update1611Noetig(Daten)) out.push(update1611Karte());
   if (!update1611Noetig(Daten) && update1611PsNoetig(Daten)) out.push(update1611PsKarte());
+  if (!update1611Noetig(Daten) && update1611PsNoetig(Daten, UPDATE_1611_P1)) out.push(update1611P1Karte());
   out.push(dlLeiste(true));
   if (Zustand.dl && dlVon(Zustand.dl)) out.push(dlBearbeiten(Zustand.dl));
   out.push(lernendeKarte(), einstellungenKarte(), datenKarte(), verbindungKarte());
