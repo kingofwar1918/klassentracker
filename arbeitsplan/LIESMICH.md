@@ -22,7 +22,7 @@ Beamer direkt öffnen: `…/arbeitsplan/?beamer=1`
 
 ## Plan-Update 16.11.2026 (DL01–DL12)
 
-DL05 (Mi 18.11.) ist neu: Wortschatz R4, KI-Workshop (30', zwei Gruppen), Posten 1 «Velotour» und Posten 2 W-Fragen aus dem Teamteaching, Arbeitsplan, Rückmeldung zum Bericht, Portfolio-Satz. Die nicht behandelten Aufträge der bisherigen DL05 (Zeugen-Puzzle, Unfallbericht, R5, Bild-Anleitung …) stehen in DL06 (25.11.). Alle späteren DL rücken eine DL nach hinten:
+DL05 (Mi 18.11.) ist neu: Wortschatz R4, KI-Workshop (30', zwei Gruppen), Posten 1 «Velotour» und Posten 2 W-Fragen aus dem Teamteaching, Arbeitsplan, Rückmeldung zum Bericht. Die nicht behandelten Aufträge der bisherigen DL05 (Zeugen-Puzzle, Unfallbericht, R5, Bild-Anleitung …) stehen in DL06 (25.11.). Alle späteren DL rücken eine DL nach hinten:
 
 | DL | Datum | Thema |
 |---|---|---|
@@ -36,6 +36,10 @@ DL05 (Mi 18.11.) ist neu: Wortschatz R4, KI-Workshop (30', zwei Gruppen), Posten
 | DL12 | 20.01.2027 | Portfolio II und Abschluss |
 
 **Anwenden (einmalig):** Lehrperson anmelden → Bearbeiten → Karte «Plan-Update 16.11.2026» → «Sicherung herunterladen und Update anwenden». Die App lädt zuerst eine Sicherung herunter und verschiebt dann Aufträge, Stand, Hausaufgaben-Termine, «Das kann ich heute» und FLK. Danach verschwindet die Karte. Die Vorlage in `index.html` entspricht dem Plan nach dem Update.
+
+### Plan-Update 16.11.2026 (2): Portfolio-Satz entfernt
+
+Der Auftrag «Portfolio-Satz schreiben» ist aus allen DL entfernt (gute Idee, braucht in der Kleinklasse aber zu viel Zeit, bis alle begonnen haben). In der Datenbank einmalig: Bearbeiten → Karte «Plan-Update 16.11.2026: Portfolio-Satz entfernen» → «Sicherung herunterladen und Portfolio-Satz entfernen». Andere Portfolio-Aufträge bleiben.
 
 ## Datenschutz
 
