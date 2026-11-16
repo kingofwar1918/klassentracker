@@ -437,7 +437,6 @@ const DATEN = {
         ["P", "Zu zweit: 2 Sterne, 1 Wunsch", "DOS 1, 3.5"],
         ["P", "Version 2 schreiben (zu zweit, jede Person ihren Text)", "DOS 1, 3.4"],
         ["P", "Austausch: Version 2 vergleichen, Verben im Präteritum?", "zu zweit"],
-        ["P", "Endfassung: Version 2 sauber ins Portfolio", "DOS 1, 3.6"],
         ["P", "Mein Plan: zuerst Korrekturen, dann nächstes Kästchen der Laufkarte", "Laufkarte"],
         ["Z", "Reporterteam: Interview, Reporter-Bericht (wenn Endfassung fertig)", "Reporter-Blatt"],
         ["Z", "Berufsbericht lesen (Wahl a, b oder c)", "DOS 1, 4.3"],
@@ -561,36 +560,32 @@ const DATEN = {
         ["P", "Schreibplan erstellen", "DOS 2, 9.2"],
         ["P", "Geschichte schreiben oder Comic gestalten", "DOS 2, 9.3"],
         ["P", "Austausch zu zweit: vorlesen oder zeigen", ""],
-        ["P", "Prüfung anschauen: 1 Aufgabe wählen, 1 Satz daraus richtig ins Portfolio, unterschreiben lassen", "Prüfung"],
+        ["P", "Prüfung anschauen: 1 Aufgabe wählen, 1 Satz daraus richtig schreiben, unterschreiben lassen", "Prüfung"],
         ["Puffer", "Puffer: Story-Box-Tausch", "AB 2"],
       ],
       hausaufgaben: [   // [Auftrag, auf wann, für alle zugeteilt?]
       ],
     },
     {
-      dl: "DL11", datum: "13.01.2027", thema: "Portfolio I: Lernbericht",
+      dl: "DL11", datum: "13.01.2027", thema: "Lernbericht",
       ziel: "Ich kann in einem Lernbericht beschreiben, was mir gelungen ist und was schwierig war.",
       flk: [],
       auftraege: [   // [Art, Auftrag, Wo]   Art: "P" = Pflicht (allen zugeteilt), "Z" = ★ Zusatz, "Puffer"
-        ["P", "Brücke: Portfolio durchblättern", "Portfolio"],
         ["P", "Wortschatz R10: Wörter für den Lernbericht", "AB 3, R10 · Version B: auch S. 15"],
-        ["P", "Portfolio ordnen, Inhaltsverzeichnis", "DOS 2, 10.1"],
         ["P", "Besten Text wählen und begründen", "DOS 2, 10.2"],
         ["P", "Lernbericht schreiben", "DOS 2, 10.3"],
         ["P", "Austausch zu zweit: besten Text zeigen", ""],
-        ["Puffer", "Puffer: Text aus dem Portfolio überarbeiten", "Portfolio"],
       ],
       hausaufgaben: [   // [Auftrag, auf wann, für alle zugeteilt?]
       ],
     },
     {
-      dl: "DL12", datum: "20.01.2027", thema: "Portfolio II und Abschluss",
+      dl: "DL12", datum: "20.01.2027", thema: "Rückblick und Abschluss",
       ziel: "Ich kann im Partnergespräch meinen besten Text mit zwei Kriterien beurteilen.",
       flk: [],
       auftraege: [   // [Art, Auftrag, Wo]   Art: "P" = Pflicht (allen zugeteilt), "Z" = ★ Zusatz, "Puffer"
         ["P", "Brücke: Lernbericht zu zweit vorlesen (freiwillig)", "DOS 2, 10.3"],
         ["P", "Wortschatz R11: Wort-Quiz Rückblick", "AB 3, R11 · Version B: auch S. 15"],
-        ["P", "Portfolio-Gespräch mit Leitfragen", "DOS 2, 10.4"],
         ["P", "SPA: Eintrag fürs Projektjournal, Das nehme ich mit", "DOS 2, 10.5"],
         ["P", "Gimkit-Rückblick", "Gimkit"],
         ["P", "Feedback an die Lehrperson (Mentimeter)", "Mentimeter"],
@@ -1669,42 +1664,58 @@ function update1611Karte() {
     el("button", { class: "primaer", onclick: update1611Anwenden }, "Sicherung herunterladen und Update anwenden"));
 }
 
-// ---------- Einmal-Update 16.11.2026 (2): Auftrag «Portfolio-Satz schreiben» überall entfernen ----------
-// Entscheid 16.11.2026: gute Idee, braucht in der Kleinklasse aber zu viel Zeit, bis alle begonnen haben.
-// Betroffen sind nur diese Aufträge (feste IDs); ein später neu angelegter Portfolio-Satz bleibt unberührt.
+// ---------- Einmal-Update 16.11.2026 (2): Portfolio-Aufträge überall entfernen ----------
+// Entscheid 16.11.2026: Jeder Wechsel zu einer anderen Unterlage bringt Unruhe, und die Portfolioarbeit bringt beim
+// jetzigen Stand der Klasse wenig. Betroffen sind nur diese Aufträge (feste IDs, Text wird geprüft).
 const UPDATE_1611_PS = {
-  ids: [["DL01", "a07"], ["DL02", "a09"], ["DL03", "a09"], ["DL04", "a08"], ["DL05", "n1116ps"], ["DL06", "a08"],
-        ["DL07", "a10"], ["DL08", "a11"], ["DL09", "a07"], ["DL10", "a08"], ["DL11", "a07"]],
-  muster: /^Portfolio-Satz schreiben/,
+  loeschen: [   // [DL, Auftrag, Text beginnt mit]
+    ["DL01", "a07", "Portfolio-Satz schreiben"], ["DL02", "a09", "Portfolio-Satz schreiben"], ["DL03", "a09", "Portfolio-Satz schreiben"],
+    ["DL04", "a08", "Portfolio-Satz schreiben"], ["DL05", "n1116ps", "Portfolio-Satz schreiben"], ["DL06", "a08", "Portfolio-Satz schreiben"],
+    ["DL07", "a10", "Portfolio-Satz schreiben"], ["DL08", "a11", "Portfolio-Satz schreiben"], ["DL09", "a07", "Portfolio-Satz schreiben"],
+    ["DL10", "a08", "Portfolio-Satz schreiben"], ["DL11", "a07", "Portfolio-Satz schreiben"],
+    ["DL04", "amvz1d4ofteh", "Endfassung: Version 2 sauber ins Portfolio"],
+    ["DL11", "a01", "Brücke: Portfolio durchblättern"], ["DL11", "a03", "Portfolio ordnen"],
+    ["DL11", "a08", "Puffer: Text aus dem Portfolio"], ["DL12", "a03", "Portfolio-Gespräch"],
+  ],
+  texte: [   // [DL, Auftrag, alter Text, neuer Text]: Stand bleibt
+    ["DL10", "a07", "Prüfung anschauen: 1 Aufgabe wählen, 1 Satz daraus richtig ins Portfolio, unterschreiben lassen",
+                    "Prüfung anschauen: 1 Aufgabe wählen, 1 Satz daraus richtig schreiben, unterschreiben lassen"],
+  ],
+  themen: [["DL11", "Portfolio I: Lernbericht", "Lernbericht"], ["DL12", "Portfolio II und Abschluss", "Rückblick und Abschluss"]],
 };
-function update1611PsTreffer(d) {
-  const dl = d && d.plan && d.plan.dls;
-  if (!dl) return [];
-  return UPDATE_1611_PS.ids.filter(([x, aid]) => {
-    const a = dl[x] && dl[x].auftraege && dl[x].auftraege[aid];
-    return !!(a && UPDATE_1611_PS.muster.test(a.text || ""));
-  });
+function update1611PsPlan(d) {
+  const dl = (d && d.plan && d.plan.dls) || {}, U = UPDATE_1611_PS;
+  const auf = (x, aid) => dl[x] && dl[x].auftraege && dl[x].auftraege[aid];
+  return {
+    loeschen: U.loeschen.filter(([x, aid, anfang]) => { const a = auf(x, aid); return !!(a && (a.text || "").startsWith(anfang)); }),
+    texte: U.texte.filter(([x, aid, alt]) => { const a = auf(x, aid); return !!(a && a.text === alt); }),
+    themen: U.themen.filter(([x, alt]) => !!(dl[x] && dl[x].thema === alt)),
+  };
 }
-const update1611PsNoetig = d => update1611PsTreffer(d).length > 0;
+const update1611PsNoetig = d => { const p = update1611PsPlan(d); return p.loeschen.length + p.texte.length + p.themen.length > 0; };
 function update1611PsAenderungen(d) {   // rein, für Test und Anwendung
-  const upd = {};
-  update1611PsTreffer(d).forEach(([x, aid]) => { upd[`plan/dls/${x}/auftraege/${aid}`] = null; upd[`stand/${x}/${aid}`] = null; });
+  const p = update1611PsPlan(d), upd = {};
+  p.loeschen.forEach(([x, aid]) => { upd[`plan/dls/${x}/auftraege/${aid}`] = null; upd[`stand/${x}/${aid}`] = null; });
+  p.texte.forEach(([x, aid, , neu]) => { upd[`plan/dls/${x}/auftraege/${aid}/text`] = neu; });
+  p.themen.forEach(([x, , neu]) => { upd[`plan/dls/${x}/thema`] = neu; });
   return upd;
 }
 function update1611PsAnwenden() {
-  const n = update1611PsTreffer(Daten).length;
-  frage(`Auftrag «Portfolio-Satz schreiben» aus ${n} DL entfernen (samt Stand)? Zuerst wird eine Sicherung heruntergeladen.`, async () => {
+  const n = update1611PsPlan(Daten).loeschen.length;
+  frage(`${n} Portfolio-Aufträge entfernen (samt Stand)? Zuerst wird eine Sicherung heruntergeladen.`, async () => {
     sicherungHerunterladen();
     const ok = await schreibeMehrere(update1611PsAenderungen(Daten));
-    if (ok) { toast(`Portfolio-Satz aus ${n} DL entfernt`); zeichnen(); }
+    if (ok) { toast(`${n} Portfolio-Aufträge entfernt`); zeichnen(); }
   }, "Entfernen");
 }
 function update1611PsKarte() {
-  const n = update1611PsTreffer(Daten).length;
-  return el("div", { class: "karte" }, el("h2", {}, "Plan-Update 16.11.2026: Portfolio-Satz entfernen"),
-    el("p", {}, `Der Auftrag «Portfolio-Satz schreiben» wird aus ${n} DL entfernt, samt Stand der Lernenden. `
-      + "Andere Portfolio-Aufträge (Endfassung ins Portfolio, Portfolio ordnen, Portfolio-Gespräch …) bleiben."),
-    el("button", { class: "primaer", onclick: update1611PsAnwenden }, "Sicherung herunterladen und Portfolio-Satz entfernen"));
+  const p = update1611PsPlan(Daten);
+  return el("div", { class: "karte" }, el("h2", {}, "Plan-Update 16.11.2026: Portfolio-Aufträge entfernen"),
+    el("p", {}, `${p.loeschen.length} Aufträge werden entfernt, samt Stand der Lernenden: «Portfolio-Satz schreiben» (DL01 bis DL11), `
+      + "«Endfassung ins Portfolio» (DL04), «Portfolio durchblättern», «Portfolio ordnen» und Puffer «Text aus dem Portfolio» (DL11), "
+      + "«Portfolio-Gespräch» (DL12). In DL10 heisst die Prüfungsrückgabe neu «1 Satz daraus richtig schreiben» (ohne Portfolio). "
+      + "Neue Themen: DL11 «Lernbericht», DL12 «Rückblick und Abschluss»."),
+    el("button", { class: "primaer", onclick: update1611PsAnwenden }, "Sicherung herunterladen und Portfolio-Aufträge entfernen"));
 }
 
 function wechsleAnsicht(id) {

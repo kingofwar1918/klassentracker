@@ -32,14 +32,14 @@ DL05 (Mi 18.11.) ist neu: Wortschatz R4, KI-Workshop (30', zwei Gruppen), Posten
 | DL08 | 09.12.2026 | Repetition und Probeprüfung |
 | DL09 | 16.12.2026 | Prüfung und Comics lesen (letzte Woche vor den Weihnachtsferien) |
 | DL10 | 06.01.2027 | Bildergeschichte und Comic |
-| DL11 | 13.01.2027 | Portfolio I: Lernbericht |
-| DL12 | 20.01.2027 | Portfolio II und Abschluss |
+| DL11 | 13.01.2027 | Lernbericht |
+| DL12 | 20.01.2027 | Rückblick und Abschluss |
 
 **Anwenden (einmalig):** Lehrperson anmelden → Bearbeiten → Karte «Plan-Update 16.11.2026» → «Sicherung herunterladen und Update anwenden». Die App lädt zuerst eine Sicherung herunter und verschiebt dann Aufträge, Stand, Hausaufgaben-Termine, «Das kann ich heute» und FLK. Danach verschwindet die Karte. Die Vorlage in `index.html` entspricht dem Plan nach dem Update.
 
-### Plan-Update 16.11.2026 (2): Portfolio-Satz entfernt
+### Plan-Update 16.11.2026 (2): Portfolio-Aufträge entfernt
 
-Der Auftrag «Portfolio-Satz schreiben» ist aus allen DL entfernt (gute Idee, braucht in der Kleinklasse aber zu viel Zeit, bis alle begonnen haben). In der Datenbank einmalig: Bearbeiten → Karte «Plan-Update 16.11.2026: Portfolio-Satz entfernen» → «Sicherung herunterladen und Portfolio-Satz entfernen». Andere Portfolio-Aufträge bleiben.
+Alle Portfolio-Aufträge sind entfernt: «Portfolio-Satz schreiben» (DL01-DL11), «Endfassung ins Portfolio» (DL04), «Portfolio durchblättern», «Portfolio ordnen» und Puffer «Text aus dem Portfolio» (DL11), «Portfolio-Gespräch» (DL12). Grund: Jeder Wechsel zu einer anderen Unterlage bringt Unruhe, und die Portfolioarbeit bringt beim jetzigen Stand der Klasse wenig. DL10: Prüfungsrückgabe ohne Portfolio. DL11 heisst neu «Lernbericht», DL12 «Rückblick und Abschluss». In der Datenbank einmalig: Bearbeiten → Karte «Plan-Update 16.11.2026: Portfolio-Aufträge entfernen» → «Sicherung herunterladen und Portfolio-Aufträge entfernen».
 
 ## Datenschutz
 
