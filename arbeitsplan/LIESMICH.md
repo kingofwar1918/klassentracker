@@ -1,6 +1,6 @@
 # Arbeitsplan Deutsch KK9 · Textproduktion HS26
 
-Online-Fassung des Excel-Arbeitsplans (DL01–DL11). Lernende tragen ihren Stand ein, die Lehrperson kontrolliert und ändert Aufträge, der Beamer zeigt den Stand live.
+Online-Fassung des Excel-Arbeitsplans (DL01–DL12). Lernende tragen ihren Stand ein, die Lehrperson kontrolliert und ändert Aufträge, der Beamer zeigt den Stand live.
 
 **Adresse:** https://kingofwar1918.github.io/klassentracker/arbeitsplan/
 
@@ -19,6 +19,23 @@ Online-Fassung des Excel-Arbeitsplans (DL01–DL11). Lernende tragen ihren Stand
 Beamer direkt öffnen: `…/arbeitsplan/?beamer=1`
 
 **Links in «Mein Plan»:** Steht bei einem Auftrag unter «Wo» das Wort `App`, erscheint ein Knopf «🔎 Bericht-Detektiv öffnen» (https://kingofwar1918.github.io/bericht-detektiv/). Steht unter «Wo» eine Adresse (`https://…`), wird sie ebenfalls zum Knopf. Weitere Stichwörter in `index.html` bei `CONFIG.links`.
+
+## Plan-Update 16.11.2026 (DL01–DL12)
+
+DL05 (Mi 18.11.) ist neu: Wortschatz R4, KI-Workshop (30', zwei Gruppen), Posten 1 «Velotour» und Posten 2 W-Fragen aus dem Teamteaching, Arbeitsplan, Rückmeldung zum Bericht, Portfolio-Satz. Die nicht behandelten Aufträge der bisherigen DL05 (Zeugen-Puzzle, Unfallbericht, R5, Bild-Anleitung …) stehen in DL06 (25.11.). Alle späteren DL rücken eine DL nach hinten:
+
+| DL | Datum | Thema |
+|---|---|---|
+| DL05 | 18.11.2026 | Bericht V: Prüfen, verbessern, KI-Workshop |
+| DL06 | 25.11.2026 | Unfallbericht und Anleitung I |
+| DL07 | 02.12.2026 | Anleitung II: Eigene Anleitung |
+| DL08 | 09.12.2026 | Repetition und Probeprüfung |
+| DL09 | 16.12.2026 | Prüfung und Comics lesen (letzte Woche vor den Weihnachtsferien) |
+| DL10 | 06.01.2027 | Bildergeschichte und Comic |
+| DL11 | 13.01.2027 | Portfolio I: Lernbericht |
+| DL12 | 20.01.2027 | Portfolio II und Abschluss |
+
+**Anwenden (einmalig):** Lehrperson anmelden → Bearbeiten → Karte «Plan-Update 16.11.2026» → «Sicherung herunterladen und Update anwenden». Die App lädt zuerst eine Sicherung herunter und verschiebt dann Aufträge, Stand, Hausaufgaben-Termine, «Das kann ich heute» und FLK. Danach verschwindet die Karte. Die Vorlage in `index.html` entspricht dem Plan nach dem Update.
 
 ## Datenschutz
 

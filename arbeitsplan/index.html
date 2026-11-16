@@ -341,7 +341,8 @@ const CONFIG = {
 
 /* ========================================================================
    1. INHALT — Vorlage aus «Arbeitsplan_Textproduktion_KK9» (Blatt
-   Einstellungen). Wird nur beim ersten Einrichten in die Datenbank geladen;
+   Einstellungen), Stand 16.11.2026 nach dem Plan-Update (DL01–DL12, wie in
+   der Datenbank). Wird nur beim ersten Einrichten in die Datenbank geladen;
    danach änderst du Aufträge direkt in der App (Bereich «Bearbeiten»).
    ======================================================================== */
 const DATEN = {
@@ -359,8 +360,8 @@ const DATEN = {
 
   vorlage: [
     {
-      dl: "DL01", datum: "21.10.2026", thema: "Bericht I: «Schreib zuerst!»",
-      ziel: "Ich kann einen kurzen Bericht über ein Ereignis schreiben (erster Versuch).",
+      dl: "DL01", datum: "23.10.2026", thema: "Bericht I: «Schreib zuerst!»",
+      ziel: "Ich kann einen kurzen Bericht über ein Ereignis schreiben (erster Versuch).\nIch schliesse mein Lesedossier ab.",
       flk: [],
       auftraege: [   // [Art, Auftrag, Wo]   Art: "P" = Pflicht (allen zugeteilt), "Z" = ★ Zusatz, "Puffer"
         ["P", "Brücke: Bild anschauen, W-Fragen zu zweit", "DOS 1, 1.1"],
@@ -371,10 +372,10 @@ const DATEN = {
         ["P", "Austausch zu zweit: Worüber schreibst du?", ""],
         ["P", "Portfolio-Satz schreiben", "DOS 1, 1.5"],
         ["Z", "Bonus: «9 minus 2» oder zeichnen", "DOS 1, 1.6 / AB 1"],
-        ["Puffer", "Puffer-Box: Schreibanlass-Karte oder Leserätsel", ""],
+        ["Puffer", "Puffer-Box: Schreibanlass-Karte", ""],
       ],
       hausaufgaben: [   // [Auftrag, auf wann, für alle zugeteilt?]
-        ["freiwillig: Wortkartei üben", "", false],
+        ["Lesedossier fertigstellen", "30.10.2026", true],
       ],
     },
     {
@@ -382,56 +383,68 @@ const DATEN = {
       ziel: "Ich kann in einem Bericht die W-Fragen und die drei Teile markieren.",
       flk: [],
       auftraege: [   // [Art, Auftrag, Wo]   Art: "P" = Pflicht (allen zugeteilt), "Z" = ★ Zusatz, "Puffer"
-        ["P", "Brücke: Bericht-Würfel zu zweit (Version A 6 Würfel, Version B 9 Würfel)", "AB 1, Karte 2"],
+        ["P", "Einstieg «Eilmeldung»: Satzstreifen ordnen, fehlende W-Frage finden", "Couvert, F. 4"],
         ["P", "Wortschatz R2: Wortfeld «sagen»", "AB 3, R2 · Version B: auch S. 13"],
         ["P", "Texte A bis D: Bericht oder Erzählung?", "DOS 1, 2.1"],
         ["P", "Merkmale ankreuzen", "DOS 1, 2.2"],
         ["P", "Bericht-Gerüst ergänzen", "DOS 1, 2.3"],
         ["P", "Text A farbig markieren", "DOS 1, 2.4"],
-        ["P", "Eigene Rohfassung prüfen: Was fehlt?", "DOS 1, 2.5"],
+        ["P", "Eigene Rohfassung prüfen: Was fehlt?", "DOS 1, 2.5 · ohne Rohfassung: Text B"],
         ["P", "Austausch zu zweit: Markierungen vergleichen", ""],
         ["P", "Portfolio-Satz schreiben", "Portfolio"],
         ["Z", "Bonus: Bericht-Würfel schriftlich oder Arbeitsheft Sprachstarken 7, S. 79-81", "DOS 1, 2.6"],
         ["Z", "App «Bericht-Detektiv»: Bericht oder Erzählung?", "App"],
         ["Puffer", "Puffer-Box (Stufe 1 bis 3)", ""],
+        ["Z", "Freies Schreiben mit Story-Cubes", "Story-Cubes"],
+        ["P", "Lesedossier (Schönenberger) fertigstellen", "DOS & Buch"],
+        ["Z", "Dossier Rechtschreibung und Leserätsel", "DOS Leserätsel"],
       ],
       hausaufgaben: [   // [Auftrag, auf wann, für alle zugeteilt?]
+        ["Rohfassung fertig schreiben (DL01, Aufträge 1.2-1.4)", "04.11.2026", false],
+        ["Lesedossier (Schönenberger) fertigstellen", "30.10.2026", true],
       ],
     },
     {
       dl: "DL03", datum: "04.11.2026", thema: "Bericht III: Überarbeiten",
-      ziel: "Ich kann Sätze aus einer Erzählung sachlich und im Präteritum umschreiben.",
+      ziel: "Ich kann Sätze aus einer Erzählung sachlich und im Präteritum umschreiben.\nIch arbeite nach meiner Laufkarte.",
       flk: [],
       auftraege: [   // [Art, Auftrag, Wo]   Art: "P" = Pflicht (allen zugeteilt), "Z" = ★ Zusatz, "Puffer"
         ["P", "Brücke: Gimkit «Bericht oder Erzählung?»", "Gimkit"],
         ["P", "Wortschatz R3: Wortschatz-Würfel", "AB 3, R3 · Version B: auch S. 13"],
         ["P", "Ankreuzen: erzählend oder sachlich?", "DOS 1, 3.1"],
+        ["P", "Arbeitszeit nach deiner Laufkarte (Start beim ersten leeren Kästchen)", "Laufkarte"],
         ["P", "Sätze sachlich umschreiben", "DOS 1, 3.2"],
         ["P", "Verben ins Präteritum setzen", "DOS 1, 3.3"],
-        ["P", "Rohfassung überarbeiten (Checkliste, KI-Korrekturmodus)", "DOS 1, 3.4 / AB 4"],
-        ["P", "Zu zweit: 2 Sterne, 1 Wunsch", "DOS 1, 3.5"],
-        ["P", "Endfassung schreiben (Portfolio-Blatt)", "DOS 1, 3.6"],
-        ["P", "Portfolio-Satz schreiben", "Portfolio"],
+        ["P", "Fr 06.11.: Drei Stationen (Checkliste live, Satz-Labor, iPad)", "Stationsblatt"],
+        ["Z", "Gimkit «Bericht oder Erzählung?»: Selbstüberprüfung zu Hause", "https://www.gimkit.com/join/6ae83c7008e7dc7f0a5af414"],
+        ["P", "Portfolio-Satz schreiben (auch den von DL02)", "Portfolio"],
         ["Z", "Bonus: «Doppelt schreiben»", "DOS 1, 3.7 / AB 1"],
         ["Z", "App: Präteritum oder Check-Bot", "App"],
         ["Puffer", "Puffer-Box: Rechtschreib-Fitnessbahn / Förderdossier", "Puffer-Box"],
       ],
       hausaufgaben: [   // [Auftrag, auf wann, für alle zugeteilt?]
+        ["Merkmale ankreuzen (DOS 1, 2.2, S. 8)", "11.11.2026", false],
+        ["Verben ins Präteritum setzen (DOS 1, 3.3, S. 15)", "11.11.2026", false],
+        ["Sätze sachlich umschreiben und Verben ins Präteritum (DOS 1, 3.2 und 3.3, S. 14-15)", "11.11.2026", false],
+        ["Gimkit «Bericht oder Erzählung?» spielen (Selbstüberprüfung, Link im Arbeitsplan DL03)", "11.11.2026", true],
       ],
     },
     {
-      dl: "DL04", datum: "11.11.2026", thema: "Bericht IV: Berichte im Beruf",
-      ziel: "Ich kann mit dem Bericht-Gerüst einen kurzen Bericht über ein Ereignis verfassen.",
+      dl: "DL04", datum: "11.11.2026", thema: "Bericht IV: Version 2",
+      ziel: "Ich kann meinen Bericht mit der Checkliste zu Version 2 überarbeiten.",
       flk: [],
       auftraege: [   // [Art, Auftrag, Wo]   Art: "P" = Pflicht (allen zugeteilt), "Z" = ★ Zusatz, "Puffer"
-        ["P", "Brücke: Gerüst repetieren", "Wandtafel"],
-        ["P", "Wortschatz R4: Unfall- und Polizeiwörter", "AB 3, R4 · Version B: auch S. 13"],
-        ["P", "Zeugen-Puzzle zu zweit", "DOS 1, 4.1"],
-        ["P", "Unfallbericht schreiben", "DOS 1, 4.2"],
-        ["P", "Berufsbericht lesen (Wahl a, b oder c)", "DOS 1, 4.3"],
-        ["P", "Eigenen Rapport schreiben", "DOS 1, 4.4"],
-        ["P", "Austausch zu zweit: Unfallberichte prüfen", ""],
-        ["P", "Portfolio-Satz schreiben", "DOS 1, 4.5"],
+        ["P", "Brücke: Arbeitsplan anschauen: Was ist zur Korrektur?", "Arbeitsplan"],
+        ["P", "Präteritum-Blatt: Aufträge 1 bis 4 und Exit-Ticket", "Präteritum-Blatt"],
+        ["P", "Zu zweit: Rohfassung prüfen mit der Checkliste", "DOS 1, 2.5, S. 12"],
+        ["P", "Zu zweit: 2 Sterne, 1 Wunsch", "DOS 1, 3.5"],
+        ["P", "Version 2 schreiben (zu zweit, jede Person ihren Text)", "DOS 1, 3.4"],
+        ["P", "Austausch: Version 2 vergleichen, Verben im Präteritum?", "zu zweit"],
+        ["P", "Endfassung: Version 2 sauber ins Portfolio", "DOS 1, 3.6"],
+        ["P", "Mein Plan: zuerst Korrekturen, dann nächstes Kästchen der Laufkarte", "Laufkarte"],
+        ["P", "Portfolio-Satz schreiben", "Portfolio"],
+        ["Z", "Reporterteam: Interview, Reporter-Bericht (wenn Endfassung fertig)", "Reporter-Blatt"],
+        ["Z", "Berufsbericht lesen (Wahl a, b oder c)", "DOS 1, 4.3"],
         ["Z", "Bonus: Story Box «Abenteuer als Bericht»", "DOS 1, 4.6 / AB 2"],
         ["Z", "App: W-Fragen finden", "App"],
         ["Puffer", "Puffer-Box (Stufe 1 bis 3)", ""],
@@ -440,32 +453,53 @@ const DATEN = {
       ],
     },
     {
-      dl: "DL05", datum: "18.11.2026", thema: "Anleitung I: Anleitungen verstehen",
-      ziel: "Ich kann eine Bild-Anleitung in nummerierte Arbeitsschritte umformen.",
+      dl: "DL05", datum: "18.11.2026", thema: "Bericht V: Prüfen, verbessern, KI-Workshop",
+      ziel: "Ich kann einen Bericht mit der Checkliste prüfen und meinen eigenen Bericht verbessern.",
       flk: [],
       auftraege: [   // [Art, Auftrag, Wo]   Art: "P" = Pflicht (allen zugeteilt), "Z" = ★ Zusatz, "Puffer"
-        ["P", "Brücke: Anleitungs-Würfel (mündlich)", "AB 1"],
-        ["P", "Wortschatz R5: Reihenfolgewörter", "AB 3, R5 · Version B: auch S. 14"],
-        ["P", "Bild-Anleitung: Bilder nummerieren", "DOS 2, 5.1"],
-        ["P", "Reihenfolgewörter einsetzen", "DOS 2, 5.2"],
-        ["P", "Sätze in Befehlsform schreiben", "DOS 2, 5.3"],
-        ["P", "Puzzle-Anleitung Papierflieger ordnen", "DOS 2, 5.4"],
-        ["P", "Zu zweit nach Anleitung falten", "DOS 2, 5.5"],
+        ["P", "Wortschatz R4: Unfall- und Polizeiwörter (aus DL 4)", "AB 3, R4 · Version B: auch S. 13"],
+        ["P", "KI-Workshop (30'): der KI einen klaren Auftrag geben und ihre Antwort prüfen", "AB 6, AB 7"],
+        ["P", "Posten 1: Einen Bericht bewerten («Velotour»), 2 Stellen verbessern", "Stationsblatt S. 2"],
+        ["P", "Posten 2: W-Fragen in einem Bericht finden (Text 2)", "Stationsblatt S. 3-4"],
+        ["P", "Arbeitsplan: zuerst Korrekturen, dann nächstes Kästchen der Laufkarte", "Laufkarte"],
+        ["P", "Rückmeldung zum Bericht: 3 Stellen verbessern (andere Farbe)", "Rückmeldung"],
         ["P", "Portfolio-Satz schreiben", "Portfolio"],
-        ["Z", "Bonus: Anleitungs-Würfel schriftlich oder Bild-Anleitung zeichnen", "DOS 2, 5.6 / AB 1"],
-        ["Z", "App: Anleitung ordnen", "App"],
+        ["Z", "Reporterteam: Redaktion und Aushang (Schritt 5)", "Reporter-Blatt S. 5"],
         ["Puffer", "Puffer-Box (Stufe 1 bis 3)", ""],
       ],
       hausaufgaben: [   // [Auftrag, auf wann, für alle zugeteilt?]
       ],
     },
     {
-      dl: "DL06", datum: "25.11.2026", thema: "Anleitung II: Eigene Anleitung",
+      dl: "DL06", datum: "25.11.2026", thema: "Unfallbericht und Anleitung I",
+      ziel: "Ich kann mit dem Bericht-Gerüst einen kurzen Bericht über ein Ereignis verfassen.\nIch kann eine Bild-Anleitung in nummerierte Arbeitsschritte umformen.",
+      flk: [],
+      auftraege: [   // [Art, Auftrag, Wo]   Art: "P" = Pflicht (allen zugeteilt), "Z" = ★ Zusatz, "Puffer"
+        ["P", "Brücke: Gerüst repetieren", "Wandtafel"],
+        ["P", "Zeugen-Puzzle zu zweit", "DOS 1, 4.1"],
+        ["P", "Unfallbericht schreiben", "DOS 1, 4.2"],
+        ["P", "Austausch zu zweit: Unfallberichte prüfen", ""],
+        ["P", "Wortschatz R5: Reihenfolgewörter", "AB 3, R5 · Version B: auch S. 14"],
+        ["P", "Bild-Anleitung: Bilder nummerieren", "DOS 2, 5.1"],
+        ["P", "Reihenfolgewörter einsetzen", "DOS 2, 5.2"],
+        ["P", "Portfolio-Satz schreiben", "DOS 1, 4.5 / Portfolio"],
+        ["Z", "Bonus: Anleitungs-Würfel schriftlich oder Bild-Anleitung zeichnen", "DOS 2, 5.6 / AB 1"],
+        ["Z", "App: Anleitung ordnen", "App"],
+        ["Puffer", "Eigenen Rapport schreiben", "DOS 1, 4.4"],
+      ],
+      hausaufgaben: [   // [Auftrag, auf wann, für alle zugeteilt?]
+      ],
+    },
+    {
+      dl: "DL07", datum: "02.12.2026", thema: "Anleitung II: Eigene Anleitung",
       ziel: "Ich kann eine eigene Anleitung in nummerierten Schritten verfassen.",
       flk: [],
       auftraege: [   // [Art, Auftrag, Wo]   Art: "P" = Pflicht (allen zugeteilt), "Z" = ★ Zusatz, "Puffer"
         ["P", "Brücke: Fehler-Anleitung korrigieren", "Folie"],
         ["P", "Wortschatz R6: Werkzeug- und Berufswörter", "AB 3, R6 · Version B: auch S. 14"],
+        ["P", "Sätze in Befehlsform schreiben", "DOS 2, 5.3"],
+        ["P", "Puzzle-Anleitung Papierflieger ordnen", "DOS 2, 5.4"],
+        ["P", "Zu zweit nach Anleitung falten", "DOS 2, 5.5"],
         ["P", "Thema wählen", "DOS 2, 6.1"],
         ["P", "Material und Schritte planen", "DOS 2, 6.2"],
         ["P", "Anleitung schreiben", "DOS 2, 6.3"],
@@ -477,11 +511,11 @@ const DATEN = {
         ["Puffer", "Puffer-Box: Anleitungs-Würfel, Leserätsel", "Puffer-Box"],
       ],
       hausaufgaben: [   // [Auftrag, auf wann, für alle zugeteilt?]
-        ["LZ-Blatt durchlesen", "02.12.2026", true],
+        ["LZ-Blatt durchlesen", "09.12.2026", true],
       ],
     },
     {
-      dl: "DL07", datum: "02.12.2026", thema: "Repetition und Probeprüfung",
+      dl: "DL08", datum: "09.12.2026", thema: "Repetition und Probeprüfung",
       ziel: "",
       flk: [
         "LZ1: Ich kann in einem Bericht die W-Fragen und die drei Teile markieren.",
@@ -504,12 +538,12 @@ const DATEN = {
         ["Puffer", "App: Check-Bot", "App"],
       ],
       hausaufgaben: [   // [Auftrag, auf wann, für alle zugeteilt?]
-        ["Probeprüfung fertig lösen und korrigieren", "09.12.2026", true],
-        ["LZ-Blatt repetieren", "09.12.2026", true],
+        ["Probeprüfung fertig lösen und korrigieren", "16.12.2026", true],
+        ["LZ-Blatt repetieren", "16.12.2026", true],
       ],
     },
     {
-      dl: "DL08", datum: "09.12.2026", thema: "Prüfung und Comics lesen",
+      dl: "DL09", datum: "16.12.2026", thema: "Prüfung und Comics lesen",
       ziel: "Ich kann die Elemente eines Comics beschriften.",
       flk: [],
       auftraege: [   // [Art, Auftrag, Wo]   Art: "P" = Pflicht (allen zugeteilt), "Z" = ★ Zusatz, "Puffer"
@@ -526,7 +560,7 @@ const DATEN = {
       ],
     },
     {
-      dl: "DL09", datum: "16.12.2026", thema: "Bildergeschichte und Comic",
+      dl: "DL10", datum: "06.01.2027", thema: "Bildergeschichte und Comic",
       ziel: "Ich kann zu einer Bilderfolge eine Geschichte in sinnvoller Reihenfolge schreiben.",
       flk: [],
       auftraege: [   // [Art, Auftrag, Wo]   Art: "P" = Pflicht (allen zugeteilt), "Z" = ★ Zusatz, "Puffer"
@@ -544,7 +578,7 @@ const DATEN = {
       ],
     },
     {
-      dl: "DL10", datum: "06.01.2027", thema: "Portfolio I: Lernbericht",
+      dl: "DL11", datum: "13.01.2027", thema: "Portfolio I: Lernbericht",
       ziel: "Ich kann in einem Lernbericht beschreiben, was mir gelungen ist und was schwierig war.",
       flk: [],
       auftraege: [   // [Art, Auftrag, Wo]   Art: "P" = Pflicht (allen zugeteilt), "Z" = ★ Zusatz, "Puffer"
@@ -561,7 +595,7 @@ const DATEN = {
       ],
     },
     {
-      dl: "DL11", datum: "13.01.2027", thema: "Portfolio II und Abschluss",
+      dl: "DL12", datum: "20.01.2027", thema: "Portfolio II und Abschluss",
       ziel: "Ich kann im Partnergespräch meinen besten Text mit zwei Kriterien beurteilen.",
       flk: [],
       auftraege: [   // [Art, Auftrag, Wo]   Art: "P" = Pflicht (allen zugeteilt), "Z" = ★ Zusatz, "Puffer"
@@ -1555,6 +1589,98 @@ function sicherungLaden(datei) {
   r.readAsText(datei);
 }
 
+/* ========================================================================
+   PLAN-UPDATE 16.11.2026 (einmalig, nur Lehrperson, Knopf im Bereich «Bearbeiten»)
+   DL05 (18.11.) wird neu: Wortschatz R4, KI-Workshop, Posten aus dem Teamteaching,
+   Arbeitsplan, Rückmeldung zum Bericht. Die bisherigen DL05-Aufträge, die nicht
+   behandelt werden, kommen in DL06 (25.11.); alle späteren DL rücken eine DL nach
+   hinten, neu DL12 (20.01.2027). Stand, «Das kann ich heute» und FLK wandern mit.
+   Der Knopf erscheint nur, solange DL05 noch das alte Thema hat und DL12 fehlt.
+   ======================================================================== */
+const UPDATE_1611 = {
+  altesThema05: "Unfallbericht und Anleitung I",
+  dl05: { datum: "18.11.2026", thema: "Bericht V: Prüfen, verbessern, KI-Workshop",
+          ziel: "Ich kann einen Bericht mit der Checkliste prüfen und meinen eigenen Bericht verbessern." },
+  bleibenIn05: ["n1011r4", "amvyafzh2is8", "a11"],   // Wortschatz R4, Reporterteam (Zusatz), Puffer-Box
+  neu05: [   // [ID, Art, Auftrag, Wo, nicht zugeteilt]
+    ["n1116ki", "P", "KI-Workshop (30'): der KI einen klaren Auftrag geben und ihre Antwort prüfen", "AB 6, AB 7"],
+    ["n1116p1", "P", "Posten 1: Einen Bericht bewerten («Velotour»), 2 Stellen verbessern", "Stationsblatt S. 2"],
+    ["n1116p2", "P", "Posten 2: W-Fragen in einem Bericht finden (Text 2)", "Stationsblatt S. 3-4"],
+    ["n1116plan", "P", "Arbeitsplan: zuerst Korrekturen, dann nächstes Kästchen der Laufkarte", "Laufkarte"],
+    ["n1116rm", "P", "Rückmeldung zum Bericht: 3 Stellen verbessern (andere Farbe)", "Rückmeldung", ["s1"]],   // s1: noch keine Rückmeldung zur Version 2
+    ["n1116ps", "P", "Portfolio-Satz schreiben", "Portfolio"],
+  ],
+  reihenfolge05: ["n1011r4", "n1116ki", "n1116p1", "n1116p2", "n1116plan", "n1116rm", "n1116ps", "amvyafzh2is8", "a11"],
+  // alte DL → neue DL (DL05 wird geteilt: Rest → DL06)
+  ziele: { DL05: "DL06", DL06: "DL07", DL07: "DL08", DL08: "DL09", DL09: "DL10", DL10: "DL11", DL11: "DL12" },
+  daten: { DL06: "25.11.2026", DL07: "02.12.2026", DL08: "09.12.2026", DL09: "16.12.2026",
+           DL10: "06.01.2027", DL11: "13.01.2027", DL12: "20.01.2027" },
+  // Hausaufgaben der verschobenen DL: «auf wann» rückt mit (alter DL-Termin → neuer Termin)
+  bis: { "25.11.2026": "02.12.2026", "02.12.2026": "09.12.2026", "09.12.2026": "16.12.2026",
+         "16.12.2026": "06.01.2027", "06.01.2027": "13.01.2027", "13.01.2027": "20.01.2027" },
+};
+function update1611Noetig(d) {
+  const p = d && d.plan, dl = p && p.dls;
+  return !!(dl && dl.DL05 && dl.DL05.thema === UPDATE_1611.altesThema05 && !dl.DL12 && dl.DL11);
+}
+/* Reine Funktion: liefert die Änderungen für schreibeMehrere (Pfade relativ zu «oeffentlich»). */
+function update1611Aenderungen(d) {
+  const U = UPDATE_1611, kopie = o => JSON.parse(JSON.stringify(o || {}));
+  const alt = kopie(d.plan.dls), altStand = kopie(d.stand), altZiel = kopie(d.ziel), altFlk = kopie(d.flk);
+  const lernende = Object.keys((d.plan && d.plan.lernende) || {});
+  const dls = {}, stand = {}, ziel = {}, flk = {};
+  // 1. unverändert: alles, was nicht verschoben wird (DL01–DL04, weitere eigene DL)
+  for (const [id, v] of Object.entries(alt)) if (!(id in U.ziele)) dls[id] = v;
+  for (const quelle of [[altStand, stand], [altZiel, ziel], [altFlk, flk]])
+    for (const [id, v] of Object.entries(quelle[0])) if (!(id in U.ziele)) quelle[1][id] = v;
+  // 2. alte DL06–DL11 → DL07–DL12 (mit Datum, Hausaufgaben-Termin, Stand, Ziel, FLK)
+  for (const [von, nach] of Object.entries(U.ziele)) {
+    if (von === "DL05" || !alt[von]) continue;
+    const v = alt[von];
+    v.ord = Number(nach.slice(2)); v.datum = U.daten[nach];
+    for (const h of Object.values(v.hausaufgaben || {})) if (h && U.bis[h.bis]) h.bis = U.bis[h.bis];
+    dls[nach] = v;
+    if (altStand[von]) stand[nach] = altStand[von];
+    if (altZiel[von]) ziel[nach] = altZiel[von];
+    if (altFlk[von]) flk[nach] = altFlk[von];
+  }
+  // 3. alte DL05 teilen: Rest → DL06, neue DL05
+  const a05 = alt.DL05, rest = {}, bleibt = {};
+  for (const [aid, a] of Object.entries(a05.auftraege || {})) (U.bleibenIn05.includes(aid) ? bleibt : rest)[aid] = a;
+  const s05 = altStand.DL05 || {}, restStand = {}, bleibtStand = {};
+  for (const [aid, s] of Object.entries(s05)) (U.bleibenIn05.includes(aid) ? bleibtStand : restStand)[aid] = s;
+  const nummeriere = obj => Object.entries(obj).sort(([, x], [, y]) => (x.ord ?? 999) - (y.ord ?? 999))
+    .forEach(([, a], i) => { a.ord = i + 1; });
+  nummeriere(rest);
+  dls.DL06 = Object.assign({}, a05, { ord: 6, datum: U.daten.DL06, auftraege: rest });
+  if (Object.keys(restStand).length) stand.DL06 = restStand;
+  if (altZiel.DL05) ziel.DL06 = altZiel.DL05;
+  if (altFlk.DL05) flk.DL06 = altFlk.DL05;
+  const neu = Object.assign({}, bleibt);
+  for (const [aid, art, text, wo, ohne] of U.neu05) {
+    neu[aid] = { art, text, wo: wo || "" };
+    if (art === "P") { bleibtStand[aid] = {}; lernende.forEach(s => { if (!(ohne || []).includes(s)) bleibtStand[aid][s] = "offen"; }); }
+  }
+  U.reihenfolge05.forEach((aid, i) => { if (neu[aid]) neu[aid].ord = i + 1; });
+  dls.DL05 = { ord: 5, datum: U.dl05.datum, thema: U.dl05.thema, ziel: U.dl05.ziel, auftraege: neu };
+  stand.DL05 = bleibtStand;
+  return { "plan/dls": dls, stand, ziel: Object.keys(ziel).length ? ziel : null, flk: Object.keys(flk).length ? flk : null };
+}
+function update1611Anwenden() {
+  frage("Plan-Update 16.11.2026 anwenden? Zuerst wird eine Sicherung heruntergeladen. Danach: DL05 neu, offene DL05-Aufträge in DL06, alle späteren DL eine nach hinten, neu DL12 (20.01.2027).", async () => {
+    sicherungHerunterladen();
+    const ok = await schreibeMehrere(update1611Aenderungen(Daten));
+    if (ok) { Zustand.dl = "DL05"; toast("Plan-Update angewendet: DL01–DL12"); zeichnen(); }
+  }, "Anwenden");
+}
+function update1611Karte() {
+  return el("div", { class: "karte" }, el("h2", {}, "Plan-Update 16.11.2026"),
+    el("p", {}, "DL05 (18.11.) wird neu: Wortschatz R4, KI-Workshop, Posten 1 und 2, Arbeitsplan, Rückmeldung zum Bericht. "
+      + "Die nicht behandelten DL05-Aufträge (Zeugen-Puzzle, Unfallbericht, R5, Bild-Anleitung …) kommen in DL06 (25.11.). "
+      + "Alle späteren DL rücken eine DL nach hinten, neu DL12 (20.01.2027). Prüfung neu in DL09 (16.12.). Stand und Hausaufgaben wandern mit."),
+    el("button", { class: "primaer", onclick: update1611Anwenden }, "Sicherung herunterladen und Update anwenden"));
+}
+
 function wechsleAnsicht(id) {
   Zustand.ansicht = id; Speicher.schreib("ansicht", id);
   zeichnen(); window.scrollTo(0, 0);
@@ -1998,11 +2124,12 @@ function ansichtLehrer() {
   else if (Zustand.regelnVeraltet) out.push(regelnKarte("veraltet"));
   if (!plan() || !plan().dls) {
     out.push(el("div", { class: "karte schmal" }, el("h2", {}, "Arbeitsplan einrichten"),
-      el("p", {}, "Die Datenbank ist noch leer. Lade den Arbeitsplan aus der Excel-Vorlage (DL01–DL11, Textproduktion HS26). Pflichtaufträge sind danach für alle «offen»."),
+      el("p", {}, "Die Datenbank ist noch leer. Lade den Arbeitsplan aus der Vorlage (DL01–DL12, Textproduktion HS26). Pflichtaufträge sind danach für alle «offen»."),
       el("button", { class: "primaer", onclick: () => { const v = ausVorlage(); schreibeMehrere({ plan: v.plan, stand: v.stand }); toast("Arbeitsplan geladen"); } }, "Arbeitsplan aus Vorlage laden")));
     out.push(verbindungKarte());
     return out;
   }
+  if (update1611Noetig(Daten)) out.push(update1611Karte());
   out.push(dlLeiste(true));
   if (Zustand.dl && dlVon(Zustand.dl)) out.push(dlBearbeiten(Zustand.dl));
   out.push(lernendeKarte(), einstellungenKarte(), datenKarte(), verbindungKarte());
@@ -2076,7 +2203,7 @@ function dlBearbeiten(dlId) {
     el("div", { class: "feld" }, el("label", {}, "Das kann ich heute (Ziel der DL, Selbsteinschätzung noch nicht · fast · sicher) – leer lassen, wenn es keines gibt"),
       el("textarea", { onchange: e => schreibe(`${b}/ziel`, e.target.value.trim()), style: "min-height:60px" }, d.ziel || "")),
     el("details", { open: flkVon(dlId).length ? true : null },
-      el("summary", {}, "FLK-Lernziele (erreicht · noch nicht), z.B. DL07"),
+      el("summary", {}, "FLK-Lernziele (erreicht · noch nicht), z.B. DL08"),
       el("div", { class: "feld" }, el("label", {}, "Ein Lernziel pro Zeile. Leer = kein FLK in dieser DL."),
         el("textarea", { onchange: e => { const z = e.target.value.split("\n").map(s => s.trim()).filter(Boolean); const o = {}; z.forEach((t, i) => { o["lz" + (i + 1)] = t; }); schreibe(`${b}/flk`, z.length ? o : null); } },
           flkVon(dlId).map(f => f.text).join("\n")))),
