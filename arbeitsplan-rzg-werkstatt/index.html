@@ -2840,8 +2840,38 @@ const REGELN = {
             }
           }
         },
+        "promptwand": {
+          "$karte": {
+            ".write": "$karte.matches(/^k[0-9a-z]{8}$/) && newData.exists() && (!data.exists() || data.child('tier').val() === newData.child('tier').val()) && (!data.child('v1').exists() || newData.child('v1').exists()) && (!data.child('v2').exists() || newData.child('v2').exists())",
+            ".validate": "newData.hasChildren(['tier', 'z'])",
+            "tier": {
+              ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 24"
+            },
+            "aufgabe": {
+              ".validate": "newData.isString() && newData.val().length <= 80"
+            },
+            "v1": {
+              ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 400"
+            },
+            "v2": {
+              ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 600"
+            },
+            "z": {
+              ".validate": "newData.isNumber()"
+            },
+            "$sonst": {
+              ".validate": false
+            }
+          }
+        },
+        "promptwandPhase": {
+          ".validate": "newData.isNumber() && (newData.val() === 1 || newData.val() === 2)"
+        },
         "meta": {
           "_regelnAlt": {
+            ".validate": false
+          },
+          "_regelnAlt2": {
             ".validate": false
           }
         }

@@ -635,8 +635,38 @@ const REGELN = {
             }
           }
         },
+        "promptwand": {
+          "$karte": {
+            ".write": "$karte.matches(/^k[0-9a-z]{8}$/) && newData.exists() && (!data.exists() || data.child('tier').val() === newData.child('tier').val()) && (!data.child('v1').exists() || newData.child('v1').exists()) && (!data.child('v2').exists() || newData.child('v2').exists())",
+            ".validate": "newData.hasChildren(['tier', 'z'])",
+            "tier": {
+              ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 24"
+            },
+            "aufgabe": {
+              ".validate": "newData.isString() && newData.val().length <= 80"
+            },
+            "v1": {
+              ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 400"
+            },
+            "v2": {
+              ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 600"
+            },
+            "z": {
+              ".validate": "newData.isNumber()"
+            },
+            "$sonst": {
+              ".validate": false
+            }
+          }
+        },
+        "promptwandPhase": {
+          ".validate": "newData.isNumber() && (newData.val() === 1 || newData.val() === 2)"
+        },
         "meta": {
           "_regelnAlt": {
+            ".validate": false
+          },
+          "_regelnAlt2": {
             ".validate": false
           }
         }
@@ -1273,6 +1303,9 @@ async function pruefeSchreibrecht() {
     // Regeln vom 09.11.2026 («zur Korrektur» gesperrt, DL-Archiv): sie lehnen diesen Testwert ab.
     const v = await Sync.schreib("oeffentlich/meta/_regelnAlt", 1);
     if (v.ok) { Zustand.regelnVeraltet = true; await Sync.schreib("oeffentlich/meta/_regelnAlt", null); }
+    // Regeln vom 21.11.2026 (Prompt-Wand für den KI-Workshop): sie lehnen diesen Testwert ab.
+    const w = await Sync.schreib("oeffentlich/meta/_regelnAlt2", 1);
+    if (w.ok) { Zustand.regelnVeraltet = true; await Sync.schreib("oeffentlich/meta/_regelnAlt2", null); }
   }
 }
 
@@ -2327,7 +2360,7 @@ function datenKarte() {
 function regelnKarte(art) {
   const text = {
     fehlt: ["Noch ein Schritt: Regeln einspielen", "Du bist angemeldet, aber die Datenbank lässt deine Änderungen noch nicht zu."],
-    veraltet: ["Regeln aktualisieren (1 Minute)", "Neu: Lernende können «zur Korrektur» nicht mehr selbst aufheben, und archivierte DL sind für sie gesperrt. Dafür braucht die Datenbank die neuen Regeln. Bis dahin funktioniert alles andere wie bisher."],
+    veraltet: ["Regeln aktualisieren (1 Minute)", "Neu (21.11.2026): die Prompt-Wand für den KI-Workshop. Lernende dürfen dort ihre Prompts schreiben, sonst nichts Neues. Dafür braucht die Datenbank die neuen Regeln. Bis dahin funktioniert alles andere wie bisher."],
   }[art] || ["Sicherheitsregeln", ""];
   return el("div", { class: "karte " + (art ? "hinweis rot" : "") },
     el("h3", {}, text[0]),

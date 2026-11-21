@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="de-CH">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prompt-Wand · KI-Workshop KK9</title>
+<style>
+  :root { --navy:#14213D; --or:#D9631A; --hell:#E9EDF4; --peach:#FBE3D2; --grau:#4A5568; --gruen:#2E7D32; --rot:#C62828; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: Arial, Helvetica, sans-serif; color:#222; background:#F6F8FB; font-size:19px; line-height:1.4; }
+  header { background:var(--navy); color:#fff; padding:14px 22px; display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
+  header h1 { font-size:26px; margin:0; }
+  header .info { margin-left:auto; font-size:16px; opacity:.9; }
+  main { max-width:900px; margin:0 auto; padding:18px 16px 60px; }
+  main.breit { max-width:none; padding:18px 22px 60px; }
+  .karte { background:#fff; border-radius:14px; padding:18px 20px; margin:0 0 16px; box-shadow:0 1px 3px rgba(0,0,0,.08); }
+  .karte h2 { margin:0 0 10px; font-size:22px; color:var(--navy); }
+  .tier { font-size:30px; font-weight:bold; color:var(--navy); }
+  .hinweis { color:var(--grau); font-size:17px; margin:4px 0 10px; }
+  button { font: inherit; font-size:19px; border:0; border-radius:10px; padding:12px 18px; cursor:pointer; background:var(--hell); color:var(--navy); min-height:48px; }
+  button.primaer { background:var(--or); color:#fff; font-weight:bold; }
+  button.klein { font-size:15px; padding:6px 12px; min-height:36px; }
+  button.gefahr { background:var(--rot); color:#fff; }
+  button:disabled { opacity:.5; cursor:default; }
+  .aufgaben { display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:10px; }
+  .aufgabe { text-align:left; background:var(--hell); border:3px solid transparent; padding:14px; min-height:96px; }
+  .aufgabe b { display:block; color:var(--or); font-size:18px; }
+  .aufgabe.gewaehlt { border-color:var(--or); background:var(--peach); }
+  textarea, input[type=text], input[type=email], input[type=password] { width:100%; font:inherit; font-size:19px; padding:12px; border:2px solid #C9D2E0; border-radius:10px; background:#fff; }
+  textarea { min-height:110px; resize:vertical; }
+  textarea:focus, input:focus { outline:none; border-color:var(--or); }
+  .zaehler { font-size:15px; color:var(--grau); text-align:right; }
+  .zeile { display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:10px; }
+  .ok { color:var(--gruen); font-weight:bold; }
+  .fehler { color:var(--rot); font-weight:bold; }
+  .teil { border-left:6px solid var(--or); padding:4px 0 4px 14px; margin:14px 0; }
+  .teil h3 { margin:0 0 2px; font-size:20px; color:var(--navy); }
+  .chips { display:flex; gap:8px; flex-wrap:wrap; margin:6px 0 8px; }
+  .chip { background:var(--peach); color:var(--navy); font-size:16px; padding:6px 12px; min-height:38px; border-radius:20px; }
+  .vorschau { background:var(--hell); border-radius:10px; padding:12px 14px; white-space:pre-wrap; min-height:52px; }
+  .gesperrt { color:var(--grau); background:var(--hell); border-radius:10px; padding:14px; }
+  /* Wand */
+  .leiste { display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:14px; }
+  .leiste .titel { font-size:20px; font-weight:bold; color:var(--navy); margin-right:auto; }
+  .wand { display:grid; grid-template-columns:repeat(auto-fill,minmax(330px,1fr)); gap:16px; }
+  .zettel { background:#fff; border-radius:14px; padding:14px 16px; box-shadow:0 1px 4px rgba(0,0,0,.1); cursor:pointer; display:flex; flex-direction:column; gap:8px; }
+  .zettel .kopf { display:flex; align-items:center; gap:10px; }
+  .zettel .name { font-size:24px; font-weight:bold; color:var(--navy); }
+  .zettel .auf { margin-left:auto; background:var(--hell); color:var(--navy); font-size:14px; padding:3px 10px; border-radius:12px; }
+  .prompt { border-radius:10px; padding:10px 12px; font-size:20px; white-space:pre-wrap; word-wrap:break-word; }
+  .prompt.v1 { background:var(--hell); }
+  .prompt.v2 { background:var(--peach); border:2px solid var(--or); }
+  .prompt .label { display:block; font-size:14px; font-weight:bold; color:var(--grau); margin-bottom:2px; }
+  .leer { color:var(--grau); font-size:22px; text-align:center; padding:50px 10px; }
+  .gross { position:fixed; inset:0; background:rgba(20,33,61,.92); display:flex; align-items:center; justify-content:center; padding:30px; z-index:9; }
+  .gross .innen { background:#fff; border-radius:18px; padding:28px 32px; max-width:1500px; width:100%; max-height:92vh; overflow:auto; }
+  .gross .spalten { display:grid; grid-template-columns:1fr 1fr; gap:22px; }
+  .gross .prompt { font-size:32px; }
+  .lp { background:#FFF7E6; border:2px dashed var(--or); }
+  .status { font-size:14px; }
+  footer { text-align:center; font-size:14px; color:var(--grau); margin-top:30px; }
+  @media (max-width:700px) { .gross .spalten { grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>Prompt-Wand</h1>
+  <span id="kopfTier" class="tier" style="color:#fff;font-size:22px"></span>
+  <span class="info" id="kopfInfo">KI-Workshop · Deutsch KK9</span>
+</header>
+<main id="app"></main>
+<footer><span id="status" class="status"></span> · <a href="#" id="lpLink">Lehrperson</a></footer>
+
+<script>
+/* ========================================================================
+   Prompt-Wand für den KI-Workshop V2 (KK9)
+   Lernende: Aufgabe wählen, Prompt 1 schreiben, später Prompt 2 aus 3 Teilen bauen.
+   Wand (?ansicht=wand): alle Prompts live am Beamer, Kopieren für den KI-Chat der LP.
+   Lehrperson (Login wie im Arbeitsplan): Phase 2 freigeben, Zettel löschen, Wand leeren.
+   Datenschutz: Lernende erscheinen nur als Tiername (zufällig, nur auf dem eigenen Gerät
+   gespeichert), nie mit Namen oder Kürzel. Prompts sind für alle mit dem Link lesbar.
+   Datenbank: dieselbe wie der Arbeitsplan KK9, Pfad arbeitsplan/oeffentlich/promptwand.
+   ======================================================================== */
+const CONFIG = {
+  datenbank: "https://arbeitsplan-kk9-default-rtdb.europe-west1.firebasedatabase.app",
+  apiKey: "AIzaSyD42RiYUix8zElt_Qq1aeLliyg2xIuv898",   // nur fürs Lehrer-Login (wie im Arbeitsplan)
+  projekt: "arbeitsplan",
+  taktMs: 2000,
+};
+const PARAM = new URLSearchParams(location.search);
+const DEMO = !CONFIG.datenbank || PARAM.get("demo") === "1";
+const ANSICHT = PARAM.get("ansicht") === "wand" ? "wand" : "schueler";
+const SPEICHER = "promptwand_kk9.";
+
+const AUFGABEN = [
+  { id: "lehre", titel: "Lehre", text: "Ich will mich in der Schule gut auf die Lehre vorbereiten.",
+    bsp: ["Ich bin in der 3. Oberstufe. Im Sommer beginne ich eine Lehre.", "Schreibe mir 5 Dinge, die ich bis dahin in der Schule üben kann.", "Schreibe einfach. Als Liste. Höchstens 5 Punkte."] },
+  { id: "schnuppern", titel: "Schnupperlehre", text: "Ich will mich gut auf einen Schnuppertag vorbereiten.",
+    bsp: ["Ich bin in der Oberstufe. Nächste Woche gehe ich schnuppern.", "Gib mir 5 Tipps für den ersten Tag.", "Schreibe einfach. Als Liste. Mit einem Beispiel."] },
+  { id: "pruefung", titel: "Prüfung", text: "Ich will gut für eine Prüfung lernen.",
+    bsp: ["Ich bin in der Oberstufe. In 1 Woche habe ich eine Prüfung.", "Mach mir einen Lernplan für 5 Tage.", "Schreibe einfach. Pro Tag höchstens 2 Sätze."] },
+  { id: "eigene", titel: "Eigene Aufgabe", text: "Ich habe eine eigene Aufgabe.",
+    bsp: ["Ich bin … Ich möchte …", "Erkläre mir … / Schreibe mir … / Gib mir …", "Schreibe einfach. Höchstens 5 Punkte."] },
+];
+const TIERE = ["🦊 Fuchs", "🐻 Bär", "🦉 Eule", "🐼 Panda", "🐯 Tiger", "🦁 Löwe", "🐸 Frosch", "🐧 Pinguin",
+  "🐙 Krake", "🐢 Schildkröte", "🦈 Hai", "🐝 Biene", "🦋 Falter", "🐬 Delfin", "🦒 Giraffe", "🐘 Elefant",
+  "🦔 Igel", "🦜 Papagei", "🐺 Wolf", "🦩 Flamingo", "🐨 Koala", "🦦 Otter", "🐿️ Hörnchen", "🦓 Zebra"];
+const TEILE = [
+  { k: "ich", titel: "1  ICH", frage: "Wer bist du? Woran arbeitest du?", chips: ["Ich bin in der 3. Oberstufe.", "Ich möchte ", "Ich habe Mühe mit "] },
+  { k: "auftrag", titel: "2  AUFTRAG", frage: "Was soll die KI tun?", chips: ["Erkläre mir ", "Schreibe mir ", "Gib mir "] },
+  { k: "so", titel: "3  SO", frage: "Wie soll die Antwort sein?", chips: ["Schreibe einfach.", "Höchstens 5 Punkte.", "Als Liste.", "Mit einem Beispiel."] },
+];
+const MAX1 = 400, MAX2 = 600;
+
+/* ---------- Speicher (nur dieses Gerät) ---------- */
+const Speicher = {
+  lies(k, d) { try { const v = localStorage.getItem(SPEICHER + k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
+  schreib(k, v) { try { localStorage.setItem(SPEICHER + k, JSON.stringify(v)); } catch (e) {} },
+};
+
+/* ---------- Datenbank (REST), Demo-Modus nur im eigenen Browser ---------- */
+const Db = (() => {
+  let idToken = null, refreshToken = null, ablauf = 0;
+  const basis = () => CONFIG.datenbank.replace(/\/$/, "") + "/" + CONFIG.projekt + "/oeffentlich/";
+  const demoLies = () => Speicher.lies("demoDaten", { promptwand: {}, promptwandPhase: 1 });
+  function demoAnfrage(pfad, methode, wert) {
+    const d = demoLies(); const teile = pfad.split("/"); let o = d;
+    for (let i = 0; i < teile.length - 1; i++) { if (o[teile[i]] == null || typeof o[teile[i]] !== "object") o[teile[i]] = {}; o = o[teile[i]]; }
+    const letzt = teile[teile.length - 1];
+    if (methode === "GET") return { ok: true, daten: o[letzt] === undefined ? null : o[letzt] };
+    if (methode === "DELETE" || wert === null) delete o[letzt];
+    else if (methode === "PATCH") o[letzt] = Object.assign({}, o[letzt] || {}, wert);
+    else o[letzt] = wert;
+    Speicher.schreib("demoDaten", d);
+    return { ok: true, daten: wert };
+  }
+  async function erneuern() {
+    if (!refreshToken) return false;
+    try {
+      const a = await fetch("https://securetoken.googleapis.com/v1/token?key=" + encodeURIComponent(CONFIG.apiKey), {
+        method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: "grant_type=refresh_token&refresh_token=" + encodeURIComponent(refreshToken) });
+      if (!a.ok) { idToken = null; refreshToken = null; return false; }
+      const d = await a.json(); idToken = d.id_token; refreshToken = d.refresh_token; ablauf = Date.now() + Number(d.expires_in) * 1000;
+      sitzungMerken(); return true;
+    } catch (e) { return false; }
+  }
+  function sitzungMerken() { try { sessionStorage.setItem(SPEICHER + "sitzung", JSON.stringify({ refreshToken })); } catch (e) {} }
+  async function anfrage(pfad, methode, wert, ohneAuth) {
+    if (DEMO) return demoAnfrage(pfad, methode, wert);
+    if (idToken && Date.now() > ablauf - 120000) await erneuern();
+    let u = basis() + pfad + ".json";
+    if (idToken && !ohneAuth) u += "?auth=" + encodeURIComponent(idToken);
+    try {
+      const a = await fetch(u, { method: methode, cache: "no-store",
+        headers: wert !== undefined ? { "Content-Type": "application/json" } : undefined,
+        body: wert !== undefined ? JSON.stringify(wert) : undefined });
+      if (!a.ok) return { ok: false, status: a.status };
+      return { ok: true, daten: await a.json() };
+    } catch (e) { return { ok: false, status: 0 }; }
+  }
+  return {
+    lies: (p) => anfrage(p, "GET"),
+    schreib: (p, w) => anfrage(p, "PUT", w),
+    ergaenze: (p, w) => anfrage(p, "PATCH", w),
+    loesche: (p) => anfrage(p, "DELETE"),
+    schreibOhneLogin: (p, w) => anfrage(p, "PUT", w, true),
+    get angemeldet() { return DEMO ? Speicher.lies("demoLehrer", false) : !!idToken; },
+    async anmelden(mail, pw) {
+      if (DEMO) { Speicher.schreib("demoLehrer", true); return { ok: true }; }
+      try {
+        const a = await fetch("https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=" + encodeURIComponent(CONFIG.apiKey), {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: mail, password: pw, returnSecureToken: true }) });
+        const d = await a.json().catch(() => ({}));
+        if (!a.ok) return { ok: false, grund: /TOO_MANY/.test((d.error || {}).message || "") ? "Zu viele Versuche. Bitte kurz warten." : "E-Mail oder Passwort stimmt nicht." };
+        idToken = d.idToken; refreshToken = d.refreshToken; ablauf = Date.now() + Number(d.expiresIn) * 1000; sitzungMerken();
+        return { ok: true };
+      } catch (e) { return { ok: false, grund: "Kein Netz." }; }
+    },
+    async sitzungLaden() {
+      if (DEMO) return;
+      try { const s = JSON.parse(sessionStorage.getItem(SPEICHER + "sitzung") || "null"); if (s && s.refreshToken) { refreshToken = s.refreshToken; await erneuern(); } } catch (e) {}
+    },
+    abmelden() { idToken = null; refreshToken = null; Speicher.schreib("demoLehrer", false); try { sessionStorage.removeItem(SPEICHER + "sitzung"); } catch (e) {} },
+  };
+})();
+
+/* ---------- Hilfen ---------- */
+function el(tag, attr, ...kinder) {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(attr || {})) {
+    if (v == null || v === false) continue;
+    if (k.startsWith("on")) e.addEventListener(k.slice(2), v);
+    else if (k === "class") e.className = v;
+    else if (k === "text") e.textContent = v;
+    else e.setAttribute(k, v === true ? "" : v);
+  }
+  for (const c of kinder.flat()) if (c != null && c !== false) e.append(c instanceof Node ? c : document.createTextNode(String(c)));
+  return e;
+}
+const zufall = (n) => Array.from(crypto.getRandomValues(new Uint8Array(n)), (b) => "0123456789abcdefghijklmnopqrstuvwxyz"[b % 36]).join("");
+function setzeStatus(t) { document.getElementById("status").textContent = t; }
+async function kopieren(text, knopf) {
+  try { await navigator.clipboard.writeText(text); }
+  catch (e) { const t = el("textarea", {}); t.value = text; document.body.append(t); t.select(); document.execCommand("copy"); t.remove(); }
+  if (knopf) { const alt = knopf.textContent; knopf.textContent = "Kopiert ✓"; setTimeout(() => (knopf.textContent = alt), 1500); }
+}
+
+/* ---------- Zustand ---------- */
+const Z = { wand: {}, phase: 1, netz: "", meldung1: "", meldung2: "", gross: null, nurV1: false, regelnFehlen: false };
+function meineKarte() {
+  let k = Speicher.lies("karte", null);
+  if (!k || !/^k[0-9a-z]{8}$/.test(k.id)) {
+    const belegt = new Set(Object.values(Z.wand || {}).map((x) => x.tier));
+    const frei = TIERE.filter((t) => !belegt.has(t));
+    const liste = frei.length ? frei : TIERE;
+    k = { id: "k" + zufall(8), tier: liste[Math.floor(Math.random() * liste.length)], aufgabe: "", eigene: "", v1: "", teile: { ich: "", auftrag: "", so: "" } };
+    Speicher.schreib("karte", k);
+  }
+  return k;
+}
+const speichereKarte = (k) => Speicher.schreib("karte", k);
+const aufgabeVon = (id) => AUFGABEN.find((a) => a.id === id);
+const aufgabeText = (k) => { const a = aufgabeVon(k.aufgabe); return !a ? "" : a.id === "eigene" ? (k.eigene.trim() || "Eigene Aufgabe").slice(0, 60) : a.titel; };
+const prompt2 = (k) => TEILE.map((t) => (k.teile[t.k] || "").trim()).filter(Boolean).join(" ");
+
+/* ---------- Abgleich ---------- */
+async function holen() {
+  const [w, p] = await Promise.all([Db.lies("promptwand"), Db.lies("promptwandPhase")]);
+  if (w.ok) { Z.wand = w.daten || {}; Z.netz = "live"; } else Z.netz = w.status === 0 ? "offline" : "fehler";
+  if (p.ok) Z.phase = p.daten === 2 ? 2 : 1;
+  setzeStatus(DEMO ? "Demo (nur dieses Gerät)" : Z.netz === "live" ? "verbunden" : Z.netz === "offline" ? "kein Netz, versuche weiter …" : "Verbindung gestört");
+  zeichnen(false);
+}
+
+/* ---------- Lernende ---------- */
+let entwurfFokus = null;
+function ansichtSchueler() {
+  const k = meineKarte();
+  document.getElementById("kopfTier").textContent = "Du bist: " + k.tier;
+  const online = Z.wand[k.id] || null;
+  const out = [];
+
+  // Schritt 1: Aufgabe
+  out.push(el("section", { class: "karte" },
+    el("h2", { text: "1  Wähle deine Aufgabe" }),
+    el("div", { class: "aufgaben" }, AUFGABEN.map((a) => el("button", {
+      class: "aufgabe" + (k.aufgabe === a.id ? " gewaehlt" : ""), "data-aufgabe": a.id,
+      onclick: () => { k.aufgabe = a.id; speichereKarte(k); zeichnen(true); } }, el("b", { text: a.titel }), a.text))),
+    k.aufgabe === "eigene" ? el("div", { style: "margin-top:10px" },
+      el("input", { type: "text", maxlength: "60", placeholder: "Meine Aufgabe in 3 bis 6 Wörtern", value: k.eigene,
+        oninput: (e) => { k.eigene = e.target.value; speichereKarte(k); } })) : null));
+
+  // Schritt 2: Prompt 1
+  if (k.aufgabe) {
+    const ta = el("textarea", { id: "v1", maxlength: String(MAX1), placeholder: "Schreib deine Frage an die KI. So, wie du sie normalerweise stellst." });
+    ta.value = k.v1;
+    const z = el("div", { class: "zaehler", text: `${k.v1.length} / ${MAX1}` });
+    ta.addEventListener("input", () => { k.v1 = ta.value; speichereKarte(k); z.textContent = `${k.v1.length} / ${MAX1}`; });
+    out.push(el("section", { class: "karte" },
+      el("h2", { text: "2  Dein Prompt 1" }),
+      el("p", { class: "hinweis", text: "Schreib ohne Regeln. Keine Namen und keine Adressen." }),
+      ta, z,
+      el("div", { class: "zeile" },
+        el("button", { class: "primaer", id: "senden1", onclick: () => senden1(k) }, online && online.v1 ? "Neu an die Wand schicken" : "An die Wand schicken"),
+        Z.meldung1 ? el("span", { class: Z.meldung1.startsWith("✓") ? "ok" : "fehler", text: Z.meldung1 }) : null)));
+  }
+
+  // Schritt 3: Prompt 2 (erst wenn die Lehrperson freigibt)
+  if (k.aufgabe && online && online.v1) {
+    if (Z.phase !== 2) out.push(el("section", { class: "karte gesperrt" }, el("b", { text: "3  Prompt 2" }), " kommt gleich. Schau zuerst mit allen an die Wand."));
+    else {
+      const bsp = (aufgabeVon(k.aufgabe) || AUFGABEN[3]).bsp;
+      const vor = el("div", { class: "vorschau", id: "vorschau", text: prompt2(k) || "…" });
+      const teile = TEILE.map((t, i) => {
+        const inp = el("textarea", { id: "teil_" + t.k, maxlength: "200", placeholder: "z.B. " + bsp[i], style: "min-height:70px" });
+        inp.value = k.teile[t.k] || "";
+        inp.addEventListener("input", () => { k.teile[t.k] = inp.value; speichereKarte(k); vor.textContent = prompt2(k) || "…"; });
+        inp.addEventListener("focus", () => (entwurfFokus = t.k));
+        return el("div", { class: "teil" }, el("h3", { text: t.titel }), el("div", { class: "hinweis", text: t.frage }),
+          el("div", { class: "chips" }, t.chips.map((c) => el("button", { class: "chip", onclick: () => {
+            const alt = (k.teile[t.k] || "").trim(); k.teile[t.k] = (alt ? alt + " " : "") + c; speichereKarte(k); zeichnen(true);
+            const neu = document.getElementById("teil_" + t.k); if (neu) { neu.focus(); neu.selectionStart = neu.selectionEnd = neu.value.length; } } }, c))),
+          inp);
+      });
+      out.push(el("section", { class: "karte" },
+        el("h2", { text: "3  Dein Prompt 2: gleiche Aufgabe, 3 Teile" }),
+        el("p", { class: "hinweis" }, "Dein Prompt 1: ", el("i", { text: online.v1 })),
+        teile,
+        el("h3", { text: "So sieht dein Prompt 2 aus:", style: "margin:14px 0 6px;font-size:19px;color:#14213D" }), vor,
+        el("div", { class: "zeile" },
+          el("button", { class: "primaer", id: "senden2", onclick: () => senden2(k) }, online.v2 ? "Neu an die Wand schicken" : "Prompt 2 an die Wand schicken"),
+          Z.meldung2 ? el("span", { class: Z.meldung2.startsWith("✓") ? "ok" : "fehler", text: Z.meldung2 }) : null)));
+    }
+  }
+  return out;
+}
+function meldungAus(r) {
+  if (r.ok) return "✓ An der Wand.";
+  if (r.status === 401 || r.status === 403) return "Die Wand ist noch nicht freigeschaltet. Sag es der Lehrperson.";
+  return "Kein Netz. Versuch es gleich nochmals.";
+}
+async function senden1(k) {
+  const t = (k.v1 || "").trim();
+  if (!t) { Z.meldung1 = "Schreib zuerst deinen Prompt."; return zeichnen(true); }
+  const knopf = document.getElementById("senden1"); if (knopf) knopf.disabled = true;
+  const r = await Db.ergaenze("promptwand/" + k.id, { tier: k.tier, aufgabe: aufgabeText(k), v1: t.slice(0, MAX1), z: Date.now() });
+  Z.meldung1 = meldungAus(r); if (r.ok) await holen(); else zeichnen(true);
+}
+async function senden2(k) {
+  const t = prompt2(k);
+  if (!t) { Z.meldung2 = "Füll zuerst die 3 Teile aus."; return zeichnen(true); }
+  const fehlt = TEILE.filter((x) => !(k.teile[x.k] || "").trim()).map((x) => x.titel.replace(/^\d\s+/, ""));
+  const knopf = document.getElementById("senden2"); if (knopf) knopf.disabled = true;
+  const r = await Db.ergaenze("promptwand/" + k.id, { tier: k.tier, v2: t.slice(0, MAX2), z: (Z.wand[k.id] || {}).z || Date.now() });
+  Z.meldung2 = meldungAus(r) + (r.ok && fehlt.length ? " Tipp: Es fehlt noch " + fehlt.join(" und ") + "." : "");
+  if (r.ok) await holen(); else zeichnen(true);
+}
+
+/* ---------- Wand (Beamer) und Lehrperson ---------- */
+function promptBlock(label, text, klasse) {
+  const knopf = el("button", { class: "klein", onclick: (e) => { e.stopPropagation(); kopieren(text, e.target); } }, "Kopieren");
+  return el("div", { class: "prompt " + klasse }, el("span", { class: "label" }, label, " ", knopf), text);
+}
+function ansichtWand() {
+  document.getElementById("kopfTier").textContent = "";
+  const lp = Db.angemeldet;
+  const zettel = Object.entries(Z.wand).filter(([, x]) => x && x.v1).sort((a, b) => (a[1].z || 0) - (b[1].z || 0));
+  const out = [];
+  const adresse = location.origin + location.pathname;
+  out.push(el("div", { class: "leiste" },
+    el("span", { class: "titel" }, `${zettel.length} Prompts`, Z.phase === 2 ? " · Prompt 2 ist offen" : ""),
+    el("span", { class: "hinweis", style: "margin:0", text: adresse.replace(/^https?:\/\//, "") }),
+    el("button", { class: "klein", onclick: () => { Z.nurV1 = !Z.nurV1; zeichnen(true); } }, Z.nurV1 ? "Prompt 1 und 2 zeigen" : "Nur Prompt 1 zeigen")));
+  if (lp) out.push(el("section", { class: "karte lp" },
+    el("b", { text: "Lehrperson: " }),
+    el("span", { text: Z.phase === 2 ? "Prompt 2 ist für alle offen. " : "Phase 1: Nur Prompt 1 ist offen. " }),
+    el("div", { class: "zeile" },
+      Z.phase === 2 ? el("button", { onclick: () => setzePhase(1) }, "Prompt 2 wieder schliessen")
+                    : el("button", { class: "primaer", onclick: () => setzePhase(2) }, "Prompt 2 freigeben"),
+      el("button", { onclick: herunterladen }, "Wand als Text herunterladen"),
+      el("button", { class: "gefahr", onclick: leeren }, "Wand leeren"),
+      el("button", { class: "klein", onclick: () => { Db.abmelden(); zeichnen(true); } }, "Abmelden")),
+    Z.regelnFehlen ? el("p", { class: "fehler" }, "Die Lernenden können noch nicht schreiben: Die Datenbank braucht die neuen Regeln. Öffne den Arbeitsplan als Lehrperson → Karte «Regeln aktualisieren» → Regeln kopieren und in Firebase einfügen.") : null));
+  if (!zettel.length) out.push(el("div", { class: "leer" }, "Noch keine Prompts. Scanne den QR-Code und schreib deinen Prompt 1."));
+  out.push(el("div", { class: "wand" }, zettel.map(([id, x]) => el("div", { class: "zettel", "data-id": id, onclick: () => { Z.gross = id; zeichnen(true); } },
+    el("div", { class: "kopf" }, el("span", { class: "name", text: x.tier }), x.aufgabe ? el("span", { class: "auf", text: x.aufgabe }) : null,
+      lp ? el("button", { class: "klein gefahr", title: "Zettel löschen", onclick: (e) => { e.stopPropagation(); loeschen(id, x.tier); } }, "×") : null),
+    promptBlock("Prompt 1", x.v1, "v1"),
+    !Z.nurV1 && x.v2 ? promptBlock("Prompt 2", x.v2, "v2") : null))));
+  if (Z.gross && Z.wand[Z.gross]) {
+    const x = Z.wand[Z.gross];
+    out.push(el("div", { class: "gross", onclick: () => { Z.gross = null; zeichnen(true); } },
+      el("div", { class: "innen", onclick: (e) => e.stopPropagation() },
+        el("div", { class: "zeile", style: "margin:0 0 16px" }, el("span", { class: "name tier", text: x.tier }), x.aufgabe ? el("span", { class: "auf", style: "font-size:20px", text: "· " + x.aufgabe }) : null,
+          el("button", { style: "margin-left:auto", onclick: () => { Z.gross = null; zeichnen(true); } }, "Schliessen")),
+        el("div", { class: "spalten" }, promptBlock("Prompt 1", x.v1, "v1"), x.v2 && !Z.nurV1 ? promptBlock("Prompt 2", x.v2, "v2") : el("div", { class: "prompt v1", style: "opacity:.4" }, el("span", { class: "label", text: "Prompt 2" }), "kommt noch")))));
+  }
+  return out;
+}
+async function setzePhase(p) { const r = await Db.schreib("promptwandPhase", p); if (!r.ok) alert("Nicht gespeichert (" + (r.status || "kein Netz") + ")."); await holen(); }
+async function loeschen(id, tier) { if (!confirm(`Zettel von ${tier} löschen?`)) return; await Db.loesche("promptwand/" + id); await holen(); }
+function textExport() {
+  return Object.values(Z.wand).filter((x) => x && x.v1).sort((a, b) => (a.z || 0) - (b.z || 0))
+    .map((x) => `${x.tier} (${x.aufgabe || "-"})\nPrompt 1: ${x.v1}\nPrompt 2: ${x.v2 || "-"}\n`).join("\n");
+}
+function herunterladen() {
+  const d = new Date(), tag = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  const a = el("a", { href: URL.createObjectURL(new Blob([textExport()], { type: "text/plain;charset=utf-8" })), download: `promptwand_${tag}.txt` });
+  document.body.append(a); a.click(); a.remove();
+}
+async function leeren() {
+  if (!confirm("Alle Prompts löschen? Tipp: zuerst «Wand als Text herunterladen».")) return;
+  await Db.loesche("promptwand"); await Db.schreib("promptwandPhase", 1); await holen();
+}
+/* Können Lernende ohne Login schreiben? (fehlt, solange die neuen Regeln nicht eingespielt sind) */
+async function regelnPruefen() {
+  if (DEMO) return;
+  const r = await Db.schreibOhneLogin("promptwand/k00000000", { tier: "Test", z: 1 });
+  Z.regelnFehlen = !r.ok && (r.status === 401 || r.status === 403);
+  if (r.ok) await Db.loesche("promptwand/k00000000");
+}
+
+/* ---------- Login-Dialog ---------- */
+function loginDialog() {
+  const m = el("input", { type: "email", placeholder: "E-Mail", autocomplete: "username" });
+  const p = el("input", { type: "password", placeholder: "Passwort", autocomplete: "current-password" });
+  const f = el("p", { class: "fehler" });
+  const box = el("div", { class: "gross" }, el("div", { class: "innen", style: "max-width:520px" },
+    el("h2", { text: "Lehrperson anmelden" }), el("p", { class: "hinweis", text: "Gleiches Konto wie im Arbeitsplan." }),
+    m, el("div", { style: "height:10px" }), p, f,
+    el("div", { class: "zeile" },
+      el("button", { class: "primaer", onclick: async () => {
+        const r = await Db.anmelden(m.value.trim(), p.value);
+        if (!r.ok) { f.textContent = r.grund; return; }
+        box.remove(); if (ANSICHT !== "wand") { location.href = location.pathname + "?ansicht=wand"; return; }
+        await regelnPruefen(); zeichnen(true); } }, "Anmelden"),
+      el("button", { onclick: () => box.remove() }, "Abbrechen"))));
+  document.body.append(box); m.focus();
+}
+document.getElementById("lpLink").addEventListener("click", (e) => { e.preventDefault(); loginDialog(); });
+
+/* ---------- Zeichnen ---------- */
+function zeichnen(erzwingen) {
+  // Während jemand tippt, nicht neu zeichnen (sonst springt der Cursor); die Wand zeichnet immer.
+  const a = document.activeElement;
+  if (!erzwingen && ANSICHT === "schueler" && a && (a.tagName === "TEXTAREA" || a.tagName === "INPUT")) return;
+  const app = document.getElementById("app");
+  app.className = ANSICHT === "wand" ? "breit" : "";
+  app.replaceChildren(...(ANSICHT === "wand" ? ansichtWand() : ansichtSchueler()));
+  document.getElementById("kopfInfo").textContent = ANSICHT === "wand" ? "KI-Workshop · Deutsch KK9 · Beamer" : "KI-Workshop · Deutsch KK9";
+}
+
+(async () => {
+  await Db.sitzungLaden();
+  if (ANSICHT === "wand" && Db.angemeldet) await regelnPruefen();
+  await holen();
+  setInterval(() => { if (!document.hidden) holen(); }, CONFIG.taktMs);
+})();
+</script>
+</body>
+</html>
